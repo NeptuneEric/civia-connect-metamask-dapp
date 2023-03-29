@@ -16,7 +16,7 @@ export const silentConnectWallet = async () => {
 
 export const connectWallet = async () => {
   const windowStarknet = await connect({
-    include: ["argentX"],
+    include: ["civia", 'argentX'],
   })
   await windowStarknet?.enable({ starknetVersion: "v4" } as any)
   return windowStarknet
@@ -41,7 +41,9 @@ export const networkId = (): Network | undefined => {
       return "mainnet-alpha"
     } else if (chainId === constants.StarknetChainId.TESTNET) {
       return "goerli-alpha"
-    } else {
+    } else if (chainId === constants.StarknetChainId.TESTNET2) 
+      return "goerli2-alpha"
+    else {
       return "localhost"
     }
   } catch {}
@@ -68,6 +70,8 @@ export const getExplorerBaseUrl = (): string | undefined => {
   if (network === "mainnet-alpha") {
     return "https://voyager.online"
   } else if (network === "goerli-alpha") {
+    return "https://goerli.voyager.online"
+  } else if (network === "goerli2-alpha") {
     return "https://goerli.voyager.online"
   }
 }

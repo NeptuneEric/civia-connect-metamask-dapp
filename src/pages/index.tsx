@@ -64,17 +64,17 @@ const Home: NextPage = () => {
       setAccount(wallet.account)
     }
     setSupportsSessions(null)
-    if (wallet?.selectedAddress) {
-      const sessionSupport = await supportsSessions(
-        wallet.selectedAddress,
-        wallet.provider,
-      )
-      console.log(
-        "🚀 ~ file: index.tsx ~ line 72 ~ handleConnectClick ~ sessionSupport",
-        sessionSupport,
-      )
-      setSupportsSessions(sessionSupport)
-    }
+    // if (wallet?.selectedAddress) {
+    //   const sessionSupport = await supportsSessions(
+    //     wallet.selectedAddress,
+    //     wallet.provider,
+    //   )
+    //   console.log(
+    //     "🚀 ~ file: index.tsx ~ line 72 ~ handleConnectClick ~ sessionSupport",
+    //     sessionSupport,
+    //   )
+    //   setSupportsSessions(sessionSupport)
+    // }
   }
 
   return (
