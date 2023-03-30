@@ -1,0 +1,16 @@
+.step_body{
+    margin: 44px auto;
+    width:100%;
+}
+.step_desc{
+    padding-left:8px;
+}
+.step_desc button{
+    width: 150px;
+    text-align:center;
+}
+
+.text_break{
+    word-break: break-all;
+    white-space: normal;
+}

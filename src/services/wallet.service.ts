@@ -16,7 +16,7 @@ export const silentConnectWallet = async () => {
 
 export const connectWallet = async () => {
   const windowStarknet = await connect({
-    include: ["civia", 'argentX'],
+    include: ["civia"],
   })
   await windowStarknet?.enable({ starknetVersion: "v4" } as any)
   return windowStarknet
@@ -96,7 +96,7 @@ export const signMessage = async (message: string) => {
   return starknet.account.signMessage({
     domain: {
       name: "Example DApp",
-      chainId: networkId() === "mainnet-alpha" ? "SN_MAIN" : "SN_GOERLI",
+      chainId: networkId() === "mainnet-alpha" ? "SN_MAIN" : "SN_GOERLI2",
       version: "0.0.1",
     },
     types: {
