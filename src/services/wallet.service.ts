@@ -4,7 +4,7 @@ import { CompiledContract, constants, shortString } from "starknet"
 import { Network } from "./token.service"
 
 export const silentConnectWallet = async () => {
-  const windowStarknet = await connect({ showList: false })
+  const windowStarknet = await connect({ include: ["civia"], showList: false })
   if (!windowStarknet?.isConnected) {
     await windowStarknet?.enable({
       showModal: false,
@@ -15,11 +15,15 @@ export const silentConnectWallet = async () => {
 }
 
 export const connectWallet = async () => {
-  const windowStarknet = await connect({
-    include: ["civia"],
-  })
-  await windowStarknet?.enable({ starknetVersion: "v4" } as any)
-  return windowStarknet
+ try{
+    const windowStarknet = await connect({
+      include: ["civia"],
+    })
+    await windowStarknet?.enable({ starknetVersion: "v4" } as any)
+    return windowStarknet
+  }catch(e){
+    console.log(e);
+  }
 }
 
 export const walletAddress = async (): Promise<string | undefined> => {
