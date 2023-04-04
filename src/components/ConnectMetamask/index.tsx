@@ -5,6 +5,7 @@ import { AccountInterface } from 'starknet';
 import { useConnect, useAccount, useSignMessage } from 'wagmi';
 import { verifyMessage } from 'ethers/lib/utils';
 import axios from 'axios';
+import civiaAccountAbi from '../../../abi/ArgentAccount.json';
 
 import { truncateHex } from '../../services/address.service';
 
@@ -92,26 +93,36 @@ const ConnectMetamask: FC<any> = () => {
 
     useEffect(() => {
         if(civiaWalletAddress && metamaskAddress && signData){
-            console.log(
-                'start bind'
-            );
-            setIsLoading(true);
-            bindTwoAddress(civiaWalletAddress, metamaskAddress!).then(({ code, msg }) => {
-                if(code === 0){
-                    messageApi.open({
-                        type: 'success',
-                        content: 'bind success',
-                      });
-                      setCurrent(3);
-                }else {
-                    messageApi.open({
-                        type: 'error',
-                        content: msg,
-                      });
-                }
-            }).finally(() => {
-                setIsLoading(false);
-            });
+            const transactions = {
+                contractAddress: civiaWalletAddress,
+                entrypoint: "bindAddress",
+                calldata: [metamaskAddress, '1'],
+            };
+
+            sendMessage({ type: 'OPEN_UI'}, extensionId);
+            sendMessage({
+                    type: "EXECUTE_TRANSACTION",
+                    data: {
+                        transactions
+                    }
+                }, extensionId);
+            // setIsLoading(true);
+            // bindTwoAddress(civiaWalletAddress, metamaskAddress!).then(({ code, msg }) => {
+            //     if(code === 0){
+            //         messageApi.open({
+            //             type: 'success',
+            //             content: 'bind success',
+            //           });
+            //           setCurrent(3);
+            //     }else {
+            //         messageApi.open({
+            //             type: 'error',
+            //             content: msg,
+            //           });
+            //     }
+            // }).finally(() => {
+            //     setIsLoading(false);
+            // });
         }
     }, [civiaWalletAddress, metamaskAddress, signData, messageApi]);
 
