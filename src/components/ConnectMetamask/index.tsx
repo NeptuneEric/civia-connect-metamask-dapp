@@ -50,35 +50,40 @@ export const bindExtraAddress = async (data: { account: string, extraAddress: st
 };
 
 const ConnectMetamask: FC<any> = () => {
+    const locationSearch = new URLSearchParams(location.search);
     const [isLoading, setIsLoading] = useState(false);
     const [current, setCurrent] = useState(0);
     const [messageApi, contextHolder] = message.useMessage();
     const [extensionId, setExtensionId] = useState('');
-    const [civiaWalletAddress, setCiviaWalletAddress] = useState<string>();
+    const [civiaWalletAddress, setCiviaWalletAddress] = useState<string | undefined | null>(locationSearch.get('civiaAddress'));
     const [supportSessions, setSupportsSessions] = useState<boolean | null>(null);
     const [chain, setChain] = useState(civiaChainId());
-    const [isCiviaConnected, setIsCiviaConnected] = useState(false);
+    const [isCiviaConnected, setIsCiviaConnected] = useState(civiaWalletAddress? true: false);
     const [civiaAccount, setCiviaAccount] = useState<AccountInterface | null>(null);
     //
     const { connect: metaMaskConnect, connectors: metaMaskConnectors, error: ucError, isLoading: ucIsLoading, pendingConnector } = useConnect();
     const { data: signData, error: usmError, isLoading: usmIsLoading, signMessage: metaMaskSignMessage } = useSignMessage();
     const { isConnected: isMetaMaskConnected, address: metamaskAddress } = useAccount();
 
+    console.log('----' + civiaWalletAddress);
+
+    
+
     //
-    const handleConnectCiviaClick = async (silence: Boolean = false) => {
-        const wallet = await (silence ? silentConnectCiviaWallet(): connectCiviaWallet());
-        setCiviaWalletAddress(wallet?.selectedAddress)
-        setChain(civiaChainId())
-        setIsCiviaConnected(!!wallet?.isConnected)
-        if (wallet?.account) {
-            setCiviaAccount(wallet.account)
-        }
-        setSupportsSessions(null)
-    }
-    //
-    useEffect(() => {
-        handleConnectCiviaClick(true);
-    }, []);
+    // const handleConnectCiviaClick = async (silence: Boolean = false) => {
+    //     const wallet = await (silence ? silentConnectCiviaWallet(): connectCiviaWallet());
+    //     setCiviaWalletAddress(wallet?.selectedAddress)
+    //     setChain(civiaChainId())
+    //     setIsCiviaConnected(!!wallet?.isConnected)
+    //     if (wallet?.account) {
+    //         setCiviaAccount(wallet.account)
+    //     }
+    //     setSupportsSessions(null)
+    // }
+    // //
+    // useEffect(() => {
+    //     handleConnectCiviaClick(true);
+    // }, []);
 
     useEffect(() => {
         const extensionId = document.getElementById('argent-x-extension')?.getAttribute('data-extension-id');
@@ -151,7 +156,7 @@ const ConnectMetamask: FC<any> = () => {
                         title: 'Connect Civia',
                         description: isCiviaConnected ? (
                                 <div className={styles.step_desc}>Wallet address: <code>{civiaWalletAddress && truncateHex(civiaWalletAddress)}</code></div>
-                            ): <div className={styles.step_desc}><Button type='primary' onClick={() => {handleConnectCiviaClick();}}>Connect</Button></div>,
+                            ): <div className={styles.step_desc}><Button type='primary' >Connect</Button></div>,
                     },
                     // {
                     //     title: 'Civia sign message',
