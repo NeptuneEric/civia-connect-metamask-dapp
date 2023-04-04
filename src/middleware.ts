@@ -19,7 +19,8 @@ export default async function getSessionToken(
             mode: 'cors',
             headers: {
                 "Content-Type": "application/json",
-                ...request.headers
+                ...request.headers,
+                origin: ''
             },
             body: request.body || "{}"
         });
@@ -31,7 +32,8 @@ export default async function getSessionToken(
             mode: 'cors',
             headers: {
                 "Content-Type": "application/json",
-                ...request.headers
+                ...request.headers,
+                origin: ''
             },
             body: request.body || "{}"
         });
