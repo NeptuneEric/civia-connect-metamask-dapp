@@ -16,6 +16,7 @@ export default async function getSessionToken(
     if(url.pathname.startsWith('/api/getSessionToken')){
         const res = await fetch('http://101.132.135.175:5000/getSessionToken', {
             method: 'POST',
+            mode: 'cors',
             headers: {
                 "Content-Type": "application/json",
                 ...request.headers
@@ -27,6 +28,7 @@ export default async function getSessionToken(
         console.log(request.body);
         const res = await fetch('http://101.132.135.175:5000/app/mockBind', {
             method: 'POST',
+            mode: 'cors',
             headers: {
                 "Content-Type": "application/json",
                 ...request.headers
