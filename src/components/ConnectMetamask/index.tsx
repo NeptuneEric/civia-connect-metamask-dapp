@@ -25,7 +25,7 @@ export const getSessionToken = async ({ account }: any) => {
     if (token) {
         return token;
     } else {
-        const res = await axios.post('http://101.132.135.175:5000/getSessionToken', { account });
+        const res = await axios.post('/api/getSessionToken', { account });
         window.localStorage.setItem(key, res.headers['session-token'] || '');
         return res;
     }
@@ -34,7 +34,7 @@ export const getSessionToken = async ({ account }: any) => {
 export const bindExtraAddress = async (data: { account: string, extraAddress: string }) => {
     const { account, extraAddress } = data;
     const key = `${account},token`;
-    const response = await axios.post('http://101.132.135.175:5000/app/mockBind',
+    const response = await axios.post('/api/app/mockBind',
         {
             civia_address: account,
             metamast_address: extraAddress
