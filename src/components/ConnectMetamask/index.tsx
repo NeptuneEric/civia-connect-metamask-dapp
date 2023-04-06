@@ -82,7 +82,7 @@ const ConnectMetamask: FC<any> = () => {
     }
     //
     useEffect(() => {
-        handleConnectCiviaClick(true);
+        !civiaWalletAddress && handleConnectCiviaClick(true);
     }, []);
 
     useEffect(() => {
