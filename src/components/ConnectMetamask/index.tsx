@@ -54,7 +54,6 @@ const ConnectMetamask: FC<any> = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [current, setCurrent] = useState(0);
     const [messageApi, contextHolder] = message.useMessage();
-    const [extensionId, setExtensionId] = useState('');
     const [civiaWalletAddress, setCiviaWalletAddress] = useState<string | undefined | null>(locationSearch.get('civiaAddress'));
     const [supportSessions, setSupportsSessions] = useState<boolean | null>(null);
     const [chain, setChain] = useState(civiaChainId());
@@ -85,11 +84,6 @@ const ConnectMetamask: FC<any> = () => {
         !civiaWalletAddress && handleConnectCiviaClick(true);
     }, []);
 
-    useEffect(() => {
-        const extensionId = document.getElementById('argent-x-extension')?.getAttribute('data-extension-id');
-        setExtensionId(extensionId!);
-    }, []);
-
     const bindTwoAddress = async (civiaWalletAddress: string, metamaskAddress: string ) => {
         await getSessionToken({ account: civiaWalletAddress });
         const bindRes = await bindExtraAddress({ account: civiaWalletAddress, extraAddress: metamaskAddress });
@@ -104,13 +98,15 @@ const ConnectMetamask: FC<any> = () => {
                 calldata: [metamaskAddress, '1'],
             };
 
-            sendMessage({ type: 'OPEN_UI'}, extensionId);
+            const extensionId = document.getElementById('argent-x-extension')?.getAttribute('data-extension-id');
+
+            sendMessage({ type: 'OPEN_UI'}, extensionId!);
             sendMessage({
                     type: "EXECUTE_TRANSACTION",
                     data: {
                         transactions
                     }
-                }, extensionId);
+                }, extensionId!);
             // setIsLoading(true);
             // bindTwoAddress(civiaWalletAddress, metamaskAddress!).then(({ code, msg }) => {
             //     if(code === 0){
