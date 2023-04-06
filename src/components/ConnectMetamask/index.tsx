@@ -70,20 +70,20 @@ const ConnectMetamask: FC<any> = () => {
     
 
     //
-    // const handleConnectCiviaClick = async (silence: Boolean = false) => {
-    //     const wallet = await (silence ? silentConnectCiviaWallet(): connectCiviaWallet());
-    //     setCiviaWalletAddress(wallet?.selectedAddress)
-    //     setChain(civiaChainId())
-    //     setIsCiviaConnected(!!wallet?.isConnected)
-    //     if (wallet?.account) {
-    //         setCiviaAccount(wallet.account)
-    //     }
-    //     setSupportsSessions(null)
-    // }
-    // //
-    // useEffect(() => {
-    //     handleConnectCiviaClick(true);
-    // }, []);
+    const handleConnectCiviaClick = async (silence: Boolean = false) => {
+        const wallet = await (silence ? silentConnectCiviaWallet(): connectCiviaWallet());
+        setCiviaWalletAddress(wallet?.selectedAddress)
+        setChain(civiaChainId())
+        setIsCiviaConnected(!!wallet?.isConnected)
+        if (wallet?.account) {
+            setCiviaAccount(wallet.account)
+        }
+        setSupportsSessions(null)
+    }
+    //
+    useEffect(() => {
+        handleConnectCiviaClick(true);
+    }, []);
 
     useEffect(() => {
         const extensionId = document.getElementById('argent-x-extension')?.getAttribute('data-extension-id');
@@ -156,7 +156,7 @@ const ConnectMetamask: FC<any> = () => {
                         title: 'Connect Civia',
                         description: isCiviaConnected ? (
                                 <div className={styles.step_desc}>Wallet address: <code>{civiaWalletAddress && truncateHex(civiaWalletAddress)}</code></div>
-                            ): <div className={styles.step_desc}><Button type='primary' >Connect</Button></div>,
+                            ): <div className={styles.step_desc}><Button type='primary' onClick={() => {handleConnectCiviaClick();}} >Connect</Button></div>,
                     },
                     // {
                     //     title: 'Civia sign message',
