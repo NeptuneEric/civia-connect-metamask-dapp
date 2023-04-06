@@ -98,7 +98,7 @@ const ConnectMetamask: FC<any> = () => {
                 calldata: [metamaskAddress, '1'],
             };
 
-            const extensionId = document.getElementById('argent-x-extension')?.getAttribute('data-extension-id');
+            const extensionId = document.getElementById('civia-extension')?.getAttribute('data-extension-id');
 
             sendMessage({ type: 'OPEN_UI'}, extensionId!);
             sendMessage({
