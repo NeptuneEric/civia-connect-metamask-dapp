@@ -99,7 +99,7 @@ const ConnectMetamask: FC<any> = () => {
     useEffect(() => {
         if(civiaWalletAddress){
             setIsLoading(true);
-            getAllBindAddress(civiaWalletAddress, 1).then((result) => {
+            getAllBindAddress(civiaWalletAddress).then((result) => {
                 result && setAllBindedAddress(result);
             }).finally(() => {
                 setIsLoading(false);
@@ -109,7 +109,7 @@ const ConnectMetamask: FC<any> = () => {
 
     useInterval(() => {
         if(civiaWalletAddress){
-            getAllBindAddress(civiaWalletAddress, 2).then((result) => {
+            getAllBindAddress(civiaWalletAddress).then((result) => {
                 result && setAllBindedAddress(result);
             });
         }
