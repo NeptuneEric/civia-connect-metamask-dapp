@@ -13,18 +13,18 @@ const Footer: FC<any> = () => {
             <div className={styles.right}>
                 <div className={styles.list}>
                     <h1>Contact Us</h1>
-                    <p>Civia.org</p>
-                    <p>@CIVIA</p>
+                    <p onClick={() => {location.href='https://civia.org/';}}>Civia.org</p>
+                    {/* <p>@CIVIA</p> */}
                 </div>
-                <div className={styles.list}>
+                {/* <div className={styles.list}>
                     <h1>Common Problem</h1>
                     <p className="cur">What is CIVIA?</p>
                     <p className="cur">What is $CIV?</p>
-                </div>
+                </div> */}
                 <div className={styles.list}>
                     <h1>Terms &amp; Agreements</h1>
-                    <p>Platform User Service Agreement</p>
-                    <p>Privacy Term</p>
+                    {/* <p>Platform User Service Agreement</p>
+                    <p>Privacy Term</p> */}
                 </div>
             </div>
         </div>

@@ -167,7 +167,7 @@ const ConnectMetamask: FC<any> = () => {
                         current={current}
                         items={[
                         {
-                            title: isCiviaConnected ? locationSearch.get('nickName') : 'Connect Civia',
+                            title: isCiviaConnected ? `Civia Account: ${locationSearch.get('nickName') || 'Unknow'}` : 'Connect Civia',
                             description: isCiviaConnected ? (
                                     <div className={styles.step_desc}>Wallet address: <code>{civiaWalletAddress && truncateHex(civiaWalletAddress)}</code></div>
                                 ): <div className={styles.step_desc}><Button type='primary' onClick={() => {handleConnectCiviaClick();}} >Connect</Button></div>,
