@@ -111,6 +111,8 @@ const ConnectMetamask: FC<any> = () => {
         if(civiaWalletAddress){
             getAllBindAddress(civiaWalletAddress).then((result) => {
                 result && setAllBindedAddress(result);
+            }).finally(() => {
+                setIsLoading(false);
             });
         }
     }, 5e3);
