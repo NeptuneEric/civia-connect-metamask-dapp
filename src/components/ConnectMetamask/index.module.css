@@ -1,7 +1,21 @@
 .title{
     text-align:center;
-    --line-height: 50px;
+    --line-height: 80px;
     font-size:32px;
+    background:#DEFAE1;
+    font-family: p-Bold;
+    color: rgba(0, 125, 40, 1);
+    font-size:42px;
+    white-space: nowrap;
+    font-weight: bold;
+    padding: 30px 0;
+}
+.step_card{
+    max-width: 500px;
+    margin:32px auto;
+}
+.step_card .ant-card{
+    box-shadow: unset;
 }
 .step_body{
     margin: 44px auto;
@@ -18,4 +32,26 @@
 .text_break{
     word-break: break-all;
     white-space: normal;
+}
+
+.connected{
+    position:relative;
+}
+.connected>div{
+    display:inline-block;
+    border-radius:100%;
+    overflow:hidden;
+}
+.connected>div:nth-of-type(2){
+    position: absolute;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.8);
+    left: 23px;
+    margin: auto;
+    width: 16px;
+    height: 16px;
+    text-align: center;
+    line-height: 16px;
+    top: 9px;
+    font-size: 12px;
 }
