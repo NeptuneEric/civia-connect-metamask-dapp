@@ -1,11 +1,12 @@
 import { FC, useEffect, useState, useRef } from 'react';
 import { Button, Steps, Card, Space, Spin, message } from 'antd';
+import { LinkOutlined } from '@ant-design/icons';
 import styles from './index.module.css';
-import { AccountInterface } from 'starknet';
+import { AccountInterface, Provider, number } from 'starknet';
 import { useConnect, useAccount, useSignMessage } from 'wagmi';
+import { useInterval } from 'ahooks';
 import { verifyMessage } from 'ethers/lib/utils';
 import axios from 'axios';
-import civiaAccountAbi from '../../../abi/ArgentAccount.json';
 
 import { truncateHex } from '../../services/address.service';
 
@@ -18,6 +19,9 @@ import {
   const sendMessage = (msg: any, extensionId: string) => {
     return window.postMessage({ ...msg, extensionId }, window.location.origin);
 }
+
+const provider = new Provider();
+
 
 export const getSessionToken = async ({ account }: any) => {
     const key = `${account},token`;
@@ -59,14 +63,11 @@ const ConnectMetamask: FC<any> = () => {
     const [chain, setChain] = useState(civiaChainId());
     const [isCiviaConnected, setIsCiviaConnected] = useState(civiaWalletAddress? true: false);
     const [civiaAccount, setCiviaAccount] = useState<AccountInterface | null>(null);
+    const [allBindedAddress, setAllBindedAddress] = useState<string[]>([]);
     //
     const { connect: metaMaskConnect, connectors: metaMaskConnectors, error: ucError, isLoading: ucIsLoading, pendingConnector } = useConnect();
     const { data: signData, error: usmError, isLoading: usmIsLoading, signMessage: metaMaskSignMessage } = useSignMessage();
     const { isConnected: isMetaMaskConnected, address: metamaskAddress } = useAccount();
-
-    console.log('----' + civiaWalletAddress);
-
-    
 
     //
     const handleConnectCiviaClick = async (silence: Boolean = false) => {
@@ -79,19 +80,45 @@ const ConnectMetamask: FC<any> = () => {
         }
         setSupportsSessions(null)
     }
+
+    //
+    const getAllBindAddress = (civiaWalletAddress: string) => {
+        return provider.callContract({
+            contractAddress: civiaWalletAddress.toLowerCase(),
+            entrypoint: 'getAllBindedAddrss',
+            calldata: []
+        }).then(({ result }) => {
+            return result.slice(1);
+        });
+    }
     //
     useEffect(() => {
         !civiaWalletAddress && handleConnectCiviaClick(true);
     }, []);
 
-    const bindTwoAddress = async (civiaWalletAddress: string, metamaskAddress: string ) => {
-        await getSessionToken({ account: civiaWalletAddress });
-        const bindRes = await bindExtraAddress({ account: civiaWalletAddress, extraAddress: metamaskAddress });
-        return bindRes;
-    }
+    useEffect(() => {
+        if(civiaWalletAddress){
+            setIsLoading(true);
+            getAllBindAddress(civiaWalletAddress, 1).then((result) => {
+                result && setAllBindedAddress(result);
+            }).finally(() => {
+                setIsLoading(false);
+            });
+        }
+    }, [civiaWalletAddress]);
+
+    useInterval(() => {
+        if(civiaWalletAddress){
+            getAllBindAddress(civiaWalletAddress, 2).then((result) => {
+                result && setAllBindedAddress(result);
+            });
+        }
+    }, 5e3);
 
     useEffect(() => {
         if(civiaWalletAddress && metamaskAddress && signData){
+            setIsLoading(true);
+            //
             const transactions = {
                 contractAddress: civiaWalletAddress,
                 entrypoint: "bindAddress",
@@ -107,23 +134,6 @@ const ConnectMetamask: FC<any> = () => {
                         transactions
                     }
                 }, extensionId!);
-            // setIsLoading(true);
-            // bindTwoAddress(civiaWalletAddress, metamaskAddress!).then(({ code, msg }) => {
-            //     if(code === 0){
-            //         messageApi.open({
-            //             type: 'success',
-            //             content: 'bind success',
-            //           });
-            //           setCurrent(3);
-            //     }else {
-            //         messageApi.open({
-            //             type: 'error',
-            //             content: msg,
-            //           });
-            //     }
-            // }).finally(() => {
-            //     setIsLoading(false);
-            // });
         }
     }, [civiaWalletAddress, metamaskAddress, signData, messageApi]);
 
@@ -132,18 +142,28 @@ const ConnectMetamask: FC<any> = () => {
         if(!metamaskAddress){
             return setCurrent(0);
         }
+        if(allBindedAddress.length){
+            const hasInAllBindedAddressList = allBindedAddress.some((address) => {
+                return number.toBN(address).eq(number.toBN(metamaskAddress));
+            });
+            if(hasInAllBindedAddressList){
+                return setCurrent(3);
+            }
+        }
         if(!signData){
             return setCurrent(1);
         }
         setCurrent(2);
-    }, [civiaWalletAddress, metamaskAddress, signData]);
+    }, [civiaWalletAddress, metamaskAddress, signData, allBindedAddress]);
+
 
 
     return (
         <Spin spinning={isLoading}>
             {contextHolder}
+            <div className={styles.title}>Bind Metamask account</div>
             <Space direction='vertical' style={{ width: '100%'}}>
-                <Card>
+                <Card bordered={false}>
                 <Steps
                     direction="vertical"
                     current={current}
@@ -175,11 +195,14 @@ const ConnectMetamask: FC<any> = () => {
                         description: signData ? (
                             <div className={styles.step_desc}><code><div className={styles.text_break}>{signData}</div></code></div>
                         ): (
-                            <div className={styles.step_desc}><Button onClick={() => { metaMaskSignMessage({ message: 'civia' });}}>Sign</Button></div>
+                            <div className={styles.step_desc}><Button onClick={() => { metaMaskSignMessage({ message: 'civia' });}} disabled={!metamaskAddress || metamaskAddress.length<10 || current >= 3}>Sign</Button></div>
                         ),
                     },
                     {
-                        title: 'Finish'
+                        title: 'Finish',
+                        description: current >=3 ? (
+                            <code style={{ color: '#1677ff'}}>{civiaWalletAddress && truncateHex(civiaWalletAddress)}&nbsp;<LinkOutlined />&nbsp;{metamaskAddress && truncateHex(metamaskAddress)}</code>
+                        ): (null)
                     }
                     ]}
                 />
