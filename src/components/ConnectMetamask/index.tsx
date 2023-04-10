@@ -171,7 +171,7 @@ const ConnectMetamask: FC<any> = () => {
     return (
         <Spin spinning={isLoading}>
             {contextHolder}
-            <div className={styles.title}>Bind Metamask account</div>
+            <div className={styles.title}>Connect wallet account</div>
             <div className={styles.step_card}>
                 <Space direction='vertical' style={{ width: '100%'}}>
                     <Card style={{ border: '0px'}}>
