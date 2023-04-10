@@ -1,6 +1,6 @@
 import { FC, useEffect, useState, useRef } from 'react';
 import { Button, Steps, Card, Space, Spin, message, Image, Avatar } from 'antd';
-import { LinkOutlined } from '@ant-design/icons';
+import { LinkOutlined, CheckOutlined } from '@ant-design/icons';
 import { AccountInterface, Provider, number } from 'starknet';
 import { useConnect, useAccount, useSignMessage } from 'wagmi';
 import { useInterval } from 'ahooks';
@@ -198,11 +198,12 @@ const ConnectMetamask: FC<any> = () => {
                         },
                         {
                             title: 'Connected',
+                            icon: <CheckOutlined />,
                             description: current >=3 ? (
                                 <div className={styles.connected}>
-                                    <div><Avatar src={getAccountImageUrlByAddress({ accountAddress: civiaWalletAddress || '0x0'})} /></div>
+                                    <div><Avatar src={getAccountImageUrlByAddress({ accountAddress: civiaWalletAddress || '0x0'})} className={styles.avantar} /></div>
                                     <div><LinkOutlined /></div>
-                                    <div><Avatar src='https://storage.fleek.zone/c33f0f64-9add-4351-ac8c-c869d382d4f8-bucket/civia/metamask-fox.svg' /></div>
+                                    <div><Avatar src='https://storage.fleek.zone/c33f0f64-9add-4351-ac8c-c869d382d4f8-bucket/civia/metamask-fox.svg' className={styles.avantar} /></div>
                                 </div>
                             ): (null)
                         }
