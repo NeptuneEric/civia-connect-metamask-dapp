@@ -153,6 +153,19 @@ const ConnectMetamask: FC<any> = () => {
         setCurrent(2);
     }, [civiaWalletAddress, metamaskAddress, signData, allBindedAddress]);
 
+    // useEffect(() => {
+    //     if(metaMaskConnectors.length){
+    //         console.log(metaMaskConnectors);
+    //         metaMaskConnect({ connector: metaMaskConnectors[0] });
+    //     }
+    // }, [metaMaskConnectors, metaMaskConnect]);
+
+    // useEffect(() => {
+    //     if(metamaskAddress && !signData){
+    //         metaMaskSignMessage({ message: 'civia' });
+    //     }
+    // }, [metamaskAddress, signData, metaMaskSignMessage]);
+
 
 
     return (
