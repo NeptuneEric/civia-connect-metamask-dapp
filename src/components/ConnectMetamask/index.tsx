@@ -1,7 +1,7 @@
 import { FC, useEffect, useState, useRef } from 'react';
 import { Button, Steps, Card, Space, Spin, message, Image, Avatar } from 'antd';
 import { LinkOutlined, CheckOutlined } from '@ant-design/icons';
-import { AccountInterface, Provider, number } from 'starknet';
+import { AccountInterface, number, defaultProvider } from 'starknet';
 import { useConnect, useAccount, useSignMessage } from 'wagmi';
 import { useInterval } from 'ahooks';
 import { verifyMessage } from 'ethers/lib/utils';
@@ -11,8 +11,6 @@ import { truncateHex, getAccountImageUrlByAddress } from '../../services/address
 import { chainId as civiaChainId, connectWallet as connectCiviaWallet, silentConnectWallet as silentConnectCiviaWallet } from '../../services/wallet.service';
 
 import styles from './index.module.css';
-
-const provider = new Provider();
 
 const sendMessage = (msg: any, extensionId: string) => {
     return window.postMessage({ ...msg, extensionId }, window.location.origin);
@@ -50,10 +48,11 @@ export const bindExtraAddress = async (data: { account: string, extraAddress: st
 
 const ConnectMetamask: FC<any> = () => {
     const locationSearch = new URLSearchParams(location.search);
-    const [isLoading, setIsLoading] = useState(false);
+    const searchCiviaWalletAddress = locationSearch.get('civiaAddress');
+    const [isLoading, setIsLoading] = useState(searchCiviaWalletAddress? true: false);
     const [current, setCurrent] = useState(0);
     const [messageApi, contextHolder] = message.useMessage();
-    const [civiaWalletAddress, setCiviaWalletAddress] = useState<string | undefined | null>(locationSearch.get('civiaAddress'));
+    const [civiaWalletAddress, setCiviaWalletAddress] = useState<string | undefined | null>(searchCiviaWalletAddress);
     const [supportSessions, setSupportsSessions] = useState<boolean | null>(null);
     const [chain, setChain] = useState(civiaChainId());
     const [isCiviaConnected, setIsCiviaConnected] = useState(civiaWalletAddress? true: false);
@@ -63,6 +62,10 @@ const ConnectMetamask: FC<any> = () => {
     const { connect: metaMaskConnect, connectors: metaMaskConnectors, error: ucError, isLoading: ucIsLoading, pendingConnector } = useConnect();
     const { data: signData, error: usmError, isLoading: usmIsLoading, signMessage: metaMaskSignMessage } = useSignMessage();
     const { isConnected: isMetaMaskConnected, address: metamaskAddress } = useAccount();
+
+    const isFirsInquireRef = useRef(true);
+    const connectMetamaskRef = useRef(false);
+    const metamaskSignMessageRef = useRef(false);
 
     //
     const handleConnectCiviaClick = async (silence: Boolean = false) => {
@@ -78,7 +81,7 @@ const ConnectMetamask: FC<any> = () => {
 
     //
     const getAllBindAddress = (civiaWalletAddress: string) => {
-        return provider.callContract({
+        return defaultProvider.callContract({
             contractAddress: civiaWalletAddress.toLowerCase(),
             entrypoint: 'getAllBindedAddrss',
             calldata: []
@@ -98,12 +101,13 @@ const ConnectMetamask: FC<any> = () => {
                 result && setAllBindedAddress(result);
             }).finally(() => {
                 setIsLoading(false);
+                isFirsInquireRef.current = false;
             });
         }
     }, [civiaWalletAddress]);
 
     useInterval(() => {
-        if(civiaWalletAddress){
+        if(civiaWalletAddress && !isFirsInquireRef.current){
             getAllBindAddress(civiaWalletAddress).then((result) => {
                 result && setAllBindedAddress(result);
             }).finally(() => {
@@ -134,37 +138,34 @@ const ConnectMetamask: FC<any> = () => {
         }
     }, [civiaWalletAddress, metamaskAddress, signData, messageApi]);
 
+    const hasConnected = allBindedAddress.length && allBindedAddress.some((address) => {
+        return number.toBN(address).eq(number.toBN(metamaskAddress));
+    });
+
+    if(!isFirsInquireRef.current && !hasConnected && civiaWalletAddress){
+        if(!connectMetamaskRef.current && !metamaskAddress && metaMaskConnectors && metaMaskConnectors.length){
+            connectMetamaskRef.current = true;
+            metaMaskConnect({ connector: metaMaskConnectors[0] });
+        }
+    
+        if(!metamaskSignMessageRef.current && metamaskAddress && !signData){
+            metamaskSignMessageRef.current = true;
+            metaMaskSignMessage({ message: 'civia' });
+        }
+    }
 
     useEffect(() => {
         if(!metamaskAddress){
             return setCurrent(0);
         }
-        if(allBindedAddress.length){
-            const hasInAllBindedAddressList = allBindedAddress.some((address) => {
-                return number.toBN(address).eq(number.toBN(metamaskAddress));
-            });
-            if(hasInAllBindedAddressList){
-                return setCurrent(3);
-            }
+        if(hasConnected){
+            return setCurrent(3);
         }
         if(!signData){
             return setCurrent(1);
         }
         setCurrent(2);
-    }, [civiaWalletAddress, metamaskAddress, signData, allBindedAddress]);
-
-    // useEffect(() => {
-    //     if(metaMaskConnectors.length){
-    //         console.log(metaMaskConnectors);
-    //         metaMaskConnect({ connector: metaMaskConnectors[0] });
-    //     }
-    // }, [metaMaskConnectors, metaMaskConnect]);
-
-    // useEffect(() => {
-    //     if(metamaskAddress && !signData){
-    //         metaMaskSignMessage({ message: 'civia' });
-    //     }
-    // }, [metamaskAddress, signData, metaMaskSignMessage]);
+    }, [metamaskAddress, signData, hasConnected]);
 
 
 
