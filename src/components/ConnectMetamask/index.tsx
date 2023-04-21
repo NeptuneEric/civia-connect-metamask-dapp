@@ -128,9 +128,9 @@ const ConnectMetamask: FC<any> = () => {
 
             const extensionId = document.getElementById('civia-extension')?.getAttribute('data-extension-id');
 
-            sendMessage({ type: 'OPEN_UI'}, extensionId!);
+            sendMessage({ type: 'CIVIADAPP_OPEN_UI'}, extensionId!);
             sendMessage({
-                    type: "EXECUTE_TRANSACTION",
+                    type: "CIVIADAPP_EXECUTE_TRANSACTION",
                     data: {
                         transactions
                     }
