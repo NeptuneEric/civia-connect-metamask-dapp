@@ -217,7 +217,7 @@ const ConnectMetamask: FC<any> = () => {
                                 <div className={styles.connected}>
                                     <div><Avatar src={getAccountImageUrlByAddress({ accountAddress: civiaWalletAddress || '0x0'})} className={styles.avantar} /></div>
                                     <div><LinkOutlined /></div>
-                                    <div><Avatar src='https://storage.fleek.zone/c33f0f64-9add-4351-ac8c-c869d382d4f8-bucket/civia/metamask-fox.svg' className={styles.avantar} /></div>
+                                    <div><Avatar src='https://fleek.fynut.com/c33f0f64-9add-4351-ac8c-c869d382d4f8-bucket/civia/metamask-fox.svg' className={styles.avantar} /></div>
                                 </div>
                             ): (null)
                         }
