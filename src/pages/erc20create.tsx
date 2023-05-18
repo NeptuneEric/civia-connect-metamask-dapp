@@ -194,8 +194,8 @@ const Erc20Create: NextPage = () => {
                   step === 1 ? (
                     <>
                       <Form.Item
-                      label="Username"
-                      name="username"
+                      label="Token address"
+                      name="tokenAddress"
                       rules={[{ required: true, message: 'Please input your username!' }]}
                     >
                       <Input value={testTokenAddress} onChange={(event: ChangeEvent<HTMLInputElement>) => {setTestTokenAddress(event.target.value); }} maxLength={44} />
