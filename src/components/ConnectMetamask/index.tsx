@@ -12,6 +12,7 @@ import { chainId as civiaChainId, connectWallet as connectCiviaWallet, silentCon
 
 import styles from './index.module.css';
 
+
 const sendMessage = (msg: any, extensionId: string) => {
     return window.postMessage({ ...msg, extensionId }, window.location.origin);
 }
@@ -172,7 +173,6 @@ const ConnectMetamask: FC<any> = () => {
     return (
         <Spin spinning={isLoading}>
             {contextHolder}
-            <div className={styles.title}>Connect wallet account</div>
             <div className={styles.step_card}>
                 <Space direction='vertical' style={{ width: '100%'}}>
                     <Card style={{ border: '0px'}}>

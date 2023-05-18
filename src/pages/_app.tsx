@@ -1,40 +1,26 @@
-import {
-  WagmiConfig,
-  createClient,
-  configureChains,
-  mainnet,
-  goerli,
-} from "wagmi";
-
-import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
+import { WagmiConfig, createConfig, configureChains, mainnet } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
+import { bscTestnet } from '@wagmi/core/chains';
 
 import "../styles/globals.css"
 
 import type { AppProps } from "next/app"
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const { chains, provider, webSocketProvider } = configureChains(
-    [mainnet, goerli],
-    [
-      publicProvider(),
-    ]
-  );
-
-  // Set up client
-  const client = createClient({
+  const { chains, publicClient, webSocketPublicClient } = configureChains(
+    [bscTestnet],
+    [publicProvider()],
+  )
+   
+  const config = createConfig({
     autoConnect: true,
-    connectors: [
-      new MetaMaskConnector({ chains }),
-    ],
-    provider,
-    webSocketProvider,
-  });
-  //
+    publicClient,
+    webSocketPublicClient,
+  })
 
     return (
         <div>
-            <WagmiConfig client={client}>
+            <WagmiConfig config={config}>
               <Component {...pageProps} />
             </WagmiConfig>
         </div>

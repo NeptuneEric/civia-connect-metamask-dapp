@@ -1,0 +1,14 @@
+.body{
+    width: 760px;
+    margin: 12px auto;
+    padding: 48px;
+}
+
+.steps{
+    margin-bottom: 48px;
+}
+
+.btnWrapper{
+    text-align:center;
+    padding: 12px;
+}

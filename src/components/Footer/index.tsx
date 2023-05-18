@@ -7,8 +7,8 @@ const Footer: FC<any> = () => {
     return (
         <div className={styles['section-footer']}>
             <div className={styles.left}>
-                <Image className={styles.icon} src="https://storage.fleek.zone/c33f0f64-9add-4351-ac8c-c869d382d4f8-bucket/civia/civia-icon2.svg" alt="" />
-                <Image className={styles.logo} src="https://storage.fleek.zone/c33f0f64-9add-4351-ac8c-c869d382d4f8-bucket/civia/civia-logo2.svg" alt="" />
+                <Image className={styles.icon} src="https://fleek.fynut.com/c33f0f64-9add-4351-ac8c-c869d382d4f8-bucket/civia/civia-icon2.svg" alt="" />
+                <Image className={styles.logo} src="https://fleek.fynut.com/c33f0f64-9add-4351-ac8c-c869d382d4f8-bucket/civia/civia-logo2.svg" alt="" />
             </div>
             <div className={styles.right}>
                 <div className={styles.list}>
