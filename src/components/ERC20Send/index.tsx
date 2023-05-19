@@ -21,7 +21,7 @@ const ERC20Send: FC<any> = () => {
     const locationSearch = new URLSearchParams(location.search);
     const searchCiviaWalletAddress = locationSearch.get('civiaAddress');
     const [isLoading, setIsLoading] = useState(false);
-    const [step, setStep] = useState(2);
+    const [step, setStep] = useState(0);
     const { connect: metaMaskConnect, connectors: metaMaskConnectors, error: ucError, isLoading: ucIsLoading, pendingConnector } = useConnect();
     const { isConnected: isMetaMaskConnected, address: metamaskAddress } = useAccount();
     const connectMetamaskRef = useRef(false);
