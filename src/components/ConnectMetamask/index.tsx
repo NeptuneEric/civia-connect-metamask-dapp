@@ -48,7 +48,7 @@ export const bindExtraAddress = async (data: { account: string, extraAddress: st
 };
 
 const ConnectMetamask: FC<any> = () => {
-    const locationSearch = new URLSearchParams(location.search);
+    const locationSearch = new URLSearchParams(window.location.search);
     const searchCiviaWalletAddress = locationSearch.get('civiaAddress');
     const [isLoading, setIsLoading] = useState(searchCiviaWalletAddress? true: false);
     const [current, setCurrent] = useState(0);

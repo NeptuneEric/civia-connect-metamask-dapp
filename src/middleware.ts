@@ -48,5 +48,23 @@ export default async function getSessionToken(
             body: request.body || "{}"
         });
         return res;
+    } else if (url.pathname.startsWith('/api/app/getMockBindedAddrs')) {
+        console.log(request.body);
+        const res = await fetch('http://101.132.135.175:5000/app/getMockBindedAddrs', {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                "Content-Type": "application/json",
+                ...request.headers,
+                'Origin': 'http://localhost:3000',
+                'Referer': 'http://localhost:3000/',
+                'sec-ch-ua-platform': "macOS",
+                'Sec-Fetch-Dest': 'empty',
+                'Sec-Fetch-Mode': 'cors',
+                'Sec-Fetch-Site': 'same-origin'
+            },
+            body: request.body || "{}"
+        });
+        return res;
     }
 }

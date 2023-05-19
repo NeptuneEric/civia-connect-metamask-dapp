@@ -120,7 +120,7 @@ const Erc20Create: NextPage = () => {
           content: String(err),
         });
       });
-      if(roleRes){
+      if(!roleRes){
         return setIsLoading(false);
       }
       const grantRes = await writeContract({

@@ -10,19 +10,19 @@ const Header = dynamic(import('../components/Header'), { ssr: false });
 const Footer = dynamic(import('../components/Footer'), { ssr: false });
 
 const Index: NextPage = () => {
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>Civia connect MetaMask dapp</title>
-        <link rel="icon" href="/civia-icon.svg" />
-      </Head>
-      <Header title='Connect wallet account' />
-      <main className={styles.main}>
-        <ConnectMetamask />
-      </main>
-      <Footer />
-    </div>
-  )
+    return (
+        <div className={styles.container}>
+            <Head>
+                <title>Civia connect MetaMask dapp</title>
+                <link rel="icon" href="/civia-icon.svg" />
+            </Head>
+            <Header title='Connect wallet account' />
+            <main className={styles.main}>
+                <ConnectMetamask />
+            </main>
+            <Footer />
+        </div>
+    )
 }
 
 export default Index
