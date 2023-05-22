@@ -1,8 +1,6 @@
 
 import { FC, useEffect, useState, ChangeEvent, useRef } from "react";
-import type { NextPage } from "next";
-import Head from "next/head"
-import dynamic from 'next/dynamic';
+import { Abi, Contract, ProviderInterface, Call, shortString, number } from 'starknet';
 import { Button, Input, message, Steps, Spin, Form, Select, Space, Avatar, Image } from 'antd';
 import { useContractRead, useContractWrite, useConnect, useAccount, useSignMessage, useSignTypedData } from 'wagmi';
 import { getContract, getWalletClient, readContract, writeContract, signTypedData } from '@wagmi/core'
@@ -89,25 +87,12 @@ const ERC20Send: FC<any> = () => {
     const types = orderParts.map(o => o.type);
     const values = orderParts.map(o => o.value);
     const hash = ethers.utils.solidityKeccak256(types, values);
-    console.log(['>>>hash', hash]);
-    console.log(ethers.utils.arrayify(hash).join(''));
-    metaMaskSignMessage({ message: ethers.utils.arrayify(hash).join('') });
-
-    // const wallet = new ethers.Wallet('2b6e60bbe9891f8b3788f343404a74e9c5eb501eea1effb32c9f1ad955d6a419', ethers.getDefaultProvider());
-    // const sig = await wallet.signMessage(ethers.utils.arrayify(hash));
-    // const sigHex = sig.substring(2); // 删除前缀 "0x"
-    // const r = '0x' + sigHex.slice(0, 64);
-    // const s = '0x' + sigHex.slice(64, 128);
-    // const v = parseInt(sigHex.slice(128, 130), 16);
-
-    // console.log(['rsv----', v,s,r, sig]);
+    metaMaskSignMessage({ message: ethers.utils.arrayify(hash) as any });
   }
 
   useEffect(() => {
     if(signData){
-      console.log('-------signData');
-      console.log(signData);
-      const sigHex = signData.substring(2); // 删除前缀 "0x"
+      const sigHex = signData.substring(2);
       const r = '0x' + sigHex.slice(0, 64);
       const s = '0x' + sigHex.slice(64, 128);
       const v = parseInt(sigHex.slice(128, 130), 16);
