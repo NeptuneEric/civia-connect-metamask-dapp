@@ -6,6 +6,8 @@ export const config = {
   runtime: 'edge',
   matcher: '/api/:path*'
 };
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
  
 export default async function getSessionToken(
   request: NextRequest,
@@ -29,6 +31,7 @@ export default async function getSessionToken(
             },
             body: request.body || "{}"
         });
+        await wait(10000);
         return res;
     } else if (url.pathname.startsWith('/api/app/mockBind')) {
         console.log(request.body);

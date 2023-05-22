@@ -32,7 +32,7 @@ export const getSessionToken = async (account: string) => {
     if (token) {
         return token;
     } else {
-        const res = await axios.post('http://101.132.135.175:5000/getSessionToken', { account });
+        const res = await axios.post('/api/getSessionToken', { account });
         window.localStorage.setItem(key, res.headers['session-token'] || '');
         return res;
     }
@@ -41,7 +41,7 @@ export const getSessionToken = async (account: string) => {
 export const getMetamaskAddressList = async (account: string, civiaAddressList: string[]) => {
 
     const key = `${account},token`;
-    const response = await axios.post('http://101.132.135.175:5000/app/getMockBindedAddrs',
+    const response = await axios.post('/api/app/getMockBindedAddrs',
         {
             civia_addresses: civiaAddressList
         },
