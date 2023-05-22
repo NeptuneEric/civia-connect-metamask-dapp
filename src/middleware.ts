@@ -13,6 +13,9 @@ export default async function getSessionToken(
   request: NextRequest,
   context: NextFetchEvent,
 ) {
+    console.log('----.....--------');
+    console.log(request.body);
+    console.log(request);
     const url = new URL(request.url);
     
     if(url.pathname.startsWith('/api/getSessionToken')){
@@ -21,17 +24,10 @@ export default async function getSessionToken(
             mode: 'cors',
             headers: {
                 "Content-Type": "application/json",
-                ...request.headers,
-                'Origin': 'http://localhost:3000',
-                'Referer': 'http://localhost:3000/',
-                'sec-ch-ua-platform': "macOS",
-                'Sec-Fetch-Dest': 'empty',
-                'Sec-Fetch-Mode': 'cors',
-                'Sec-Fetch-Site': 'same-origin'
+                ...request.headers
             },
             body: request.body || "{}"
         });
-        await wait(10000);
         return res;
     } else if (url.pathname.startsWith('/api/app/mockBind')) {
         console.log(request.body);
@@ -40,13 +36,7 @@ export default async function getSessionToken(
             mode: 'cors',
             headers: {
                 "Content-Type": "application/json",
-                ...request.headers,
-                'Origin': 'http://localhost:3000',
-                'Referer': 'http://localhost:3000/',
-                'sec-ch-ua-platform': "macOS",
-                'Sec-Fetch-Dest': 'empty',
-                'Sec-Fetch-Mode': 'cors',
-                'Sec-Fetch-Site': 'same-origin'
+                ...request.headers
             },
             body: request.body || "{}"
         });
@@ -58,13 +48,7 @@ export default async function getSessionToken(
             mode: 'cors',
             headers: {
                 "Content-Type": "application/json",
-                ...request.headers,
-                'Origin': 'http://localhost:3000',
-                'Referer': 'http://localhost:3000/',
-                'sec-ch-ua-platform': "macOS",
-                'Sec-Fetch-Dest': 'empty',
-                'Sec-Fetch-Mode': 'cors',
-                'Sec-Fetch-Site': 'same-origin'
+                ...request.headers
             },
             body: request.body || "{}"
         });
