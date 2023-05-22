@@ -12,10 +12,10 @@ const Erc20Send: NextPage = () => {
   return (
     <div>
         <Head>
-          <title>Send Token</title>
+          <title>Write checks</title>
           <link rel="icon" href="/civia-icon.svg" />
         </Head>
-          <Header title='Send Token'  />
+          <Header title='Write checks'  />
           <main className='main'>
             <ERC20Send />
         </main>

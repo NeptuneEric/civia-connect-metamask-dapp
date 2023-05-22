@@ -14,7 +14,7 @@ import styles from "../styles/erc20create.module.css"
 const Header = dynamic(import('../components/Header'), { ssr: false });
 const Footer = dynamic(import('../components/Footer'), { ssr: false });
 
-const CIVIA_ERC20_CONTRACT_ADDRESS = '0x4C1b4A6DD7968DcF3C1b7b5DC5d89B5e4085a2F8';
+const CIVIA_ERC20_CONTRACT_ADDRESS = '0x7fd4c5dE475801D4691Bd325Bf5937b430c516E4';
 
 
 const Erc20Create: NextPage = () => {
@@ -82,7 +82,7 @@ const Erc20Create: NextPage = () => {
     if(!testTokenAddress){
       messageApi.open({
         type: 'error',
-        content: '请输入有效的token address',
+        content: 'Please specify token contract address',
       });
     }else{
       setIsLoading(true);
@@ -145,7 +145,7 @@ const Erc20Create: NextPage = () => {
       }else{
         messageApi.open({
           type: 'error',
-          content: 'grant fail',
+          content: 'Authorize fail',
         });
       }
       
@@ -156,10 +156,10 @@ const Erc20Create: NextPage = () => {
         <Spin spinning={isLoading}>
           {contextHolder}
           <Head>
-            <title>Create Token</title>
+            <title>Register tokens</title>
             <link rel="icon" href="/civia-icon.svg" />
           </Head>
-            <Header title='Create Token'  />
+            <Header title='Register tokens'  />
             <main className='main'>
               <div className={styles.body}>
                 <div className={styles.steps}>
@@ -168,55 +168,55 @@ const Erc20Create: NextPage = () => {
                     current={step}
                     items={[
                       {
-                        title: 'Connect Metamask',
+                        title: 'Connect Wallet',
                       },
                       {
-                        title: 'Type a Token address',
+                        title: 'Input token contract address',
                       },
                       {
-                        title: 'Grant role',
+                        title: 'Authorize Civia to mint',
                       },{
                         title: 'Success',
                       },
                     ]}
                   />
                 </div>
-                <div>
-                <Form
-                  name="basic"
-                  layout="vertical"
-                  labelCol={{ span: 8 }}
-                  wrapperCol={{ span: 16 }}
-                  style={{ maxWidth: 600 }}
-                  autoComplete="off"
-                >
-                 {
-                  step === 1 ? (
-                    <>
-                      <Form.Item
-                      label="Token address"
-                      name="tokenAddress"
-                      rules={[{ required: true, message: 'Please input your username!' }]}
-                    >
-                      <Input value={testTokenAddress} onChange={(event: ChangeEvent<HTMLInputElement>) => {setTestTokenAddress(event.target.value); }} maxLength={44} />
-                    </Form.Item>
-                    <Form.Item>
-                      <div className={styles.btnWrapper}>
-                        <Button onClick={registCiviaErc20} disabled={testTokenAddress.length<42} type="primary">register</Button>
-                      </div>
-                    </Form.Item>
-                    </>
-                  ): null
-                 }
-                 {
-                  step === 2? (
-                    <>
-                      <div className={styles.btnWrapper}>
-                      <Button onClick={grantRole} type="primary">grant</Button>
-                      </div>
-                    </>
-                  ): null
-                 }
+                <div className={styles.form}>
+                  <Form
+                    name="basic"
+                    layout="vertical"
+                    labelCol={{ span: 8 }}
+                    wrapperCol={{ span: 16 }}
+                    style={{ maxWidth: 600 }}
+                    autoComplete="off"
+                  >
+                  {
+                    step === 1 ? (
+                      <>
+                        <Form.Item
+                        label="Token contract address"
+                        name="tokenAddress"
+                        rules={[{ required: true, message: 'Please input token contract address!' }]}
+                      >
+                        <Input value={testTokenAddress} onChange={(event: ChangeEvent<HTMLInputElement>) => {setTestTokenAddress(event.target.value); }} maxLength={44} />
+                      </Form.Item>
+                      <Form.Item>
+                        <div className={styles.btnWrapper}>
+                          <Button onClick={registCiviaErc20} disabled={testTokenAddress.length<42} type="primary">Register</Button>
+                        </div>
+                      </Form.Item>
+                      </>
+                    ): null
+                  }
+                  {
+                    step === 2? (
+                      <>
+                        <div className={styles.btnWrapper}>
+                        <Button onClick={grantRole} type="primary">Authorize</Button>
+                        </div>
+                      </>
+                    ): null
+                  }
                  </Form>
                 </div>
               </div>

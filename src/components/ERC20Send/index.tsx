@@ -10,7 +10,7 @@ import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
 import styles from "../../styles/erc20send.module.css"
 import { ethers } from "ethers";
 
-const CIVIA_ERC20_CONTRACT_ADDRESS = '0x4C1b4A6DD7968DcF3C1b7b5DC5d89B5e4085a2F8';
+const CIVIA_ERC20_CONTRACT_ADDRESS = '0x7fd4c5dE475801D4691Bd325Bf5937b430c516E4';
 
 const ERC20Send: FC<any> = () => {
 
@@ -165,15 +165,21 @@ const ERC20Send: FC<any> = () => {
       if(!selectToken){
         return messageApi.open({
           type: 'error',
-          content: '请选择token',
+          content: 'Please select token',
         });
       }
     } else if (toStep === 3){
       const { inputAmount, selectFriend } = form.getFieldsValue();
-      if(!inputAmount || !selectFriend){
+      if(!inputAmount || !/^[1-9]\d*$/.test(inputAmount)){
         return messageApi.open({
           type: 'error',
-          content: '请输入amount和选择friend address',
+          content: 'Please specify token amount',
+        });
+      }
+      if(!selectFriend){
+        return messageApi.open({
+          type: 'error',
+          content: 'Please select receipients(s)',
         });
       }
       await getUsersOwnerTokenCurrentIdAndSignData();
@@ -203,20 +209,20 @@ const ERC20Send: FC<any> = () => {
                         current={step}
                         items={[
                         {
-                            title: 'Connect Metamask',
+                            title: 'Connect wallet',
                         },{
-                            title: 'Select Token',
+                            title: 'Select token',
                         },{
-                            title: 'Select user address',
+                            title: 'Select receipient address(es)',
                         },{
-                            title: 'Sign Data & Send',
+                            title: 'Sign requirest(s)',
                         },{
                             title: 'Success',
                         },
                         ]}
                     />
                     </div>
-                    <div>
+                    <div className={styles.form}>
                     <Form
                       name="basic"
                       layout="vertical"
@@ -227,33 +233,29 @@ const ERC20Send: FC<any> = () => {
                       form={form}
                     >
                     <Form.Item
-                      label="Select Token"
+                      label="Select token"
                       name="selectToken"
                       hidden={step !== 1}
                       >
                         {
-                          grantedTokens.length? (
-                            <Select
-                              placeholder="Select a option and change input text above"
-                              >
-                              {
-                                  grantedTokens.map((item: string) => {
-                                      return <Select.Option value={item} key={item}>{item}</Select.Option>;
-                                  })
-                              }
-                              </Select>
-                          ): null
+                         <Select >
+                         {
+                             grantedTokens.map((item: string) => {
+                                 return <Select.Option value={item} key={item}>{item}</Select.Option>;
+                             })
+                         }
+                         </Select>
                         }
                       </Form.Item>
                       <Form.Item
-                          label="Input amount"
+                          label="Token amount(symbol)"
                           name="inputAmount"
                           hidden={step !== 2}
                           >
                             <Input />
                           </Form.Item>
                           <Form.Item
-                          label="Select Friend"
+                          label="Select receipient(s)"
                           name="selectFriend"
                           hidden={step !== 2}
                           >
@@ -262,7 +264,7 @@ const ERC20Send: FC<any> = () => {
                                 <Select
                                   placeholder="Select a option and change input text above"
                                     // defaultValue={followings[0].address}
-                                    // mode="multiple"
+                                    mode="multiple"
                                     onChange={(res) => {
                                       console.log(res);
                                     }}
@@ -285,13 +287,13 @@ const ERC20Send: FC<any> = () => {
                             }
                           </Form.Item>
                           <Form.Item hidden={step !== 3}>
-                            <div className={styles.signData}>{signData}</div>
+                            <div className={styles.signData}>signData: {signData}</div>
                           </Form.Item>
                     </Form>
                     <div className={styles.btnWrapper}>
                       <Space>
                         {
-                          step >0 ? <Button onClick={handlePreviousStep} >&nbsp;Per&nbsp;</Button>: null
+                          step >0 ? <Button onClick={handlePreviousStep} >Back</Button>: null
                         }
                         {
                           step<4 ? <Button onClick={handleNextStep} type="primary">Next</Button>: null
