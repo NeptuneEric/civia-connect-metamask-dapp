@@ -25,6 +25,7 @@ export default async function getSessionToken(
                 'sec-ch-ua-platform': "macOS",
                 'Sec-Fetch-Dest': 'empty',
                 'Sec-Fetch-Mode': 'cors',
+                'Sec-Fetch-Site': 'same-origin'
             },
             body: request.body || "{}"
         });
@@ -37,6 +38,12 @@ export default async function getSessionToken(
             headers: {
                 "Content-Type": "application/json",
                 ...request.headers,
+                'Origin': 'http://localhost:3000',
+                'Referer': 'http://localhost:3000/',
+                'sec-ch-ua-platform': "macOS",
+                'Sec-Fetch-Dest': 'empty',
+                'Sec-Fetch-Mode': 'cors',
+                'Sec-Fetch-Site': 'same-origin'
             },
             body: request.body || "{}"
         });
@@ -48,7 +55,13 @@ export default async function getSessionToken(
             mode: 'cors',
             headers: {
                 "Content-Type": "application/json",
-                ...request.headers
+                ...request.headers,
+                'Origin': 'http://localhost:3000',
+                'Referer': 'http://localhost:3000/',
+                'sec-ch-ua-platform': "macOS",
+                'Sec-Fetch-Dest': 'empty',
+                'Sec-Fetch-Mode': 'cors',
+                'Sec-Fetch-Site': 'same-origin'
             },
             body: request.body || "{}"
         });
