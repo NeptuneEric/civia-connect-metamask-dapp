@@ -1,6 +1,7 @@
 
 import { FC, useEffect, useState, ChangeEvent, useRef } from "react";
-import { Button, Input, message, Steps, Spin, Form, Select, Space, Avatar, Image } from 'antd';
+import { Button, Input, message, Steps, Spin, Form, Select, Space, Avatar, List } from 'antd';
+import { CheckOutlined } from '@ant-design/icons';
 import { useConnect, useAccount, useSignMessage } from 'wagmi';
 import { readContract, writeContract, signTypedData } from '@wagmi/core'
 import { getFollowingList, getSynthesizeAddressList, getUsersOwnerTokenCurrentId, leaveMessageERC20 } from '../../services/account.service';
@@ -27,7 +28,24 @@ const ERC20Send: FC<any> = () => {
     const [form] = Form.useForm();
     const [orderParts, setOrderParts] = useState<any[]>([]);
 
-    const { data: signData, error: usmError, isLoading: usmIsLoading, signMessage: metaMaskSignMessage } = useSignMessage();
+    const { signMessage: metaMaskSignMessage } = useSignMessage({
+      onSuccess: (signData: any) => { 
+        const sigHex = signData.substring(2);
+        const r = '0x' + sigHex.slice(0, 64);
+        const s = '0x' + sigHex.slice(64, 128);
+        const v = parseInt(sigHex.slice(128, 130), 16);
+        setSignDataList(pre => [...pre, {r,s,v}]);
+      },
+      onError: () => { setSignDataList(pre => [...pre, null]) }
+    });
+    const [signDataList, setSignDataList] = useState<any[]>([]);
+    const [userCurrentIds, setUserCurrentIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    if(userCurrentIds.length && userCurrentIds.length === signDataList.length){
+      setStep(3);
+    }
+  }, [signDataList, userCurrentIds]);
 
   useEffect(() => {
     getSynthesizeAddressList(searchCiviaWalletAddress!).then((res) => {
@@ -69,24 +87,13 @@ const ERC20Send: FC<any> = () => {
     }
   }, [metamaskAddress]);
 
-  useEffect(() => {
-    if(signData){
-      const sigHex = signData.substring(2);
-      const r = '0x' + sigHex.slice(0, 64);
-      const s = '0x' + sigHex.slice(64, 128);
-      const v = parseInt(sigHex.slice(128, 130), 16);
-      console.log([v, s, r]);
-      //
-      setStep(3);
-    }
-  }, [signData]);
-
   const getUsersOwnerTokenCurrentIdAndSignData = async () => {
     setIsLoading(true);
     const { selectToken, inputAmount, selectFriend } = form.getFieldsValue();
     const res = await getUsersOwnerTokenCurrentId(searchCiviaWalletAddress!, selectFriend, selectToken).finally(() => { setIsLoading(false);});
     if(res && res.code === 0){
       const userCurrentIds = res.result.ownedInfos;
+      setUserCurrentIds(userCurrentIds);
       //
       userCurrentIds.forEach(({ currentId, user }:any) => {
         const orderParts = [
@@ -116,38 +123,49 @@ const ERC20Send: FC<any> = () => {
 
   const sendSignData = async () => {
     const { selectToken, inputAmount, selectFriend } = form.getFieldsValue();
-    const to = followings.reduce((to, item: any) => {
-      if(item.metamaskAddressList.includes(selectFriend[0])){
-        return item.address;
-      }
-      return to;
-    }, null);
-    const res = await leaveMessageERC20(searchCiviaWalletAddress, {
-      from: searchCiviaWalletAddress,
-      to: to!,
-      sign: signData!,
-      idBegin: orderParts[3].value,
-      idEnd: orderParts[4].value,
-      amount: inputAmount,
-      token: selectToken,
-      sender: metamaskAddress!,
-      receiver: orderParts[1]
-    }).finally(() => { setIsLoading(false);});
-    if(res && res.code === 0){
-      setStep(4);
-    } else {
-      messageApi.open({
-        type: 'error',
-        content: res.msg,
-      });
-      return null;
-    }
+
+    const promises = userCurrentIds.map(({ currentId, user}: any, index: number) => {
+      const signData = signDataList[index];
+        if(!signData){
+          return Promise.resolve();
+        }
+        const to = followings.reduce((to, item: any) => {
+          if(item.metamaskAddressList.includes(user)){
+            return item.address;
+          }
+          return to;
+        }, null);
+        //
+        return leaveMessageERC20(searchCiviaWalletAddress, {
+          from: searchCiviaWalletAddress,
+          to: to!,
+          sign: JSON.stringify(signData),
+          idBegin: currentId + 1,
+          idEnd: currentId + 1,
+          amount: inputAmount,
+          token: selectToken,
+          sender: metamaskAddress!,
+          receiver: user
+        })
+    });
+
+    console.log(promises);
+
+    const resList = await Promise.all(promises).catch(err => {
+      console.log(err);
+    }).finally(() => {
+      setIsLoading(false);
+    });
+    setStep(4);
   }
 
   const handlePreviousStep = async () => {
     const toStep = step - 1;
     if(toStep === -1){
       return;
+    }
+    if(toStep === 2){
+      setSignDataList([]);
     }
     setStep(toStep);
   }
@@ -185,18 +203,14 @@ const ERC20Send: FC<any> = () => {
       await getUsersOwnerTokenCurrentIdAndSignData();
       return;
     } else if(toStep === 4){
-      if(!signData){
-        return messageApi.open({
-          type: 'error',
-          content: 'signData is null',
-        });
-      }
       return await sendSignData();
     }
     setStep(toStep);
   }
 
-  console.log(form.getFieldsValue());
+  console.log('//////////');
+  console.log(signDataList);
+  console.log(userCurrentIds);
 
     return (
         <>
@@ -262,7 +276,6 @@ const ERC20Send: FC<any> = () => {
                             {
                               followings.length ? (
                                 <Select
-                                  placeholder="Select a option and change input text above"
                                     // defaultValue={followings[0].address}
                                     mode="multiple"
                                     onChange={(res) => {
@@ -287,7 +300,20 @@ const ERC20Send: FC<any> = () => {
                             }
                           </Form.Item>
                           <Form.Item hidden={step !== 3}>
-                            <div className={styles.signData}>signData: {signData}</div>
+                            {/* <div className={styles.signData}>signData: {signData}</div> */}
+                            <List bordered style={{ width: '500px'}}>
+                              {
+                                userCurrentIds.map((item: any, index: number) => {
+                                  return (
+                                    <List.Item key={item.user}
+                                      actions = {[signDataList[index]? <CheckOutlined style={{ color: 'green'}}/>: null]}
+                                    >
+                                      {item.user}
+                                    </List.Item>
+                                  );
+                                })
+                              }
+                            </List>
                           </Form.Item>
                     </Form>
                     <div className={styles.btnWrapper}>

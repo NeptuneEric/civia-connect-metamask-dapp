@@ -1,6 +1,7 @@
 import { Abi, Contract, ProviderInterface, Call, shortString, number, defaultProvider } from 'starknet';
 import { zipWith } from 'lodash-es';
 import SBTMgrCompiledContractAbi from '../../abi/SBTMgr.json';
+import { abi as TestTokenAbi } from '../../abi/TestToken.json';
 const { decodeShortString } = shortString;
 import axios from 'axios';
 import { ethers } from 'ethers';
@@ -124,4 +125,11 @@ export const leaveMessageERC20 = async (account: string, params: lme20) => {
             }
         });
     return Promise.resolve(response.data);
+}
+
+export const getTokenInfo = async (address: string) => {
+    const contract = new Contract(TestTokenAbi, address, defaultProvider);
+    const res = await contract.call('name');
+    console.log(res);
+    return res;
 }
