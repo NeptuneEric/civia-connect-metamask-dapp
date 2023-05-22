@@ -1,13 +1,11 @@
 
 import { FC, useEffect, useState, ChangeEvent, useRef } from "react";
-import { Abi, Contract, ProviderInterface, Call, shortString, number } from 'starknet';
 import { Button, Input, message, Steps, Spin, Form, Select, Space, Avatar, Image } from 'antd';
-import { useContractRead, useContractWrite, useConnect, useAccount, useSignMessage, useSignTypedData } from 'wagmi';
-import { getContract, getWalletClient, readContract, writeContract, signTypedData } from '@wagmi/core'
-import { getFollowingList, getSynthesizeAddressList } from '../../services/account.service';
+import { useConnect, useAccount, useSignMessage } from 'wagmi';
+import { readContract, writeContract, signTypedData } from '@wagmi/core'
+import { getFollowingList, getSynthesizeAddressList, getUsersOwnerTokenCurrentId, leaveMessageERC20 } from '../../services/account.service';
 
 import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
-import TestToken from '../../../abi/TestToken.json';
 
 import styles from "../../styles/erc20send.module.css"
 import { ethers } from "ethers";
@@ -17,7 +15,7 @@ const CIVIA_ERC20_CONTRACT_ADDRESS = '0x4C1b4A6DD7968DcF3C1b7b5DC5d89B5e4085a2F8
 const ERC20Send: FC<any> = () => {
 
     const locationSearch = new URLSearchParams(location.search);
-    const searchCiviaWalletAddress = locationSearch.get('civiaAddress');
+    const searchCiviaWalletAddress = locationSearch.get('civiaAddress') as string;
     const [isLoading, setIsLoading] = useState(false);
     const [step, setStep] = useState(0);
     const { connect: metaMaskConnect, connectors: metaMaskConnectors, error: ucError, isLoading: ucIsLoading, pendingConnector } = useConnect();
@@ -27,14 +25,12 @@ const ERC20Send: FC<any> = () => {
     const [grantedTokens, setGrantedTokens] = useState([]);
     const [followings, setFollowings] = useState<Array<{address: string; id: string; nickName: string;}>>([]);
     const [form] = Form.useForm();
-    //
-    const [testTokenAddress, setTestTokenAddress] = useState('');
+    const [orderParts, setOrderParts] = useState<any[]>([]);
 
     const { data: signData, error: usmError, isLoading: usmIsLoading, signMessage: metaMaskSignMessage } = useSignMessage();
 
   useEffect(() => {
     getSynthesizeAddressList(searchCiviaWalletAddress!).then((res) => {
-      console.log(res);
       setFollowings(res as any);
     });
   }, []);
@@ -73,23 +69,6 @@ const ERC20Send: FC<any> = () => {
     }
   }, [metamaskAddress]);
 
-
-  const nextSignData = async () => {
-    const orderParts = [
-      { value: metamaskAddress, type: 'address' },
-      { value: '0x39e60EA6d6417ab2b4a44f714b7503748Ce658eD', type: 'address' },
-      { value: grantedTokens[0], type: "address" },
-      { value: 1, type: "uint256" },
-      { value: 1, type: "uint256" },
-      { value: `${1 * 1000000000000000000}`, type: "uint256" },
-    ];
-    console.log(JSON.stringify(orderParts));
-    const types = orderParts.map(o => o.type);
-    const values = orderParts.map(o => o.value);
-    const hash = ethers.utils.solidityKeccak256(types, values);
-    metaMaskSignMessage({ message: ethers.utils.arrayify(hash) as any });
-  }
-
   useEffect(() => {
     if(signData){
       const sigHex = signData.substring(2);
@@ -97,8 +76,121 @@ const ERC20Send: FC<any> = () => {
       const s = '0x' + sigHex.slice(64, 128);
       const v = parseInt(sigHex.slice(128, 130), 16);
       console.log([v, s, r]);
+      //
+      setStep(3);
     }
   }, [signData]);
+
+  const getUsersOwnerTokenCurrentIdAndSignData = async () => {
+    setIsLoading(true);
+    const { selectToken, inputAmount, selectFriend } = form.getFieldsValue();
+    const res = await getUsersOwnerTokenCurrentId(searchCiviaWalletAddress!, selectFriend, selectToken).finally(() => { setIsLoading(false);});
+    if(res && res.code === 0){
+      const userCurrentIds = res.result.ownedInfos;
+      //
+      userCurrentIds.forEach(({ currentId, user }:any) => {
+        const orderParts = [
+          { value: metamaskAddress, type: 'address' },
+          { value: user, type: 'address' },
+          { value: selectToken, type: "address" },
+          { value: currentId + 1, type: "uint256" },
+          { value: currentId + 1, type: "uint256" },
+          { value: `${inputAmount * 1e18}`, type: "uint256" },
+        ];
+        setOrderParts(orderParts);
+        console.log(JSON.stringify(orderParts));
+        const types = orderParts.map(o => o.type);
+        const values = orderParts.map(o => o.value);
+        const hash = ethers.utils.solidityKeccak256(types, values);
+        metaMaskSignMessage({ message: ethers.utils.arrayify(hash) as any });
+      });
+    } else {
+      messageApi.open({
+        type: 'error',
+        content: res.msg,
+      });
+      return null;
+    }
+    console.log(res);
+  }
+
+  const sendSignData = async () => {
+    const { selectToken, inputAmount, selectFriend } = form.getFieldsValue();
+    const to = followings.reduce((to, item: any) => {
+      if(item.metamaskAddressList.includes(selectFriend[0])){
+        return item.address;
+      }
+      return to;
+    }, null);
+    const res = await leaveMessageERC20(searchCiviaWalletAddress, {
+      from: searchCiviaWalletAddress,
+      to: to!,
+      sign: signData!,
+      idBegin: orderParts[3].value,
+      idEnd: orderParts[4].value,
+      amount: inputAmount,
+      token: selectToken,
+      sender: metamaskAddress!,
+      receiver: orderParts[1]
+    }).finally(() => { setIsLoading(false);});
+    if(res && res.code === 0){
+      setStep(4);
+    } else {
+      messageApi.open({
+        type: 'error',
+        content: res.msg,
+      });
+      return null;
+    }
+  }
+
+  const handlePreviousStep = async () => {
+    const toStep = step - 1;
+    if(toStep === -1){
+      return;
+    }
+    setStep(toStep);
+  }
+
+  const handleNextStep = async () => {
+    const toStep = step + 1;
+    if(toStep === 5){
+      return;
+    } else if (toStep === 1){
+      if(!isMetaMaskConnected){
+        return metaMaskConnect();
+      }
+    } else if(toStep === 2){
+      const { selectToken } = form.getFieldsValue();
+      if(!selectToken){
+        return messageApi.open({
+          type: 'error',
+          content: '请选择token',
+        });
+      }
+    } else if (toStep === 3){
+      const { inputAmount, selectFriend } = form.getFieldsValue();
+      if(!inputAmount || !selectFriend){
+        return messageApi.open({
+          type: 'error',
+          content: '请输入amount和选择friend address',
+        });
+      }
+      await getUsersOwnerTokenCurrentIdAndSignData();
+      return;
+    } else if(toStep === 4){
+      if(!signData){
+        return messageApi.open({
+          type: 'error',
+          content: 'signData is null',
+        });
+      }
+      return await sendSignData();
+    }
+    setStep(toStep);
+  }
+
+  console.log(form.getFieldsValue());
 
     return (
         <>
@@ -112,15 +204,11 @@ const ERC20Send: FC<any> = () => {
                         items={[
                         {
                             title: 'Connect Metamask',
-                        },
-                        {
+                        },{
                             title: 'Select Token',
-                        },
-                        {
-
+                        },{
                             title: 'Select user address',
-                            },
-                        {
+                        },{
                             title: 'Sign Data & Send',
                         },{
                             title: 'Success',
@@ -138,56 +226,46 @@ const ERC20Send: FC<any> = () => {
                       autoComplete="off"
                       form={form}
                     >
-                    {
-                      step === 1 ? (
-                          <>
-                          <Form.Item
-                          label="Select Token"
-                          name="selectToken"
-                          >
-                            {
-                              grantedTokens.length? (
-                                <Select
-                                  placeholder="Select a option and change input text above"
-                                  defaultValue={grantedTokens[0]}
-                                  >
-                                  {
-                                      grantedTokens.map((item: string) => {
-                                          return <Select.Option value={item} key={item}>{item}</Select.Option>;
-                                      })
-                                  }
-                                  </Select>
-                              ): null
-                            }
-                          </Form.Item>
-                          <Form.Item>
-                          <div className={styles.btnWrapper}>
-                            <Button onClick={() => { setStep(2);}} type="primary">Next</Button>
-                          </div>
-                          </Form.Item>
-                          </>
-                      ): null
-                    }
-
-                    {
-                      step === 2 ? (
-                          <>
-                          <Form.Item
+                    <Form.Item
+                      label="Select Token"
+                      name="selectToken"
+                      hidden={step !== 1}
+                      >
+                        {
+                          grantedTokens.length? (
+                            <Select
+                              placeholder="Select a option and change input text above"
+                              >
+                              {
+                                  grantedTokens.map((item: string) => {
+                                      return <Select.Option value={item} key={item}>{item}</Select.Option>;
+                                  })
+                              }
+                              </Select>
+                          ): null
+                        }
+                      </Form.Item>
+                      <Form.Item
                           label="Input amount"
                           name="inputAmount"
+                          hidden={step !== 2}
                           >
                             <Input />
                           </Form.Item>
                           <Form.Item
                           label="Select Friend"
                           name="selectFriend"
+                          hidden={step !== 2}
                           >
                             {
                               followings.length ? (
                                 <Select
                                   placeholder="Select a option and change input text above"
                                     // defaultValue={followings[0].address}
-                                    mode="multiple"
+                                    // mode="multiple"
+                                    onChange={(res) => {
+                                      console.log(res);
+                                    }}
                                   >
                                     {
                                       followings.map((item: any) => {
@@ -206,19 +284,21 @@ const ERC20Send: FC<any> = () => {
                               ): null
                             }
                           </Form.Item>
-                          <Form.Item>
-                          <div className={styles.btnWrapper}>
-                            <Space>
-                              <Button onClick={() => { setStep(1);}} >&nbsp;Per&nbsp;</Button>
-                              <Button onClick={nextSignData} type="primary">Next</Button>
-                            </Space>
-                          </div>
+                          <Form.Item hidden={step !== 3}>
+                            <div className={styles.signData}>{signData}</div>
                           </Form.Item>
-                          </>
-                      ): null
-                      }
                     </Form>
-                </div>
+                    <div className={styles.btnWrapper}>
+                      <Space>
+                        {
+                          step >0 ? <Button onClick={handlePreviousStep} >&nbsp;Per&nbsp;</Button>: null
+                        }
+                        {
+                          step<4 ? <Button onClick={handleNextStep} type="primary">Next</Button>: null
+                        }
+                      </Space>
+                    </div>
+                  </div>
                 </div>
             </Spin>
         </>

@@ -18,3 +18,7 @@
     height:16px!important;
     margin-right:8px;
 }
+
+.signData{
+    word-break:break-all;
+}

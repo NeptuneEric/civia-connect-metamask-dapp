@@ -10,7 +10,6 @@ const sbtConstractAddress = '0x056041215dda8462b041678717612fd64f99310aaa834a9d4
 export const getFollowingList = async (address: string) => {
     const contract = new Contract(SBTMgrCompiledContractAbi, sbtConstractAddress, defaultProvider);
     const res = await contract.call('get_all_follows', [address]);
-    console.log(res);
     const addressList = res.addrs.map((item: any) => (number.toHex(item)));
     const idList = res.ids.map((item: any) => (item.toNumber()));
     const nickNameList = res.nick_names.map((item: any) => (decodeShortString(item.toString())));
@@ -64,7 +63,6 @@ export const getSynthesizeAddressList = async (account: string) => {
             return new Array(civiaAddressList!.length);
         }
     }).catch((err) => {});
-    console.log(metamaskAddressList);
     const syntheAddressList = zipWith(civiaAddressList as any[], metamaskAddressList, (a, b: any) => {
         return {
             ...a,
@@ -72,4 +70,58 @@ export const getSynthesizeAddressList = async (account: string) => {
         };
     });
     return syntheAddressList;
+}
+
+export const getUsersOwnerTokenCurrentId = async (account: string, users: string[], tokenAddr: string) => {
+    const key = `${account},token`;
+    const response = await axios.post('/api/app/getUsersOwnTokenCurrentId',
+        {
+            account,
+            users,
+            token_addr: tokenAddr
+        },
+        {
+            headers: {
+                authorization: `Bearer ${window.localStorage.getItem(key) || ''}`,
+                'Content-type': 'application/json;charset=utf-8'
+            }
+        });
+    return Promise.resolve(response.data);
+}
+
+
+type lme20 = {
+    from: string;
+    to: string;
+    sign: string;
+    idBegin: number;
+    idEnd: number;
+    amount: string;
+    token: string;
+    sender: string;
+    receiver: string;
+}
+
+export const leaveMessageERC20 = async (account: string, params: lme20) => {
+    const key = `${account},token`;
+    const response = await axios.post('/api/app/leaveMessageERC20',
+        {
+            account,
+            from: params.from,
+            to: params.to,
+            sign: params.sign,
+            id_begin: params.idBegin,
+            id_end: params.idEnd,
+            amount: params.amount,
+            token: params.token,
+            sender: params.sender,
+            receiver: params.receiver
+        },
+        {
+            headers: {
+                authorization: `Bearer ${window.localStorage.getItem(key) || ''}`,
+                'Content-type': 'application/json;charset=utf-8'
+            }
+        });
+    return Promise.resolve(response.data);
 }

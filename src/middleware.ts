@@ -13,9 +13,6 @@ export default async function getSessionToken(
   request: NextRequest,
   context: NextFetchEvent,
 ) {
-    console.log('----.....--------');
-    console.log(request.body);
-    console.log(request);
     const url = new URL(request.url);
     
     if(url.pathname.startsWith('/api/getSessionToken')){
@@ -29,21 +26,8 @@ export default async function getSessionToken(
             body: request.body || "{}"
         });
         return res;
-    } else if (url.pathname.startsWith('/api/app/mockBind')) {
-        console.log(request.body);
-        const res = await fetch('http://101.132.135.175:5000/app/mockBind', {
-            method: 'POST',
-            mode: 'cors',
-            headers: {
-                "Content-Type": "application/json",
-                ...request.headers
-            },
-            body: request.body || "{}"
-        });
-        return res;
-    } else if (url.pathname.startsWith('/api/app/getMockBindedAddrs')) {
-        console.log(request.body);
-        const res = await fetch('http://101.132.135.175:5000/app/getMockBindedAddrs', {
+    } else if(url.pathname.startsWith('/api/app/')){
+        const res = await fetch(`http://101.132.135.175:5000/${url.pathname.slice(5)}`, {
             method: 'POST',
             mode: 'cors',
             headers: {
