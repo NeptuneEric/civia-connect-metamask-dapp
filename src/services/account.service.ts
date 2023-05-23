@@ -7,6 +7,8 @@ const { decodeShortString } = shortString;
 import axios from 'axios';
 import { ethers } from 'ethers';
 
+console.log(CiviaERC20CheckAbi);
+
 const sbtConstractAddress = '0x056041215dda8462b041678717612fd64f99310aaa834a9d42527aeba5f3c661';
 
 export const getFollowingList = async (address: string) => {
@@ -158,9 +160,19 @@ export const getErc20Message = async (account: string) => {
     });
 };
 
-export const erc20tokenMint= async (address: string, addrs: string[], users: string[], beginIds: number[], endIds: number[], amounts: string[], v: string[], r_s: string[]) => {
-    const contract = new Contract(CiviaERC20CheckAbi, address, defaultProvider);
-    const res = await contract.call('batchMint', [addrs, users, beginIds, endIds, amounts, v, r_s]);
-    console.log(res);
-    return res;
+export const userMintERC20Done = async (account: string, messageIds: number[]) => {
+    const key = `${account},token`;
+    const getTokenRes = await getSessionToken(account).catch((err) => {});
+    const response = await axios.post('/api/app/userMintERC20Done',
+        {
+            account,
+            messageIds: messageIds.join(',')
+        },
+        {
+            headers: {
+                authorization: `Bearer ${window.localStorage.getItem(key) || ''}`,
+                'Content-type': 'application/json;charset=utf-8'
+            }
+        });
+    return Promise.resolve(response.data);
 }

@@ -1,17 +1,27 @@
 import { FC, useEffect, useState, useRef } from 'react';
-import { Spin, Button, List, message, Steps, Space, Card } from 'antd';
-import { useConnect, useAccount, useSignMessage } from 'wagmi';
+import { Spin, Button, List, message, Steps, Space, Card, Empty } from 'antd';
+import { useContractRead, useContractWrite, useConnect, useAccount, useSignMessage } from 'wagmi';
+import { getContract, getWalletClient, readContract, writeContract } from '@wagmi/core'
 import { ethers } from "ethers";
-import { erc20tokenMint } from '../../services/account.service';
+import { userMintERC20Done } from '../../services/account.service';
+
+import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
+import TestToken from '../../../abi/TestToken.json';
 
 import { getErc20Message, getSessionToken } from '../../services/account.service';
 
+const CIVIA_ERC20_CONTRACT_ADDRESS = '0x7fd4c5dE475801D4691Bd325Bf5937b430c516E4';
+
 import styles from './index.module.css';
+
+console.log(CiviaERC20Check.abi);
 
 
 const TokenItem: FC<any> = ({ item }) => {
+    const locationSearch = new URLSearchParams(location.search);
+    const searchCiviaWalletAddress = locationSearch.get('civiaAddress') as string;
     const [isLoaing, setIsLoading] = useState(false);
-    const [step, setStep] = useState<0|1>(0);
+    const [step, setStep] = useState<0|1|-1>(0);
     const { data: signData, signMessage: metaMaskSignMessage } = useSignMessage({
         onSuccess: () => {
             setStep(1);
@@ -20,14 +30,22 @@ const TokenItem: FC<any> = ({ item }) => {
     const { isConnected: isMetaMaskConnected, address: metamaskAddress } = useAccount();
     const { connect: metaMaskConnect, connectors: metaMaskConnectors, error: ucError, isLoading: ucIsLoading, pendingConnector } = useConnect();
     const connectMetamaskRef = useRef(false);
+    const [messageApi, contextHolder] = message.useMessage();
+
+    const { data, isError, isLoading } = useContractRead({
+        address: '0xD48db146c6269a91FC701Aa8264D9ea16e0C2b2E',
+        abi: TestToken.abi,
+        functionName: 'balanceOf',
+        args: ['0x39e60EA6d6417ab2b4a44f714b7503748Ce658eD']
+    });
+
+    console.log('balance-----' + data);
 
     // auto connect metamask
     if(!connectMetamaskRef.current && !metamaskAddress && metaMaskConnectors && metaMaskConnectors.length){
         connectMetamaskRef.current = true;
         metaMaskConnect({ connector: metaMaskConnectors[0] });
     }
-
-    console.log(item);
 
     //
     const handleSignData = async () => {
@@ -66,8 +84,20 @@ const TokenItem: FC<any> = ({ item }) => {
             r_s = [signObj.r, signObj.s, receiverR, receiverS];
             //
             setIsLoading(true);
-            const res = erc20tokenMint(metamaskAddress!, addrs, users, beginIds, endIds, amounts, v, r_s).catch((err) => {
+            const res = await writeContract({
+                address: CIVIA_ERC20_CONTRACT_ADDRESS,
+                abi: CiviaERC20Check.abi,
+                functionName: 'batchMint',
+                args: [addrs, users, beginIds, endIds, amounts, v, r_s]
+            }).then(() => {
+                setStep(-1);
+                return userMintERC20Done(searchCiviaWalletAddress, [item.message_id]);
+            }).catch((err) => {
                 console.log(err);
+                messageApi.open({
+                    type: 'error',
+                    content: String(err)
+                });
             }).finally(() => {
                 setIsLoading(false);
             });
@@ -77,15 +107,18 @@ const TokenItem: FC<any> = ({ item }) => {
 
 
     return (
-        <List.Item
-            extra={<div>
-                {
-                    step === 0? (<Button size='small' onClick={handleSignData}>Sign</Button>) : (<Button size='small' onClick={handleMint}>Mint</Button>)
-                }
-            </div>}
-        >
-            <div>Amount: { item.content.amount }</div>
-        </List.Item>
+        <>
+            {contextHolder}
+            <List.Item
+                extra={<div>
+                    {
+                        step === 0? (<Button size='small' onClick={handleSignData}>Sign</Button>) : (<Button size='small' onClick={handleMint} loading={isLoaing}>Mint</Button>)
+                    }
+                </div>}
+            >
+                <div>Amount: { item.content.amount }</div>
+            </List.Item>
+        </>
     );
 };
 
@@ -148,6 +181,9 @@ const ERC20Mint: FC<any> = () => {
                         }) 
                         }
                     </List>
+                    {
+                        filterMessageList.length === 0? <Empty />: null
+                    }
                 </div>
             </Spin>
         </>
