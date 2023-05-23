@@ -58,3 +58,11 @@ samp {
   display: flex;
   flex-direction: column;
 }
+
+.ant-steps-item-finish .ant-steps-item-icon{
+  background-color:#DEFAE1!important;
+  border-color: #DEFAE1!important;
+}
+.ant-steps-item-finish .ant-steps-item-icon svg{
+  color: rgba(0, 125, 40, 1);
+}

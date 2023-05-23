@@ -23,6 +23,7 @@
     "react-dom": "^18.0.0",
     "starknet": "^4.21.0",
     "starknet5": "npm:starknet@5.0.0-beta.3",
+    "swr": "^2.1.5",
     "viem": "^0.3.29",
     "wagmi": "^1.0.5"
   },

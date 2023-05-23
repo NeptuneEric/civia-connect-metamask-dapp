@@ -6,6 +6,8 @@ import { useConnect, useAccount, useSignMessage } from 'wagmi';
 import { readContract, writeContract, signTypedData } from '@wagmi/core'
 import { getFollowingList, getSynthesizeAddressList, getUsersOwnerTokenCurrentId, leaveMessageERC20 } from '../../services/account.service';
 
+import { ERC20TokenInfo } from '../../components/ERC20TokenInfo';
+
 import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
 
 import styles from "./index.module.css"
@@ -220,6 +222,8 @@ const ERC20Send: FC<any> = () => {
     setStep(toStep);
   }
 
+  const selectedToken = form.getFieldValue('selectToken');
+
     return (
         <>
             <Spin spinning={isLoading}>
@@ -263,14 +267,35 @@ const ERC20Send: FC<any> = () => {
                          <Select >
                          {
                              grantedTokens.map((item: string) => {
-                                 return <Select.Option value={item} key={item}>{item}</Select.Option>;
+                                 return (
+                                    <Select.Option value={item} key={item}>
+                                       <ERC20TokenInfo tokenAddress={item}>
+                                            {
+                                                (tokeName: string, tokenSymbol: string, formatAddr: string) => {
+                                                    return `${tokeName} (${tokenSymbol}) ${formatAddr}`;
+                                                }
+                                            }
+                                        </ERC20TokenInfo>
+                                    </Select.Option>
+                                  );
                              })
                          }
                          </Select>
                         }
                       </Form.Item>
                       <Form.Item
-                          label="Token amount(symbol)"
+                          label={
+                            <div>
+                                Token amount
+                                <ERC20TokenInfo tokenAddress={selectedToken}>
+                                    {
+                                        (tokeName: string, tokenSymbol: string, formatAddr: string) => {
+                                            return ` (${tokenSymbol})`;
+                                        }
+                                    }
+                                  </ERC20TokenInfo>
+                            </div>
+                          }
                           name="inputAmount"
                           hidden={step !== 2}
                           >
@@ -284,7 +309,6 @@ const ERC20Send: FC<any> = () => {
                             {
                               followings.length ? (
                                 <Select
-                                    // defaultValue={followings[0].address}
                                     mode="multiple"
                                     onChange={(res) => {
                                       console.log(res);

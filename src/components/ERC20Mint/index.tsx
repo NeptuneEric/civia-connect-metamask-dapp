@@ -6,8 +6,12 @@ import { getContract, getWalletClient, readContract, writeContract } from '@wagm
 import { ethers } from "ethers";
 import { userMintERC20Done } from '../../services/account.service';
 
+import { ERC20TokenInfo } from '../ERC20TokenInfo';
+
 import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
 import TestToken from '../../../abi/TestToken.json';
+
+import { useERC20TokenInfo } from '../../hooks/useERC20TokenInfo';
 
 import { getErc20Message, getSessionToken } from '../../services/account.service';
 
@@ -171,7 +175,14 @@ const ERC20Mint: FC<any> = () => {
                         filterMessageList.map((item: any, index: number) => {
                             return (
                                 <div key={index}>
-                                    <Card title={item[0].content.token} >
+                                    <Card title={
+                                        <ERC20TokenInfo tokenAddress={item[0].content.token}>
+                                            {
+                                                (tokeName: string, tokenSymbol: string, formatAddr: string) => {
+                                                    return `${tokeName} (${tokenSymbol}) ${formatAddr}`;
+                                                }
+                                            }
+                                        </ERC20TokenInfo>} >
                                         {
                                             item.map((subItem: any, subIndex: number) => {
                                                 return (
