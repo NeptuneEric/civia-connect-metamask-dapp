@@ -140,7 +140,7 @@ const ConnectMetamask: FC<any> = () => {
     }, [civiaWalletAddress, metamaskAddress, signData, messageApi]);
 
     const hasConnected = allBindedAddress.length && allBindedAddress.some((address) => {
-        return number.toBN(address).eq(number.toBN(metamaskAddress));
+        return number.toBN(address).eq(number.toBN(metamaskAddress!));
     });
 
     if(!isFirsInquireRef.current && !hasConnected && civiaWalletAddress){

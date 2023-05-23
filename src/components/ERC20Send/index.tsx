@@ -8,7 +8,7 @@ import { getFollowingList, getSynthesizeAddressList, getUsersOwnerTokenCurrentId
 
 import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
 
-import styles from "../../styles/erc20send.module.css"
+import styles from "./index.module.css"
 import { ethers } from "ethers";
 
 const CIVIA_ERC20_CONTRACT_ADDRESS = '0x7fd4c5dE475801D4691Bd325Bf5937b430c516E4';
@@ -208,10 +208,6 @@ const ERC20Send: FC<any> = () => {
     setStep(toStep);
   }
 
-  console.log('//////////');
-  console.log(signDataList);
-  console.log(userCurrentIds);
-
     return (
         <>
             <Spin spinning={isLoading}>
@@ -319,7 +315,7 @@ const ERC20Send: FC<any> = () => {
                     <div className={styles.btnWrapper}>
                       <Space>
                         {
-                          step >0 ? <Button onClick={handlePreviousStep} >Back</Button>: null
+                          step >0 && step <4 ? <Button onClick={handlePreviousStep} >Back</Button>: null
                         }
                         {
                           step<4 ? <Button onClick={handleNextStep} type="primary">Next</Button>: null

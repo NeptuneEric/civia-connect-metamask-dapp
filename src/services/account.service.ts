@@ -133,3 +133,26 @@ export const getTokenInfo = async (address: string) => {
     console.log(res);
     return res;
 }
+
+export const getErc20Message = async (account: string) => {
+    const getTokenRes = await getSessionToken(account).catch((err) => {});
+    const key = `${account},token`;
+    const response = await axios.post('/api/app/getUserERC20MessagesUnMint',
+        {
+            account
+        },
+        {
+            headers: {
+                authorization: `Bearer ${window.localStorage.getItem(key) || ''}`,
+                'Content-type': 'application/json;charset=utf-8'
+            }
+        });
+    return Promise.resolve(response.data).then((res) => {
+        if (res.code === 1) {
+            return false;
+        }
+        return res.result.messages;
+    }).catch((err) => {
+        console.log(err);
+    });
+};
