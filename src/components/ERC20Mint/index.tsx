@@ -1,5 +1,6 @@
 import { FC, useEffect, useState, useRef } from 'react';
 import { Spin, Button, List, message, Steps, Space, Card, Empty } from 'antd';
+import { CheckCircleOutlined } from '@ant-design/icons';
 import { useContractRead, useContractWrite, useConnect, useAccount, useSignMessage } from 'wagmi';
 import { getContract, getWalletClient, readContract, writeContract } from '@wagmi/core'
 import { ethers } from "ethers";
@@ -49,7 +50,7 @@ const TokenItem: FC<any> = ({ item }) => {
 
     //
     const handleSignData = async () => {
-        const { receiver, token, id_begin: idBegin, id_end: idEnd, amount,  } = item.content;
+        const { receiver, token, id_begin: idBegin, id_end: idEnd, amount } = item.content;
         const orderParts = [
             { value: metamaskAddress, type: 'address' },
             { value: receiver, type: 'address' },
@@ -93,11 +94,14 @@ const TokenItem: FC<any> = ({ item }) => {
                 setStep(-1);
                 return userMintERC20Done(searchCiviaWalletAddress, [item.message_id]);
             }).catch((err) => {
+                const errStr = String(err);
+                const IsStartIdNotMatch = /start id not match/.test(errStr);
                 console.log(err);
                 messageApi.open({
                     type: 'error',
-                    content: String(err)
+                    content: IsStartIdNotMatch ? 'start id not match' : errStr
                 });
+                IsStartIdNotMatch && userMintERC20Done(searchCiviaWalletAddress, [item.message_id]);
             }).finally(() => {
                 setIsLoading(false);
             });
@@ -112,11 +116,12 @@ const TokenItem: FC<any> = ({ item }) => {
             <List.Item
                 extra={<div>
                     {
-                        step === 0? (<Button size='small' onClick={handleSignData}>Sign</Button>) : (<Button size='small' onClick={handleMint} loading={isLoaing}>Mint</Button>)
+                        step === 0? (<Button size='small' onClick={handleSignData}>Sign</Button>) :
+                        (step ===1? <Button size='small' onClick={handleMint} loading={isLoaing} type='primary'>Mint</Button>: <CheckCircleOutlined />)
                     }
                 </div>}
             >
-                <div>Amount: { item.content.amount }</div>
+                <div>amount: { item.content.amount }</div>
             </List.Item>
         </>
     );

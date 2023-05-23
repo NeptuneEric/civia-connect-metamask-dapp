@@ -90,9 +90,21 @@ const ERC20Send: FC<any> = () => {
   const getUsersOwnerTokenCurrentIdAndSignData = async () => {
     setIsLoading(true);
     const { selectToken, inputAmount, selectFriend } = form.getFieldsValue();
-    const res = await getUsersOwnerTokenCurrentId(searchCiviaWalletAddress!, selectFriend, selectToken).finally(() => { setIsLoading(false);});
+    const addrsMap = followings.reduce((addrsMap: Map<string, string>, item: any) => {
+      if(selectFriend.includes(item.metamaskAddressList[0])){
+        addrsMap.set(item.address, item.metamaskAddressList[0]);
+      }
+      return addrsMap;
+    }, new Map());
+    //
+    const res = await getUsersOwnerTokenCurrentId(searchCiviaWalletAddress!, Array.from(addrsMap.keys()), selectToken).finally(() => { setIsLoading(false);});
     if(res && res.code === 0){
-      const userCurrentIds = res.result.ownedInfos;
+      const userCurrentIds = res.result.ownedInfos.map((item: any) => (
+        {
+          ...item,
+          user: addrsMap.get(item.user)
+        }
+      ));
       setUserCurrentIds(userCurrentIds);
       //
       userCurrentIds.forEach(({ currentId, user }:any) => {
@@ -283,7 +295,7 @@ const ERC20Send: FC<any> = () => {
                                         return (
                                           <Select.OptGroup key={item.id} label={item.nickName}>
                                             {
-                                              item.metamaskAddressList.map((mItem: any) => {
+                                              item.metamaskAddressList.slice(0, 1).map((mItem: any) => {
                                                   return <Select.Option value={mItem} key={mItem}><Avatar src='https://fleek.fynut.com/c33f0f64-9add-4351-ac8c-c869d382d4f8-bucket/civia/metamask-fox.svg' className={styles.avantar} />{mItem}</Select.Option>;
                                               })
                                             }

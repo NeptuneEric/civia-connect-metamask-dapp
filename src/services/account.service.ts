@@ -60,7 +60,7 @@ export const getMetamaskAddressList = async (account: string, civiaAddressList: 
 export const getSynthesizeAddressList = async (account: string) => {
     const civiaAddressList = await getFollowingList(account).catch((err) => {});
     const getTokenRes = await getSessionToken(account).catch((err) => {});
-    const metamaskAddressList = await getMetamaskAddressList(account, (civiaAddressList as any[]).map((item) => item.address)).then(({ code, result }) => {
+    const metamaskAddressList = await getMetamaskAddressList(account, (civiaAddressList || [] as any[]).map((item) => item.address)).then(({ code, result }) => {
         if(code === 0){
             return result.addressInfos;
         }else{
