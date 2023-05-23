@@ -2,6 +2,7 @@ import { Abi, Contract, ProviderInterface, Call, shortString, number, defaultPro
 import { zipWith } from 'lodash-es';
 import SBTMgrCompiledContractAbi from '../../abi/SBTMgr.json';
 import { abi as TestTokenAbi } from '../../abi/TestToken.json';
+import { abi as CiviaERC20CheckAbi } from '../../abi/CiviaERC20Check.json';
 const { decodeShortString } = shortString;
 import axios from 'axios';
 import { ethers } from 'ethers';
@@ -156,3 +157,10 @@ export const getErc20Message = async (account: string) => {
         console.log(err);
     });
 };
+
+export const erc20tokenMint= async (address: string, addrs: string[], users: string[], beginIds: number[], endIds: number[], amounts: string[], v: string[], r_s: string[]) => {
+    const contract = new Contract(CiviaERC20CheckAbi, address, defaultProvider);
+    const res = await contract.call('batchMint', [addrs, users, beginIds, endIds, amounts, v, r_s]);
+    console.log(res);
+    return res;
+}
