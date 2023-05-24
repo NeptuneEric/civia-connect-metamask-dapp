@@ -9,7 +9,6 @@ export const useERC20TokenInfo = (testTokenAddress: `0x${string}`) => {
     const key = `@"${testTokenAddress}","tokenInfo"`;
     const { data, error } = useSWR(key, async () => {
         if(testTokenAddress){
-            console.log(['token address', testTokenAddress]);
             const res = await readContracts({
                 contracts: [
                     {

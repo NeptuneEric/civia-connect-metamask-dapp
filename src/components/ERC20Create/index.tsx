@@ -163,7 +163,7 @@ const Erc20Create: NextPage = () => {
                         title: 'Input token contract address',
                       },
                       {
-                        title: 'Authorize Civia to mint',
+                        title: 'Authorize Check to mint',
                       },{
                         title: 'Success',
                       },

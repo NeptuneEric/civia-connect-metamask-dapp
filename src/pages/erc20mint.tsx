@@ -12,10 +12,10 @@ const Erc20Mint: NextPage = () => {
   return (
     <div>
         <Head>
-          <title>Mint token</title>
+          <title>Mint tokens</title>
           <link rel="icon" href="/civia-icon.svg" />
         </Head>
-          <Header title='Mint token'  />
+          <Header title='Mint tokens'  />
           <main className='main'>
             <ERC20Mint />
         </main>
