@@ -15,7 +15,9 @@ export default async function getSessionToken(
 ) {
     const url = new URL(request.url);
     
-    if(url.pathname.startsWith('/api/getSessionToken')){
+    if(url.pathname.startsWith('/api/test')){
+        return new Response('Blocked for legal reasons', { status: 451 });
+    } else if(url.pathname.startsWith('/api/getSessionToken')){
         const res = await fetch('http://101.132.135.175:5000/getSessionToken', {
             method: 'POST',
             mode: 'cors',
