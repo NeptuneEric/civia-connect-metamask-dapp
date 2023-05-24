@@ -59,12 +59,12 @@ const Erc20Create: NextPage = () => {
     }
   }, [metamaskAddress]);
 
-  useEffect(() => {
-    if(testTokenAddress && grantedTokens.length){
-      const isTestTokenGranted = grantedTokens.some((add: string) => add === testTokenAddress);
-      isTestTokenGranted && setStep(3);
-    }
-  }, [grantedTokens, testTokenAddress]);
+  // useEffect(() => {
+  //   if(testTokenAddress && grantedTokens.length){
+  //     const isTestTokenGranted = grantedTokens.some((add: string) => add === testTokenAddress);
+  //     isTestTokenGranted && setStep(3);
+  //   }
+  // }, [grantedTokens, testTokenAddress]);
 
   // auto connect metamask
   if(!connectMetamaskRef.current && !metamaskAddress && metaMaskConnectors && metaMaskConnectors.length){
@@ -80,6 +80,14 @@ const Erc20Create: NextPage = () => {
         content: 'Please specify token contract address',
       });
     }else{
+      // check if registered
+      if(testTokenAddress && grantedTokens.length){
+        const isTestTokenGranted = grantedTokens.some((add: string) => add === testTokenAddress);
+        if(isTestTokenGranted){
+          return setStep(2);
+        }
+      }
+      //
       setIsLoading(true);
       const res = await writeAsync({ args: [testTokenAddress]}).then((res) => {
         setStep(2);
@@ -117,6 +125,17 @@ const Erc20Create: NextPage = () => {
       });
       if(!roleRes){
         return setIsLoading(false);
+      }
+      const hasRole = await readContract({
+        address: testTokenAddress  as `0x${string}`,
+        abi: TestToken.abi,
+        functionName: 'hasRole',
+        args: [roleRes, CIVIA_ERC20_CONTRACT_ADDRESS]
+      });
+      console.log(hasRole);
+      if(hasRole){
+        setIsLoading(false);
+        return setStep(3);
       }
       const grantRes = await writeContract({
         address: testTokenAddress  as `0x${string}`,
