@@ -14,13 +14,15 @@ export default async function getSessionToken(
   context: NextFetchEvent,
 ) {
     const url = new URL(request.url);
+    console.log('=====');
+    console.info(request.body);
+    console.log(request.headers);
     
     if(url.pathname.startsWith('/api/test')){
         return new Response('Blocked for legal reasons', { status: 451 });
     } else if(url.pathname.startsWith('/api/getSessionToken')){
         const res = await fetch('http://101.132.135.175:5000/getSessionToken', {
             method: 'POST',
-            mode: 'cors',
             headers: {
                 "Content-Type": "application/json",
                 ...request.headers
@@ -31,7 +33,6 @@ export default async function getSessionToken(
     } else if(url.pathname.startsWith('/api/app/')){
         const res = await fetch(`http://101.132.135.175:5000/${url.pathname.slice(5)}`, {
             method: 'POST',
-            mode: 'cors',
             headers: {
                 "Content-Type": "application/json",
                 ...request.headers
