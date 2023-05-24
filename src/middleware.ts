@@ -33,6 +33,9 @@ export default async function getSessionToken(
     } else if(url.pathname.startsWith('/api/app/')){
         const res = await fetch(`http://101.132.135.175:5000/${url.pathname.slice(5)}`, {
             method: 'POST',
+            mode: "cors",
+            credentials: "same-origin",
+            referrerPolicy: "no-referrer",
             headers: {
                 "Content-Type": "application/json",
                 ...request.headers
