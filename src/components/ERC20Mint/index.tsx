@@ -146,7 +146,9 @@ const ERC20Mint: FC<any> = () => {
                     ...item,
                     content
                 });
-                newML.set(token, newMLItem);
+                newML.set(token, newMLItem.sort((a: any, b: any) => {
+                    return a.content.id_begin > b.content.id_begin ? 1: -1;
+                }));
                 return newML;
             }, new Map());
             setMessageList(newMessageMapList);
