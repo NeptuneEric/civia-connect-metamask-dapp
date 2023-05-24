@@ -5,9 +5,6 @@ import { abi as TestTokenAbi } from '../../abi/TestToken.json';
 import { abi as CiviaERC20CheckAbi } from '../../abi/CiviaERC20Check.json';
 const { decodeShortString } = shortString;
 import axios from 'axios';
-import { ethers } from 'ethers';
-
-console.log(CiviaERC20CheckAbi);
 
 const sbtConstractAddress = '0x056041215dda8462b041678717612fd64f99310aaa834a9d42527aeba5f3c661';
 
@@ -67,6 +64,7 @@ export const getSynthesizeAddressList = async (account: string) => {
             return new Array(civiaAddressList!.length);
         }
     }).catch((err) => {});
+
     const syntheAddressList = zipWith(civiaAddressList as any[], metamaskAddressList, (a, b: any) => {
         return {
             ...a,

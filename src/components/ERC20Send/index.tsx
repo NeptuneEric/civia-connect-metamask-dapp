@@ -160,7 +160,7 @@ const ERC20Send: FC<any> = () => {
           token: selectToken,
           sender: metamaskAddress!,
           receiver: user
-        })
+        });
     });
 
     console.log(promises);
@@ -170,7 +170,7 @@ const ERC20Send: FC<any> = () => {
     }).finally(() => {
       setIsLoading(false);
     });
-    setStep(4);
+    setStep(5);
   }
 
   const handlePreviousStep = async () => {
