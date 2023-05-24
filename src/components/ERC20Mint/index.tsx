@@ -119,6 +119,7 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
 
 //
 const ERC20Mint: FC<any> = () => {
+    const [refreshMessageList, setRefreshMessageList] = useState(1);
     const locationSearch = new URLSearchParams(location.search);
     const searchCiviaWalletAddress = locationSearch.get('civiaAddress') as string;
     const searchERC20Token = locationSearch.get('erc20token') as string;
@@ -155,7 +156,7 @@ const ERC20Mint: FC<any> = () => {
         }).finally(() => {
             setIsLoading(false);
         });
-    }, []);
+    }, [refreshMessageList]);
 
     const handleSelectAll = (evt: CheckboxChangeEvent) => {
         console.log(evt);
@@ -219,6 +220,7 @@ const ERC20Mint: FC<any> = () => {
             checkedMessageList.flat().forEach(({ message_id }) => {
                 userMintERC20Done(searchCiviaWalletAddress, [message_id]);
             });
+            setRefreshMessageList(pre => pre + 1);
             return true;
         }).catch((err) => {
             const errStr = String(err);
