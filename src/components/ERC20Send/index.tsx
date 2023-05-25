@@ -13,7 +13,7 @@ import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
 import styles from "./index.module.css"
 import { ethers } from "ethers";
 
-const CIVIA_ERC20_CONTRACT_ADDRESS = '0x7fd4c5dE475801D4691Bd325Bf5937b430c516E4';
+const CIVIA_ERC20_CONTRACT_ADDRESS = '0x8a647C33fe1fb520bDbcbA10d88d0397F5FdC056';
 
 const ERC20Send: FC<any> = () => {
 

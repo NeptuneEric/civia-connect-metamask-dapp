@@ -13,7 +13,7 @@ import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
 
 import { getErc20Message, getSessionToken } from '../../services/account.service';
 
-const CIVIA_ERC20_CONTRACT_ADDRESS = '0x7fd4c5dE475801D4691Bd325Bf5937b430c516E4';
+const CIVIA_ERC20_CONTRACT_ADDRESS = '0x8a647C33fe1fb520bDbcbA10d88d0397F5FdC056';
 
 import styles from './index.module.css';
 import { CheckboxChangeEvent, CheckboxChangeEventTarget } from 'antd/es/checkbox/Checkbox';
@@ -227,7 +227,7 @@ const ERC20Mint: FC<any> = () => {
     const handleBatchMint = async () => {
         console.log(checkedMessageList);
         const getOneContractArgs = (item: any) => {
-            const { receiver, token, id_begin: idBegin, id_end: idEnd, amount, sign } = item.content;
+            const { sender, receiver, token, id_begin: idBegin, id_end: idEnd, amount, sign } = item.content;
             const signObj = JSON.parse(sign);
             const sigHex = item.customContent.signData.substring(2);
             const receiverR = '0x' + sigHex.slice(0, 64);
@@ -235,6 +235,7 @@ const ERC20Mint: FC<any> = () => {
             const receiverV = parseInt(sigHex.slice(128, 130), 16);
             //
             const addrs = [token],
+            senders = [sender],
             users = [receiver],
             beginIds = [idBegin],
             endIds = [idEnd],
@@ -242,13 +243,13 @@ const ERC20Mint: FC<any> = () => {
             v = [signObj.v, receiverV],
             r_s = [signObj.r, signObj.s, receiverR, receiverS];
 
-            return [addrs, users, beginIds, endIds, amounts, v, r_s];
+            return [addrs, senders, users, beginIds, endIds, amounts, v, r_s];
         };
 
-        const mergedContractArgs = checkedMessageList.flat().reduce(([preAddrs, preUsers, preUeginIds, preEndIds, preAmounts, preV, preR_s], subItem: any) => {
-            const [addrs, users, beginIds, endIds, amounts, v, r_s] = getOneContractArgs(subItem);
-            return [preAddrs.concat(addrs), preUsers.concat(users), preUeginIds.concat(beginIds), preEndIds.concat(endIds), preAmounts.concat(amounts), preV.concat(v), preR_s.concat(r_s)];
-        }, [[], [], [], [], [], [], []]);
+        const mergedContractArgs = checkedMessageList.flat().reduce(([preAddrs, preSenders, preUsers, preUeginIds, preEndIds, preAmounts, preV, preR_s], subItem: any) => {
+            const [addrs, senders, users, beginIds, endIds, amounts, v, r_s] = getOneContractArgs(subItem);
+            return [preAddrs.concat(addrs), preSenders.concat(senders), preUsers.concat(users), preUeginIds.concat(beginIds), preEndIds.concat(endIds), preAmounts.concat(amounts), preV.concat(v), preR_s.concat(r_s)];
+        }, [[], [], [], [], [], [], [], []]);
 
         console.log(mergedContractArgs);
 

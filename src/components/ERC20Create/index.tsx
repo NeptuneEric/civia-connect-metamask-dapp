@@ -9,7 +9,7 @@ import TestToken from '../../../abi/TestToken.json';
 
 import styles from "./index.module.css"
 
-const CIVIA_ERC20_CONTRACT_ADDRESS = '0x7fd4c5dE475801D4691Bd325Bf5937b430c516E4';
+const CIVIA_ERC20_CONTRACT_ADDRESS = '0x8a647C33fe1fb520bDbcbA10d88d0397F5FdC056';
 
 
 const Erc20Create: NextPage = () => {
@@ -22,6 +22,8 @@ const Erc20Create: NextPage = () => {
   const [grantedTokens, setGrantedTokens] = useState([]);
   //
   const [testTokenAddress, setTestTokenAddress] = useState('');
+  const [testTokenAdmin, setTestTokenAdmin] = useState('');
+  const [testTokenAmount, setTestTokenAmount] = useState('');
 
   useEffect(() => {
     if(metamaskAddress){
@@ -38,6 +40,7 @@ const Erc20Create: NextPage = () => {
 
   useEffect(() => {
     if(metamaskAddress){
+      setTestTokenAdmin(metamaskAddress);
       setIsLoading(true);
       readContract({
         address: CIVIA_ERC20_CONTRACT_ADDRESS,
@@ -79,6 +82,16 @@ const Erc20Create: NextPage = () => {
         type: 'error',
         content: 'Please specify token contract address',
       });
+    } else if(!testTokenAdmin){
+      messageApi.open({
+        type: 'error',
+        content: 'Please specify token admin',
+      });
+    } else if(!testTokenAmount){
+      messageApi.open({
+        type: 'error',
+        content: 'Please specify token amount',
+      });
     }else{
       // check if registered
       if(testTokenAddress && grantedTokens.length){
@@ -89,7 +102,7 @@ const Erc20Create: NextPage = () => {
       }
       //
       setIsLoading(true);
-      const res = await writeAsync({ args: [testTokenAddress]}).then((res) => {
+      const res = await writeAsync({ args: [testTokenAddress, testTokenAdmin, 1e18 * (testTokenAmount as any as number)]}).then((res) => {
         setStep(2);
         return res;
       }).catch((err) => {
@@ -165,6 +178,8 @@ const Erc20Create: NextPage = () => {
       
   }
 
+  console.log(testTokenAdmin);
+
     return (
       <div>
         <Spin spinning={isLoading}>
@@ -208,9 +223,24 @@ const Erc20Create: NextPage = () => {
                       >
                         <Input value={testTokenAddress} onChange={(event: ChangeEvent<HTMLInputElement>) => {setTestTokenAddress(event.target.value); }} maxLength={44} />
                       </Form.Item>
+                      <Form.Item
+                        label="Token admin"
+                        name="tokenAdmin"
+                        rules={[{ required: true, message: 'Please input token admin address!' }]}
+                        initialValue={testTokenAdmin}
+                      >
+                        <Input value={testTokenAdmin} onChange={(event: ChangeEvent<HTMLInputElement>) => {setTestTokenAdmin(event.target.value); }} maxLength={44} />
+                      </Form.Item>
+                      <Form.Item
+                        label="Token amount"
+                        name="tokenAmount"
+                        rules={[{ required: true, message: 'Please input token amount!' }]}
+                      >
+                        <Input value={testTokenAmount} onChange={(event: ChangeEvent<HTMLInputElement>) => {setTestTokenAmount(event.target.value); }} maxLength={44} />
+                      </Form.Item>
                       <Form.Item>
                         <div className={styles.btnWrapper}>
-                          <Button onClick={registCiviaErc20} disabled={testTokenAddress.length<42} type="primary">Register</Button>
+                          <Button onClick={registCiviaErc20}  type="primary">Register</Button>
                         </div>
                       </Form.Item>
                       </>
