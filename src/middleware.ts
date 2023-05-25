@@ -14,9 +14,6 @@ export default async function getSessionToken(
   context: NextFetchEvent,
 ) {
     const url = new URL(request.url);
-    console.log('=====');
-    console.info(request.body);
-    console.log(request.headers);
     
     if(url.pathname.startsWith('/api/test')){
         return new Response('Blocked for legal reasons', { status: 451 });

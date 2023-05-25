@@ -1,5 +1,5 @@
-import { FC, useEffect, useState, useRef } from 'react';
-import { Spin, Button, List, message, Steps, Space, Card, Empty, Checkbox } from 'antd';
+import { FC, useEffect, useState, useRef, ReactElement, useImperativeHandle, forwardRef } from 'react';
+import { Spin, Button, List, message, Steps, Space, Card, Empty, Checkbox, notification } from 'antd';
 import { CheckCircleOutlined } from '@ant-design/icons';
 import { useContractRead, useContractWrite, useConnect, useAccount, useSignMessage } from 'wagmi';
 import { getContract, getWalletClient, readContract, writeContract } from '@wagmi/core'
@@ -7,9 +7,9 @@ import { ethers } from "ethers";
 import { userMintERC20Done } from '../../services/account.service';
 
 import { ERC20TokenInfo } from '../ERC20TokenInfo';
+import { ERC20TokenBalance } from '../ERC20TokenBalance';
 
 import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
-import TestToken from '../../../abi/TestToken.json';
 
 import { getErc20Message, getSessionToken } from '../../services/account.service';
 
@@ -17,6 +17,8 @@ const CIVIA_ERC20_CONTRACT_ADDRESS = '0x7fd4c5dE475801D4691Bd325Bf5937b430c516E4
 
 import styles from './index.module.css';
 import { CheckboxChangeEvent, CheckboxChangeEventTarget } from 'antd/es/checkbox/Checkbox';
+
+import TestToken from '../../../abi/TestToken.json';
 
 
 const TokenItem: FC<any> = ({ item, onSigned }) => {
@@ -30,16 +32,9 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
             onSigned({ signData: res });
         }
     });
-    const { isConnected: isMetaMaskConnected, address: metamaskAddress } = useAccount();
-    const { connect: metaMaskConnect, connectors: metaMaskConnectors, error: ucError, isLoading: ucIsLoading, pendingConnector } = useConnect();
-    const connectMetamaskRef = useRef(false);
-    const [messageApi, contextHolder] = message.useMessage();
 
-    // auto connect metamask
-    if(!connectMetamaskRef.current && !metamaskAddress && metaMaskConnectors && metaMaskConnectors.length){
-        connectMetamaskRef.current = true;
-        metaMaskConnect({ connector: metaMaskConnectors[0] });
-    }
+    const [messageApi, contextHolder] = message.useMessage();
+    const { isConnected: isMetaMaskConnected, address: metamaskAddress } = useAccount();
 
     //
     const handleSignData = async () => {
@@ -117,20 +112,61 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
     );
 };
 
+const ERC20CheckList: FC<any> = forwardRef((props, ref) => {
+    const [api, contextHolder] = notification.useNotification();
+
+    useImperativeHandle(ref, () => (
+        {
+            openNotification,
+            destroy: () => {
+                api.destroy(1);
+            }
+        }
+    ));
+
+    const openNotification = (placement: ReactElement) => {
+        api.info({
+            icon: null,
+            message: 'Check list',
+            description: props.children,
+            duration: null,
+            closeIcon: null,
+            key: 1
+        });
+    };
+
+    return (
+        <>
+            {contextHolder}
+        </>
+    );
+});
+
 //
 const ERC20Mint: FC<any> = () => {
     const [refreshMessageList, setRefreshMessageList] = useState(1);
     const locationSearch = new URLSearchParams(location.search);
     const searchCiviaWalletAddress = locationSearch.get('civiaAddress') as string;
     const searchERC20Token = locationSearch.get('erc20token') as string;
-    const [currentERC20Token, setCurrentERC20Token] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [messageList, setMessageList] = useState<Map<string, any[]>>(new Map());
+    //
+    const { isConnected: isMetaMaskConnected, address: metamaskAddress } = useAccount();
+    const { connect: metaMaskConnect, connectors: metaMaskConnectors, error: ucError, isLoading: ucIsLoading, pendingConnector } = useConnect();
+    const connectMetamaskRef = useRef(false);
+    
+
+    // auto connect metamask
+    if(!connectMetamaskRef.current && !metamaskAddress && metaMaskConnectors && metaMaskConnectors.length){
+        connectMetamaskRef.current = true;
+        metaMaskConnect({ connector: metaMaskConnectors[0] });
+    }
 
     const [messageApi, contextHolder] = message.useMessage();
-    const [selectedTokensAndSign, setSelectedTokensAndSign] = useState<Map<string, any>>(new Map());
 
-    const filterMessageList = Array.from(messageList.values());// currentERC20Token?  messageList.filter((item) => item[0].content.token === currentERC20Token) : messageList;
+    const checkListRef = useRef();
+
+    const filterMessageList = Array.from(messageList.values());
 
     const checkedMessageList = filterMessageList.filter((item) => {
         return item.every((su: any) => su.customContent);
@@ -157,6 +193,12 @@ const ERC20Mint: FC<any> = () => {
             setIsLoading(false);
         });
     }, [refreshMessageList]);
+
+    useEffect(() => {
+        if(checkedMessageList.length){
+            setTimeout((checkListRef.current as any).openNotification, 500);
+        }
+    }, [checkedMessageList.length]);
 
     const handleSelectAll = (evt: CheckboxChangeEvent) => {
         console.log(evt);
@@ -221,6 +263,7 @@ const ERC20Mint: FC<any> = () => {
                 userMintERC20Done(searchCiviaWalletAddress, [message_id]);
             });
             setRefreshMessageList(pre => pre + 1);
+            (checkListRef.current as any).destroy();
             return true;
         }).catch((err) => {
             const errStr = String(err);
@@ -248,13 +291,23 @@ const ERC20Mint: FC<any> = () => {
                             return (
                                 <div key={index}>
                                     <Card title={
+                                        <>
                                             <ERC20TokenInfo tokenAddress={item[0].content.token}>
                                                 {
                                                     (tokeName: string, tokenSymbol: string, formatAddr: string) => {
-                                                        return <div><label className={styles.label}>Token:</label>{`${tokeName} (${tokenSymbol}) ${formatAddr}`}</div>;
+                                                        return <span><label className={styles.label}>Token:</label>{`${tokeName} (${tokenSymbol}) ${formatAddr}`}&nbsp;&nbsp;</span>;
                                                     }
                                                 }
                                             </ERC20TokenInfo>
+                                            <ERC20TokenBalance tokenAddress={item[0].content.token} userAddress={metamaskAddress}>
+                                                {
+                                                    (res: any) => {
+                                                        console.log(res);
+                                                        return res ? <code>{`Balance: ${res/1e18}`}</code>: null;
+                                                    }
+                                                }
+                                            </ERC20TokenBalance>
+                                        </>
                                         }
                                         extra={
                                             <Checkbox onChange={handleSelectAll} checked={item.every((su: any) => su.customContent)}>Select all</Checkbox>
@@ -264,9 +317,7 @@ const ERC20Mint: FC<any> = () => {
                                         {
                                             item.map((subItem: any, subIndex: number) => {
                                                 return (
-                                                    <>
-                                                        <TokenItem item={subItem} key={subIndex} onSigned={handleSignedCreater(subItem.content.token, subIndex)} />
-                                                    </>
+                                                    <TokenItem item={subItem} key={subIndex} onSigned={handleSignedCreater(subItem.content.token, subIndex)} />
                                                 );
                                             })
                                         }
@@ -281,38 +332,41 @@ const ERC20Mint: FC<any> = () => {
                         filterMessageList.length === 0? <Empty />: null
                     }
                 </div>
-                {
-                    checkedMessageList.length? (
-                        <div className={styles.floatFooter}>
-                            <div>
-                                <div className={styles.shopCard}>
-                                    <List>
-                                        {
-                                            checkedMessageList.map((item: any, index: number) => {
-                                                return <List.Item key={index}>
-                                                    <ERC20TokenInfo tokenAddress={item[0].content.token}>
-                                                        {
-                                                            (tokeName: string, tokenSymbol: string, formatAddr: string) => {
-                                                                return <div><label className={styles.label}>Token:</label>{`${tokeName} (${tokenSymbol}) ${formatAddr}`}</div>;
+                
+                <ERC20CheckList ref={checkListRef}>
+                    {
+                        checkedMessageList.length? (
+                            <div className={styles.floatFooter}>
+                                <div>
+                                    <div className={styles.shopCard}>
+                                        <List>
+                                            {
+                                                checkedMessageList.map((item: any, index: number) => {
+                                                    return <List.Item key={index}>
+                                                        <ERC20TokenInfo tokenAddress={item[0].content.token}>
+                                                            {
+                                                                (tokeName: string, tokenSymbol: string, formatAddr: string) => {
+                                                                    return <div><label className={styles.label}>Token:</label>{`${tokeName} (${tokenSymbol}) ${formatAddr}`}</div>;
+                                                                }
                                                             }
-                                                        }
-                                                    </ERC20TokenInfo>
-                                                </List.Item>
-                                            })
-                                        }
-                                        <List.Item>
-                                            <div className={styles.batchButton}>
-                                                <Space>
-                                                    <Button type='primary' onClick={handleBatchMint}>Batch mint</Button>
-                                                </Space>
-                                            </div>
-                                        </List.Item>
-                                    </List>
+                                                        </ERC20TokenInfo>
+                                                    </List.Item>
+                                                })
+                                            }
+                                            <List.Item>
+                                                <div className={styles.batchButton}>
+                                                    <Space>
+                                                        <Button type='primary' onClick={handleBatchMint}>Batch mint</Button>
+                                                    </Space>
+                                                </div>
+                                            </List.Item>
+                                        </List>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ): null
-                }
+                        ): null
+                    }
+                </ERC20CheckList>
             </Spin>
         </>
     );
