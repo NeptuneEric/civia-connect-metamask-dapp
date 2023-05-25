@@ -12,10 +12,10 @@ const Erc20Pack: NextPage = () => {
   return (
     <div>
         <Head>
-          <title>Pack mint</title>
+          <title>Pack message</title>
           <link rel="icon" href="/civia-icon.svg" />
         </Head>
-          <Header title='Pack mint'  />
+          <Header title='Pack message'  />
           <main className='main'>
             <ERC20Pack />
         </main>
