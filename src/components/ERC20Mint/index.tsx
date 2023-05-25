@@ -267,11 +267,12 @@ const ERC20Mint: FC<any> = () => {
             return true;
         }).catch((err) => {
             const errStr = String(err);
-            const IsStartIdNotMatch = /start id not match/.test(errStr);
+            const isStartIdNotMatch = /start id not match/.test(errStr);
+            const isDenied = /MetaMask Tx Signature: User denied transaction signature/.test(errStr);
             console.log(err);
             messageApi.open({
                 type: 'error',
-                content: IsStartIdNotMatch ? 'start id not match' : errStr
+                content: isStartIdNotMatch ? 'start id not match' : (isDenied? 'MetaMask Tx Signature: User denied transaction signature': errStr)
             });
         }).finally(() => {
             setIsLoading(false);
