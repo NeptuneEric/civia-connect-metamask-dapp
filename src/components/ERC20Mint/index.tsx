@@ -11,7 +11,7 @@ import { ERC20TokenBalance } from '../ERC20TokenBalance';
 
 import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
 
-import { getErc20Message, getSessionToken } from '../../services/account.service';
+import { getErc20Message, leaveMessagePackERC20 } from '../../services/account.service';
 
 const CIVIA_ERC20_CONTRACT_ADDRESS = '0x8a647C33fe1fb520bDbcbA10d88d0397F5FdC056';
 
@@ -200,7 +200,7 @@ const ERC20Mint: FC<any> = () => {
         }
     }, [checkedMessageList.length]);
 
-    const handleSelectAll = (evt: CheckboxChangeEvent) => {
+    const handleSelectAll = async (evt: CheckboxChangeEvent) => {
         console.log(evt);
         const { value, checked } = evt.target;
         // if(checked){
@@ -209,6 +209,21 @@ const ERC20Mint: FC<any> = () => {
         //     selectedTokens.delete(value);
         // }
         // setSelectedTokens(selectedTokens);
+    }
+
+    const handlePackAll = async (tokenAddress: string) => {
+        //
+        const messageItems = messageList.get(tokenAddress);
+        console.log(messageItems);
+        const messageIds = messageItems!.map((item: any) => item.message_id);
+        console.log(messageIds);
+        setIsLoading(true);
+        const res = await leaveMessagePackERC20(searchCiviaWalletAddress, messageIds).catch((err) => {
+            console.log(err);
+        }).finally(() => {
+            setIsLoading(false);
+        });
+        console.log(res);
     }
 
     const handleSignedCreater = (tokenAddress: string, itemIndex: number) => {
@@ -304,7 +319,6 @@ const ERC20Mint: FC<any> = () => {
                                             <ERC20TokenBalance tokenAddress={item[0].content.token} userAddress={metamaskAddress}>
                                                 {
                                                     (res: any) => {
-                                                        console.log(res);
                                                         return res ? <code>{`Balance: ${res/1e18}`}</code>: null;
                                                     }
                                                 }
@@ -312,7 +326,8 @@ const ERC20Mint: FC<any> = () => {
                                         </>
                                         }
                                         extra={
-                                            <Checkbox onChange={handleSelectAll} checked={item.every((su: any) => su.customContent)}>Select all</Checkbox>
+                                            item.length>1? <Button type="link" onClick={() => { handlePackAll(item[0].content.token);}}>Pack mint</Button>: null
+                                            // <Checkbox onChange={handleSelectAll} checked={item.every((su: any) => su.customContent)}>Select all</Checkbox>
                                         }
                                     >
                                         <List.Item><label className={styles.label}>Amount:</label></List.Item>

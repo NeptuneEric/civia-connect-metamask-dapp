@@ -174,3 +174,77 @@ export const userMintERC20Done = async (account: string, messageIds: number[]) =
         });
     return Promise.resolve(response.data);
 }
+
+export const leaveMessagePackERC20 = async (account: string, messageIds: string[]) => {
+    const getTokenRes = await getSessionToken(account).catch((err) => {});
+    const key = `${account},token`;
+    const response = await axios.post('/api/app/leaveMessagePackERC20',
+        {
+            account,
+            messageIds: messageIds.join(',')
+        },
+        {
+            headers: {
+                authorization: `Bearer ${window.localStorage.getItem(key) || ''}`,
+                'Content-type': 'application/json;charset=utf-8'
+            }
+        });
+    return Promise.resolve(response.data);
+}
+
+export const getUserERC20MessagesUnPacked = async (account: string) => {
+    const getTokenRes = await getSessionToken(account).catch((err) => {});
+    const key = `${account},token`;
+    const response = await axios.post('/api/app/getUserERC20MessagesUnPacked',
+        {
+            account
+        },
+        {
+            headers: {
+                authorization: `Bearer ${window.localStorage.getItem(key) || ''}`,
+                'Content-type': 'application/json;charset=utf-8'
+            }
+        });
+    return Promise.resolve(response.data);
+}
+
+type lmep20 = {
+    from: string;
+    to: string;
+    sign: string;
+    idBegin: number;
+    idEnd: number;
+    amount: string;
+    token: string;
+    sender: string;
+    receiver: string;
+    packMsgId: number;
+    messageIds: string;
+}
+export const leaveMessageERC20PackDone = async (account: string, params: lmep20) => {
+    console.log(params);
+    const getTokenRes = await getSessionToken(account).catch((err) => {});
+    const key = `${account},token`;
+    const response = await axios.post('/api/app/leaveMessageERC20PackDone',
+        {
+            account,
+            from: params.from,
+            to: params.to,
+            sign: params.sign,
+            id_begin: params.idBegin,
+            id_end: params.idEnd,
+            amount: params.amount,
+            token: params.token,
+            sender: params.sender,
+            receiver: params.receiver,
+            pack_msg_id: params.packMsgId,
+            message_ids: params.messageIds
+        },
+        {
+            headers: {
+                authorization: `Bearer ${window.localStorage.getItem(key) || ''}`,
+                'Content-type': 'application/json;charset=utf-8'
+            }
+        });
+    return Promise.resolve(response.data);
+}
