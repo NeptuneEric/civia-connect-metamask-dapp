@@ -13,7 +13,7 @@ const Footer: FC<any> = () => {
             <div className={styles.right}>
                 <div className={styles.list}>
                     <h1>Contact Us</h1>
-                    <p onClick={() => {location.href='https://civia.org/';}}>Civia.org</p>
+                    <p onClick={() => { location.href = 'https://civia.org/'; }}>Civia.org</p>
                     {/* <p>@CIVIA</p> */}
                 </div>
                 {/* <div className={styles.list}>

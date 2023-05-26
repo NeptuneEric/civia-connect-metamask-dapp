@@ -4,13 +4,13 @@ import { getUserERC20MessagesUnPacked } from '../../services/account.service';
 export const useGetUserERC20MessagesUnPackedCache = (account: string) => {
     const key = `@"${account}","unpackMessage"`;
     const { data, error } = useSWR(key, async () => {
-        return getUserERC20MessagesUnPacked(account).then(({ code, result}) => {
+        return getUserERC20MessagesUnPacked(account).then(({ code, result }) => {
             console.log(result);
-            if(code === 0){
+            if (code === 0) {
                 return result.messages;
             }
         });
-    }, { revalidateIfStale: true, refreshInterval: 5e3  })
+    }, { revalidateIfStale: true, refreshInterval: 5e3 });
 
     return { data };
 };

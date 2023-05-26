@@ -1,10 +1,10 @@
 import { FC, useEffect, useState, useRef, ReactElement, useImperativeHandle, forwardRef } from 'react';
-import { Spin, Button, List, message, Steps, Space, Card, Empty, Checkbox, notification } from 'antd';
-import { CheckCircleOutlined } from '@ant-design/icons';
-import { useContractRead, useContractWrite, useConnect, useAccount, useSignMessage } from 'wagmi';
-import { getContract, getWalletClient, readContract, writeContract } from '@wagmi/core'
-import { ethers } from "ethers";
-import { userMintERC20Done } from '../../services/account.service';
+import { Spin, Button, List, message, Space, Card, Empty, notification } from 'antd';
+import { CheckOutlined } from '@ant-design/icons';
+import { useConnect, useAccount, useSignMessage } from 'wagmi';
+import { writeContract } from '@wagmi/core';
+import { ethers } from 'ethers';
+import { userMintERC20Done, leaveMessagePackERC20 } from '../../services/account.service';
 
 import { useGetERCMessageUnMint } from '../../hooks/useGetERCMessageUnMint';
 
@@ -13,15 +13,9 @@ import { ERC20TokenBalance } from '../ERC20TokenBalance';
 
 import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
 
-import { getErc20Message, leaveMessagePackERC20 } from '../../services/account.service';
+import styles from './index.module.css';
 
 const CIVIA_ERC20_CONTRACT_ADDRESS = '0x8a647C33fe1fb520bDbcbA10d88d0397F5FdC056';
-
-import styles from './index.module.css';
-import { CheckboxChangeEvent, CheckboxChangeEventTarget } from 'antd/es/checkbox/Checkbox';
-
-import TestToken from '../../../abi/TestToken.json';
-
 
 const TokenItem: FC<any> = ({ item, onSigned }) => {
     const locationSearch = new URLSearchParams(location.search);
@@ -44,34 +38,34 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
         const orderParts = [
             { value: metamaskAddress, type: 'address' },
             { value: receiver, type: 'address' },
-            { value: token, type: "address" },
-            { value: idBegin, type: "uint256" },
-            { value: idEnd, type: "uint256" },
-            { value: `${amount * 1e18}`, type: "uint256" },
+            { value: token, type: 'address' },
+            { value: idBegin, type: 'uint256' },
+            { value: idEnd, type: 'uint256' },
+            { value: `${amount * 1e18}`, type: 'uint256' }
         ];
 
         const types = orderParts.map(o => o.type);
         const values = orderParts.map(o => o.value);
         const hash = ethers.utils.solidityKeccak256(types, values);
         metaMaskSignMessage({ message: ethers.utils.arrayify(hash) as any });
-    }
+    };
     //
     const handleMint = async () => {
         const { receiver, token, id_begin: idBegin, id_end: idEnd, amount, sign } = item.content;
         const signObj = JSON.parse(sign);
-        if(signData){
+        if (signData) {
             const sigHex = signData.substring(2);
             const receiverR = '0x' + sigHex.slice(0, 64);
             const receiverS = '0x' + sigHex.slice(64, 128);
             const receiverV = parseInt(sigHex.slice(128, 130), 16);
             //
-            const addrs = [token],
-            users = [receiver],
-            beginIds = [idBegin],
-            endIds = [idEnd],
-            amounts = [`${amount * 1e18}`],
-            v = [signObj.v, receiverV],
-            r_s = [signObj.r, signObj.s, receiverR, receiverS];
+            const addrs = [token];
+            const users = [receiver];
+            const beginIds = [idBegin];
+            const endIds = [idEnd];
+            const amounts = [`${amount * 1e18}`];
+            const v = [signObj.v, receiverV];
+            const r_s = [signObj.r, signObj.s, receiverR, receiverS];
             //
             setIsLoading(true);
             const res = await writeContract({
@@ -95,8 +89,7 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
                 setIsLoading(false);
             });
         }
-    }
-
+    };
 
     return (
         <>
@@ -104,11 +97,11 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
             <List.Item
                 extra={<div>
                     {
-                        step === 0? (<Button size='small' onClick={handleSignData}>Sign</Button>) : (<CheckCircleOutlined className={styles.successIcon} />)
+                        step === 0 ? (<Button size='small' onClick={handleSignData}>Sign</Button>) : (<CheckOutlined className={styles.successIcon} />)
                     }
                 </div>}
             >
-                <div><label className={styles.label} />{ item.content.amount }</div>
+                <div><label className={styles.label} />{item.content.amount}</div>
             </List.Item>
         </>
     );
@@ -155,10 +148,9 @@ const ERC20Mint: FC<any> = () => {
     const { isConnected: isMetaMaskConnected, address: metamaskAddress } = useAccount();
     const { connect: metaMaskConnect, connectors: metaMaskConnectors, error: ucError, isLoading: ucIsLoading, pendingConnector } = useConnect();
     const connectMetamaskRef = useRef(false);
-    
 
     // auto connect metamask
-    if(!connectMetamaskRef.current && !metamaskAddress && metaMaskConnectors && metaMaskConnectors.length){
+    if (!connectMetamaskRef.current && !metamaskAddress && metaMaskConnectors && metaMaskConnectors.length) {
         connectMetamaskRef.current = true;
         metaMaskConnect({ connector: metaMaskConnectors[0] });
     }
@@ -176,7 +168,7 @@ const ERC20Mint: FC<any> = () => {
     const { data: unMintMessageData } = useGetERCMessageUnMint(searchCiviaWalletAddress);
 
     useEffect(() => {
-        if(unMintMessageData && unMintMessageData.length){
+        if (unMintMessageData && unMintMessageData.length) {
             const newMessageMapList = unMintMessageData.reduce((newML: Map<string, any>, item: any, index: number) => {
                 const content = JSON.parse(item.content);
                 const token = content.token;
@@ -186,7 +178,7 @@ const ERC20Mint: FC<any> = () => {
                     content
                 });
                 newML.set(token, newMLItem.sort((a: any, b: any) => {
-                    return a.content.id_begin > b.content.id_begin ? 1: -1;
+                    return a.content.id_begin > b.content.id_begin ? 1 : -1;
                 }));
                 return newML;
             }, new Map());
@@ -196,8 +188,8 @@ const ERC20Mint: FC<any> = () => {
     }, [unMintMessageData]);
 
     useEffect(() => {
-        if(checkedMessageList.length){
-            setTimeout((checkListRef.current as any).openNotification, 500);
+        if (checkedMessageList.length) {
+            setTimeout((checkListRef.current as any).openNotification, 300);
         }
     }, [checkedMessageList.length]);
 
@@ -214,7 +206,7 @@ const ERC20Mint: FC<any> = () => {
             setIsLoading(false);
         });
         console.log(res);
-    }
+    };
 
     const handleSignedCreater = (tokenAddress: string, itemIndex: number) => {
         return (signedInfo: {signData: string, [k:string]: any}) => {
@@ -226,8 +218,8 @@ const ERC20Mint: FC<any> = () => {
             };
             newMessageList.set(tokenAddress, subItems!);
             setMessageList(newMessageList);
-        }
-    }
+        };
+    };
 
     const handleBatchMint = async () => {
         console.log(checkedMessageList);
@@ -239,14 +231,14 @@ const ERC20Mint: FC<any> = () => {
             const receiverS = '0x' + sigHex.slice(64, 128);
             const receiverV = parseInt(sigHex.slice(128, 130), 16);
             //
-            const addrs = [token],
-            senders = [sender],
-            users = [receiver],
-            beginIds = [idBegin],
-            endIds = [idEnd],
-            amounts = [`${amount * 1e18}`],
-            v = [signObj.v, receiverV],
-            r_s = [signObj.r, signObj.s, receiverR, receiverS];
+            const addrs = [token];
+            const senders = [sender];
+            const users = [receiver];
+            const beginIds = [idBegin];
+            const endIds = [idEnd];
+            const amounts = [`${amount * 1e18}`];
+            const v = [signObj.v, receiverV];
+            const r_s = [signObj.r, signObj.s, receiverR, receiverS];
 
             return [addrs, senders, users, beginIds, endIds, amounts, v, r_s];
         };
@@ -277,71 +269,69 @@ const ERC20Mint: FC<any> = () => {
             console.log(err);
             messageApi.open({
                 type: 'error',
-                content: isStartIdNotMatch ? 'start id not match' : (isDenied? 'MetaMask Tx Signature: User denied transaction signature': errStr)
+                content: isStartIdNotMatch ? 'start id not match' : (isDenied ? 'MetaMask Tx Signature: User denied transaction signature' : errStr)
             });
         }).finally(() => {
             setIsLoading(false);
         });
-            
-    }
-
+    };
 
     return (
         <>
-        <Spin spinning={isLoading}>
-            {contextHolder}
+            <Spin spinning={isLoading}>
+                {contextHolder}
                 <div className={styles.body}>
-                    <List style={{ visibility: filterMessageList.length? 'initial': 'hidden'}}>
+                    <List style={{ visibility: filterMessageList.length ? 'initial' : 'hidden' }}>
                         {
-                        filterMessageList.map((item: any, index: number) => {
-                            return (
-                                <div key={index}>
-                                    <Card title={
-                                        <>
-                                            <ERC20TokenInfo tokenAddress={item[0].content.token}>
-                                                {
-                                                    (tokeName: string, tokenSymbol: string, formatAddr: string) => {
-                                                        return <span><label className={styles.label}>Token:</label>{`${tokeName} (${tokenSymbol}) ${formatAddr}`}&nbsp;&nbsp;</span>;
+                            filterMessageList.map((item: any, index: number) => {
+                                return (
+                                    <div key={index}>
+                                        <Card title={
+                                            <>
+                                                <ERC20TokenInfo tokenAddress={item[0].content.token}>
+                                                    {
+                                                        (tokeName: string, tokenSymbol: string, formatAddr: string) => {
+                                                            return <span><label className={styles.label}>Token:</label>{`${tokeName} (${tokenSymbol}) ${formatAddr}`}&nbsp;&nbsp;</span>;
+                                                        }
                                                     }
-                                                }
-                                            </ERC20TokenInfo>
-                                            <ERC20TokenBalance tokenAddress={item[0].content.token} userAddress={metamaskAddress}>
-                                                {
-                                                    (res: any) => {
-                                                        return res ? <code>{`Balance: ${res/1e18}`}</code>: null;
+                                                </ERC20TokenInfo>
+                                                <ERC20TokenBalance tokenAddress={item[0].content.token} userAddress={metamaskAddress}>
+                                                    {
+                                                        (res: any) => {
+                                                            return res ? <code>{`Balance: ${res / 1e18}`}</code> : null;
+                                                        }
                                                     }
-                                                }
-                                            </ERC20TokenBalance>
-                                        </>
+                                                </ERC20TokenBalance>
+                                            </>
                                         }
                                         extra={
-                                            item.length>1? <Button type="link" onClick={() => { handlePackAll(item[0].content.token);}}>Pack mint</Button>: null
+                                            item.length > 1 ? <Button type="link" onClick={() => { handlePackAll(item[0].content.token); }}>Pack mint</Button> : null
                                             // <Checkbox onChange={handleSelectAll} checked={item.every((su: any) => su.customContent)}>Select all</Checkbox>
                                         }
-                                    >
-                                        <List.Item><label className={styles.label}>Amount:</label></List.Item>
-                                        {
-                                            item.map((subItem: any, subIndex: number) => {
-                                                return (
-                                                    <TokenItem item={subItem} key={subIndex} onSigned={handleSignedCreater(subItem.content.token, subIndex)} />
-                                                );
-                                            })
-                                        }
-                                    </Card>
-                                    <br/>
-                                </div>
-                            );
-                        }) 
+                                        >
+                                            <List.Item><label className={styles.label}>Amount:</label></List.Item>
+                                            {
+                                                item.map((subItem: any, subIndex: number) => {
+                                                    return (
+                                                        <TokenItem item={subItem} key={subIndex} onSigned={handleSignedCreater(subItem.content.token, subIndex)} />
+                                                    );
+                                                })
+                                            }
+                                        </Card>
+                                        <br />
+                                    </div>
+                                );
+                            })
                         }
                     </List>
                     {
-                        filterMessageList.length === 0? <Empty />: null
+                        filterMessageList.length === 0 ? <Empty /> : null
                     }
                 </div>
-                
+
                 <ERC20CheckList ref={checkListRef}>
                     {
-                        checkedMessageList.length? (
+                        checkedMessageList.length ? (
                             <div className={styles.floatFooter}>
                                 <div>
                                     <div className={styles.shopCard}>
@@ -356,7 +346,7 @@ const ERC20Mint: FC<any> = () => {
                                                                 }
                                                             }
                                                         </ERC20TokenInfo>
-                                                    </List.Item>
+                                                    </List.Item>;
                                                 })
                                             }
                                             <List.Item>
@@ -370,7 +360,7 @@ const ERC20Mint: FC<any> = () => {
                                     </div>
                                 </div>
                             </div>
-                        ): null
+                        ) : null
                     }
                 </ERC20CheckList>
             </Spin>

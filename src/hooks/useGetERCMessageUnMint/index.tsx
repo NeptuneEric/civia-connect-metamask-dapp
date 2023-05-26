@@ -6,7 +6,7 @@ export const useGetERCMessageUnMint = (account: string) => {
     console.log(key);
     const { data, error } = useSWR(key, async () => {
         return getErc20Message(account);
-    }, { revalidateIfStale: true, refreshInterval: 5e3  })
+    }, { revalidateIfStale: true, refreshInterval: 5e3 });
 
     return { data };
 };

@@ -5,11 +5,9 @@ import TestToken from '../../../abi/TestToken.json';
 import { truncateHex } from '../../services/address.service';
 
 export const useERC20TokenInfo = (testTokenAddress: `0x${string}`) => {
-    
-
     const key = `@"${testTokenAddress}","tokenInfo"`;
     const { data, error } = useSWR(key, async () => {
-        if(testTokenAddress){
+        if (testTokenAddress) {
             const res = await readContracts({
                 contracts: [
                     {
@@ -22,46 +20,21 @@ export const useERC20TokenInfo = (testTokenAddress: `0x${string}`) => {
                         abi: TestToken.abi,
                         functionName: 'symbol'
                     }
-                ]}).then(([{ result: tokenName }, { result: tokenSymbol }]) => {
+                ]
+            }).then(([{ result: tokenName }, { result: tokenSymbol }]) => {
                 return {
                     tokenName,
                     tokenSymbol,
                     formatAddr: truncateHex(testTokenAddress)
                 };
-              }).catch(() => {
+            }).catch(() => {
                 return null;
-              });
+            });
             return res;
-        }else{
+        } else {
             return null;
         }
-    }, { revalidateIfStale: true })
-
-    
-    // const [data, setData] = useState<any>();
-    // useEffect(() => {
-    //     readContracts({
-    //     contracts: [
-    //         {
-    //             address: testTokenAddress,
-    //             abi: TestToken.abi as unknown as any,
-    //             functionName: 'name'
-    //         },
-    //         {
-    //             address: testTokenAddress,
-    //             abi: TestToken.abi,
-    //             functionName: 'symbol'
-    //         }
-    //     ]}).then(([{ result: tokenName }, { result: tokenSymbol }]) => {
-    //         const data = {
-    //             tokenName,
-    //             tokenSymbol
-    //         };
-    //         setData(data);
-    //     }).catch(() => {
-    //         return null;
-    //     });
-    // }, [testTokenAddress]);
+    }, { revalidateIfStale: true });
 
     return data || {
         tokenName: null,

@@ -1,12 +1,12 @@
 import { Abi, Contract, ProviderInterface, Call, shortString, number, defaultProvider } from 'starknet';
 import { zipWith } from 'lodash-es';
-import { Multicall } from "@argent/x-multicall"
+import { Multicall } from '@argent/x-multicall';
 import SBTMgrCompiledContractAbi from '../../abi/SBTMgr.json';
 import { abi as TestTokenAbi } from '../../abi/TestToken.json';
 import { abi as CiviaERC20CheckAbi } from '../../abi/CiviaERC20Check.json';
-const { decodeShortString } = shortString;
 import axios from 'axios';
 import useSWR from 'swr';
+const { decodeShortString } = shortString;
 
 const sbtConstractAddress = '0x056041215dda8462b041678717612fd64f99310aaa834a9d42527aeba5f3c661';
 
@@ -25,7 +25,7 @@ export const getFollowingList = async (address: string) => {
         };
     });
     return resData;
-}
+};
 
 export const getSessionToken = async (account: string) => {
     const key = `${account},token`;
@@ -56,10 +56,9 @@ export const getCiviaBinedAddressByAddressList = async (addressList: string[]) =
     );
 
     return res;
-}
+};
 
 export const getMetamaskAddressList = async (account: string, civiaAddressList: string[]) => {
-
     const key = `${account},token`;
     const response = await axios.post('/api/app/getMockBindedAddrs',
         {
@@ -100,7 +99,7 @@ export const getSynthesizeAddressList = async (account: string) => {
         };
     });
     return syntheAddressList;
-}
+};
 
 export const getUsersOwnerTokenCurrentId = async (account: string, users: string[], tokenAddr: string) => {
     const key = `${account},token`;
@@ -117,8 +116,7 @@ export const getUsersOwnerTokenCurrentId = async (account: string, users: string
             }
         });
     return Promise.resolve(response.data);
-}
-
+};
 
 type lme20 = {
     from: string;
@@ -154,14 +152,14 @@ export const leaveMessageERC20 = async (account: string, params: lme20) => {
             }
         });
     return Promise.resolve(response.data);
-}
+};
 
 export const getTokenInfo = async (address: string) => {
     const contract = new Contract(TestTokenAbi, address, defaultProvider);
     const res = await contract.call('name');
     console.log(res);
     return res;
-}
+};
 
 export const getErc20Message = async (account: string) => {
     const getTokenRes = await getSessionToken(account).catch((err) => {});
@@ -201,7 +199,7 @@ export const userMintERC20Done = async (account: string, messageIds: number[]) =
             }
         });
     return Promise.resolve(response.data);
-}
+};
 
 export const leaveMessagePackERC20 = async (account: string, messageIds: string[]) => {
     const getTokenRes = await getSessionToken(account).catch((err) => {});
@@ -218,7 +216,7 @@ export const leaveMessagePackERC20 = async (account: string, messageIds: string[
             }
         });
     return Promise.resolve(response.data);
-}
+};
 
 export const getUserERC20MessagesUnPacked = async (account: string) => {
     const getTokenRes = await getSessionToken(account).catch((err) => {});
@@ -235,7 +233,7 @@ export const getUserERC20MessagesUnPacked = async (account: string) => {
             }
         });
     return Promise.resolve(response.data);
-}
+};
 
 type lmep20 = {
     from: string;
@@ -276,4 +274,4 @@ export const leaveMessageERC20PackDone = async (account: string, params: lmep20)
             }
         });
     return Promise.resolve(response.data);
-}
+};

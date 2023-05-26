@@ -1,20 +1,15 @@
-import { FC, useEffect, useState, useRef, ReactElement, useImperativeHandle, forwardRef } from 'react';
-import { Spin, Button, List, message, Steps, Space, Card, Empty, Checkbox, notification } from 'antd';
-import { CheckCircleOutlined } from '@ant-design/icons';
+import { FC, useEffect, useState, useRef } from 'react';
+import { Spin, Button, List, message, Card, Empty } from 'antd';
 import { useContractRead, useContractWrite, useConnect, useAccount, useSignMessage } from 'wagmi';
-import { getContract, getWalletClient, readContract, writeContract } from '@wagmi/core'
-import { ethers } from "ethers";
-import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
+import { ethers } from 'ethers';
 
 import { truncateHex } from '../../services/address.service';
 
 import { ERC20TokenInfo } from '../ERC20TokenInfo';
 
-import { getUserERC20MessagesUnPacked, leaveMessageERC20PackDone } from '../../services/account.service';
+import { leaveMessageERC20PackDone } from '../../services/account.service';
 
 import { useGetUserERC20MessagesUnPackedCache } from '../../hooks/useGetUserERC20MessageUnPacked';
-
-const CIVIA_ERC20_CONTRACT_ADDRESS = '0x8a647C33fe1fb520bDbcbA10d88d0397F5FdC056';
 
 import styles from './index.module.css';
 
@@ -22,7 +17,7 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
     return (
         <>
             <List.Item>
-                <div><label className={styles.label} />{ item.amount }</div>
+                <div><label className={styles.label} />{item.amount}</div>
             </List.Item>
         </>
     );
@@ -43,21 +38,19 @@ const ERC20Mint: FC<any> = () => {
         onSuccess: (res) => {
             onSignDataFn.current && onSignDataFn.current(res);
         },
-        onError: (err) =>{
+        onError: (err) => {
             console.log(err);
             const errStr = String(err);
             const isDenied = /MetaMask Tx Signature: User denied transaction signature/.test(errStr);
             messageApi.open({
                 type: 'error',
-                content: isDenied? 'MetaMask Tx Signature: User denied transaction signature': errStr
+                content: isDenied ? 'MetaMask Tx Signature: User denied transaction signature' : errStr
             });
         }
     });
 
-    console.log(unPackMessageList);
-
     // auto connect metamask
-    if(!connectMetamaskRef.current && !metamaskAddress && metaMaskConnectors && metaMaskConnectors.length){
+    if (!connectMetamaskRef.current && !metamaskAddress && metaMaskConnectors && metaMaskConnectors.length) {
         connectMetamaskRef.current = true;
         metaMaskConnect({ connector: metaMaskConnectors[0] });
     }
@@ -78,7 +71,7 @@ const ERC20Mint: FC<any> = () => {
                 ...item,
                 messageIds: content.messageIds,
                 content: newMLItem.sort((a: any, b: any) => {
-                    return a.id_begin > b.id_begin ? 1: -1;
+                    return a.id_begin > b.id_begin ? 1 : -1;
                 })
             });
             return newML;
@@ -90,7 +83,7 @@ const ERC20Mint: FC<any> = () => {
     const handleSign = async (tokenAddress: string) => {
         const unPackMessageItem: any = unPackMessageList.get(tokenAddress);
         console.log(unPackMessageItem);
-        
+
         const mergedMessageContent = unPackMessageItem.content.reduce((preContent: any, content: any) => {
             const newContent = {
                 amount: Number(preContent.amount) + Number(content.amount),
@@ -116,10 +109,10 @@ const ERC20Mint: FC<any> = () => {
         const orderParts = [
             { value: metamaskAddress, type: 'address' },
             { value: receiver, type: 'address' },
-            { value: token, type: "address" },
-            { value: idBegin, type: "uint256" },
-            { value: idEnd, type: "uint256" },
-            { value: `${amount * 1e18}`, type: "uint256" },
+            { value: token, type: 'address' },
+            { value: idBegin, type: 'uint256' },
+            { value: idEnd, type: 'uint256' },
+            { value: `${amount * 1e18}`, type: 'uint256' }
         ];
 
         const types = orderParts.map(o => o.type);
@@ -128,14 +121,13 @@ const ERC20Mint: FC<any> = () => {
         metaMaskSignMessage({ message: ethers.utils.arrayify(hash) as any });
         //
         onSignDataFn.current = (signData: string) => {
-            
-            doLeaveMessageERC20PackDone({signData, mergedMessageContent, unPackMessageItem});
+            doLeaveMessageERC20PackDone({ signData, mergedMessageContent, unPackMessageItem });
         };
-    }
+    };
 
-    const doLeaveMessageERC20PackDone = async ({signData, mergedMessageContent, unPackMessageItem}: any) => {
+    const doLeaveMessageERC20PackDone = async ({ signData, mergedMessageContent, unPackMessageItem }: any) => {
         console.log(unPackMessageItem);
-        if(signData){
+        if (signData) {
             const sigHex = signData.substring(2);
             const r = '0x' + sigHex.slice(0, 64);
             const s = '0x' + sigHex.slice(64, 128);
@@ -145,7 +137,7 @@ const ERC20Mint: FC<any> = () => {
             leaveMessageERC20PackDone(searchCiviaWalletAddress, {
                 from: searchCiviaWalletAddress,
                 to: unPackMessageItem.to,
-                sign: JSON.stringify({ r, s, v}),
+                sign: JSON.stringify({ r, s, v }),
                 idBegin: mergedMessageContent.id_begin,
                 idEnd: mergedMessageContent.id_end,
                 amount: mergedMessageContent.amount,
@@ -153,61 +145,60 @@ const ERC20Mint: FC<any> = () => {
                 sender: mergedMessageContent.sender,
                 receiver: mergedMessageContent.receiver,
                 packMsgId: unPackMessageItem.message_id,
-                messageIds: unPackMessageItem.messageIds,
+                messageIds: unPackMessageItem.messageIds
             }).then(() => {
 
             }).finally(() => {
-               
+
             });
         }
-    }
-
+    };
 
     const filterMessageList = Array.from(unPackMessageList.values());
 
     return (
         <>
-        <Spin spinning={isLoading}>
-            {contextHolder}
+            <Spin spinning={isLoading}>
+                {contextHolder}
                 <div className={styles.body}>
-                <List style={{ visibility: filterMessageList.length? 'initial': 'hidden'}}>
+                    <List style={{ visibility: filterMessageList.length ? 'initial' : 'hidden' }}>
                         {
-                        filterMessageList.map((item: any, index: number) => {
-                            return (
-                                <div key={index}>
-                                    <Card title={
-                                        <>
-                                            <div><label className={styles.label}>Receive:</label><code>{truncateHex(item.content[0].receiver)}</code></div>
-                                            <ERC20TokenInfo tokenAddress={item.content[0].token}>
-                                                {
-                                                    (tokeName: string, tokenSymbol: string, formatAddr: string) => {
-                                                        return <span><label className={styles.label}>Token:</label>{`${tokeName} (${tokenSymbol}) ${formatAddr}`}&nbsp;&nbsp;</span>;
+                            filterMessageList.map((item: any, index: number) => {
+                                return (
+                                    <div key={index}>
+                                        <Card title={
+                                            <>
+                                                <div><label className={styles.label}>Receive:</label><code>{truncateHex(item.content[0].receiver)}</code></div>
+                                                <ERC20TokenInfo tokenAddress={item.content[0].token}>
+                                                    {
+                                                        (tokeName: string, tokenSymbol: string, formatAddr: string) => {
+                                                            return <span><label className={styles.label}>Token:</label>{`${tokeName} (${tokenSymbol}) ${formatAddr}`}&nbsp;&nbsp;</span>;
+                                                        }
                                                     }
-                                                }
-                                            </ERC20TokenInfo>
-                                        </>
+                                                </ERC20TokenInfo>
+                                            </>
                                         }
                                         extra={
-                                            <Button type="link" onClick={() => { handleSign(item.message_id);}}>Pack sign</Button>
+                                            <Button type="link" onClick={() => { handleSign(item.message_id); }}>Pack sign</Button>
                                         }
-                                    >
-                                        <List.Item><label className={styles.label}>Amount:</label></List.Item>
-                                        {
-                                            item.content.map((subItem: any, subIndex: number) => {
-                                                return (
-                                                    <TokenItem item={subItem} key={subIndex} />
-                                                );
-                                            })
-                                        }
-                                    </Card>
-                                    <br/>
-                                </div>
-                            );
-                        }) 
+                                        >
+                                            <List.Item><label className={styles.label}>Amount:</label></List.Item>
+                                            {
+                                                item.content.map((subItem: any, subIndex: number) => {
+                                                    return (
+                                                        <TokenItem item={subItem} key={subIndex} />
+                                                    );
+                                                })
+                                            }
+                                        </Card>
+                                        <br />
+                                    </div>
+                                );
+                            })
                         }
                     </List>
                     {
-                        filterMessageList.length === 0? <Empty />: null
+                        filterMessageList.length === 0 ? <Empty /> : null
                     }
                 </div>
             </Spin>

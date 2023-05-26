@@ -6,7 +6,7 @@ import TestToken from '../../../abi/TestToken.json';
 export const ERC20TokenBalance: FC<any> = ({ tokenAddress, userAddress, children }) => {
     const key = `${userAddress}-${tokenAddress}-balance`;
     const { data } = useSWR(key, async () => {
-        if(tokenAddress && userAddress){
+        if (tokenAddress && userAddress) {
             return await readContract({
                 address: tokenAddress,
                 abi: TestToken.abi,
@@ -15,10 +15,10 @@ export const ERC20TokenBalance: FC<any> = ({ tokenAddress, userAddress, children
             }).catch((err) => {
                 console.log(err);
             });
-        }else{
+        } else {
             return undefined;
         }
-    }, { revalidateIfStale: true })
+    }, { revalidateIfStale: true });
 
     return children && children(String(data));
 };

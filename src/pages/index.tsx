@@ -1,9 +1,9 @@
-import { supportsSessions } from "@argent/x-sessions"
-import type { NextPage } from "next"
-import Head from "next/head"
+import { supportsSessions } from '@argent/x-sessions';
+import type { NextPage } from 'next';
+import Head from 'next/head';
 import dynamic from 'next/dynamic';
 
-import styles from "../styles/index.module.css"
+import styles from '../styles/index.module.css';
 
 const ConnectMetamask = dynamic(import('../components/ConnectMetamask'), { ssr: false });
 const Header = dynamic(import('../components/Header'), { ssr: false });
@@ -22,7 +22,7 @@ const Index: NextPage = () => {
             </main>
             <Footer />
         </div>
-    )
-}
+    );
+};
 
-export default Index
+export default Index;
