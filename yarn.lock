@@ -61,6 +61,14 @@
   dependencies:
     get-starknet "^1.0.0"
 
+"@argent/x-multicall@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@argent/x-multicall/-/x-multicall-6.0.0.tgz#9b446e4fe757c9efcb360b405fe8ba2671182763"
+  integrity sha512-JOLpklbQ8wLSeFRcgVpKuSQBgnBsDNClTSZvcxYPhl+HmyQClvuSTLzELv6CUWL6+viQEVqNY6RpqTAROPfyaA==
+  dependencies:
+    dataloader "^2.1.0"
+    starknet "^4.15.0"
+
 "@argent/x-sessions@^5.3.15":
   version "5.3.15"
   resolved "https://registry.yarnpkg.com/@argent/x-sessions/-/x-sessions-5.3.15.tgz#fc584dc36cc858884b53bcbf3f2c68fb3ae9d440"
@@ -2212,6 +2220,11 @@ damerau-levenshtein@^1.0.8:
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/damerau-levenshtein/-/damerau-levenshtein-1.0.8.tgz#b43d286ccbd36bc5b2f7ed41caf2d0aba1f8a6e7"
   integrity sha512-sdQSFB7+llfUcQHUQO3+B8ERRj0Oa4w9POWMI/puGtuf7gFywGmkaLCElnudfTiKZV+NvHqL0ifzdrI8Ro7ESA==
+
+dataloader@^2.1.0:
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/dataloader/-/dataloader-2.2.2.tgz#216dc509b5abe39d43a9b9d97e6e5e473dfbe3e0"
+  integrity sha512-8YnDaaf7N3k/q5HnTJVuzSyLETjoZjVmHc4AeKAzOvKHEFQKcn64OKBfzHYtE9zGjctNM7V9I0MfnUVLpi7M5g==
 
 dayjs@^1.11.1, dayjs@^1.9.1:
   version "1.11.7"
@@ -4885,7 +4898,7 @@ split2@^4.0.0:
     ts-custom-error "^3.3.1"
     url-join "^4.0.1"
 
-starknet@^4.21.0:
+starknet@^4.15.0, starknet@^4.21.0:
   version "4.22.0"
   resolved "https://registry.yarnpkg.com/starknet/-/starknet-4.22.0.tgz#8d0c628e2a8e868ee9b4757afe89f07b05ec55ff"
   integrity sha512-jC9Taxb6a/ht9zmS1LU/DSLfwJKpgCJnE9AktVksc5SE/+jQMpqxsq6fm7PRiqupjiqRC1DOS8N47cj+KaGv4Q==

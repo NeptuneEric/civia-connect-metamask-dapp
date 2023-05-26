@@ -1,5 +1,6 @@
 import { Abi, Contract, ProviderInterface, Call, shortString, number, defaultProvider } from 'starknet';
 import { zipWith } from 'lodash-es';
+import { Multicall } from "@argent/x-multicall"
 import SBTMgrCompiledContractAbi from '../../abi/SBTMgr.json';
 import { abi as TestTokenAbi } from '../../abi/TestToken.json';
 import { abi as CiviaERC20CheckAbi } from '../../abi/CiviaERC20Check.json';
@@ -39,6 +40,24 @@ export const getSessionToken = async (account: string) => {
     }
 };
 
+export const getCiviaBinedAddressByAddressList = async (addressList: string[]) => {
+    const multicall = new Multicall(defaultProvider);
+
+    const calls: Call[] = addressList.map((address: string) => (
+        {
+            contractAddress: address,
+            entrypoint: 'getAllBindedAddrss',
+            calldata: []
+        }
+    ));
+    //
+    const res = await Promise.all(
+        calls.map((call) => multicall.call(call))
+    );
+
+    return res;
+}
+
 export const getMetamaskAddressList = async (account: string, civiaAddressList: string[]) => {
 
     const key = `${account},token`;
@@ -58,13 +77,21 @@ export const getMetamaskAddressList = async (account: string, civiaAddressList: 
 export const getSynthesizeAddressList = async (account: string) => {
     const civiaAddressList = await getFollowingList(account).catch((err) => {});
     const getTokenRes = await getSessionToken(account).catch((err) => {});
-    const metamaskAddressList = await getMetamaskAddressList(account, (civiaAddressList || [] as any[]).map((item) => item.address)).then(({ code, result }) => {
-        if(code === 0){
-            return result.addressInfos;
-        }else{
-            return new Array(civiaAddressList!.length);
-        }
-    }).catch((err) => {});
+    // const metamaskAddressList = await getMetamaskAddressList(account, (civiaAddressList || [] as any[]).map((item) => item.address)).then(({ code, result }) => {
+    //     if(code === 0){
+    //         return result.addressInfos;
+    //     }else{
+    //         return new Array(civiaAddressList!.length);
+    //     }
+    // }).catch((err) => {});
+
+    const metamaskAddressList = await getCiviaBinedAddressByAddressList((civiaAddressList || [] as any[]).map((item) => item.address)).then((res: any[]) => {
+        return res.map((itme: any) => (
+            {
+                metamast_addresses: itme.slice(1)
+            }
+        ));
+    });
 
     const syntheAddressList = zipWith(civiaAddressList as any[], metamaskAddressList, (a, b: any) => {
         return {

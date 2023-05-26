@@ -50,8 +50,9 @@ const ERC20Send: FC<any> = () => {
   }, [signDataList, userCurrentIds]);
 
   useEffect(() => {
-    getSynthesizeAddressList(searchCiviaWalletAddress!).then((res) => {
-      setFollowings(res as any);
+    getSynthesizeAddressList(searchCiviaWalletAddress!).then((res: any[]) => {
+      const followings = res.filter((item: any) => item.metamaskAddressList.length);
+      setFollowings(followings);
     });
   }, []);
 

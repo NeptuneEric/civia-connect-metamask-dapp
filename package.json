@@ -12,6 +12,7 @@
   "dependencies": {
     "@ant-design/icons": "^5.0.1",
     "@argent/get-starknet": "^5.3.15",
+    "@argent/x-multicall": "^6.0.0",
     "@argent/x-sessions": "^5.3.15",
     "ahooks": "^3.7.6",
     "antd": "^5.3.3",
