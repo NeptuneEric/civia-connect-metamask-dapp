@@ -6,6 +6,8 @@ import { getContract, getWalletClient, readContract, writeContract } from '@wagm
 import { ethers } from "ethers";
 import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
 
+import { truncateHex } from '../../services/address.service';
+
 import { ERC20TokenInfo } from '../ERC20TokenInfo';
 
 import { getUserERC20MessagesUnPacked, leaveMessageERC20PackDone } from '../../services/account.service';
@@ -27,7 +29,6 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
 };
 //
 const ERC20Mint: FC<any> = () => {
-    const [refreshMessageList, setRefreshMessageList] = useState(1);
     const locationSearch = new URLSearchParams(location.search);
     const searchCiviaWalletAddress = locationSearch.get('civiaAddress') as string;
     const searchERC20Token = locationSearch.get('erc20token') as string;
@@ -140,6 +141,7 @@ const ERC20Mint: FC<any> = () => {
             const s = '0x' + sigHex.slice(64, 128);
             const v = parseInt(sigHex.slice(128, 130), 16);
             //
+            setIsLoading(true);
             leaveMessageERC20PackDone(searchCiviaWalletAddress, {
                 from: searchCiviaWalletAddress,
                 to: unPackMessageItem.to,
@@ -152,6 +154,10 @@ const ERC20Mint: FC<any> = () => {
                 receiver: mergedMessageContent.receiver,
                 packMsgId: unPackMessageItem.message_id,
                 messageIds: unPackMessageItem.messageIds,
+            }).then(() => {
+
+            }).finally(() => {
+               
             });
         }
     }
@@ -171,6 +177,7 @@ const ERC20Mint: FC<any> = () => {
                                 <div key={index}>
                                     <Card title={
                                         <>
+                                            <div><label className={styles.label}>Receive:</label><code>{truncateHex(item.content[0].receiver)}</code></div>
                                             <ERC20TokenInfo tokenAddress={item.content[0].token}>
                                                 {
                                                     (tokeName: string, tokenSymbol: string, formatAddr: string) => {

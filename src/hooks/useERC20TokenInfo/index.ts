@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { readContracts } from '@wagmi/core';
 import TestToken from '../../../abi/TestToken.json';
+import { truncateHex } from '../../services/address.service';
 
 export const useERC20TokenInfo = (testTokenAddress: `0x${string}`) => {
     
@@ -25,7 +26,7 @@ export const useERC20TokenInfo = (testTokenAddress: `0x${string}`) => {
                 return {
                     tokenName,
                     tokenSymbol,
-                    formatAddr: `${testTokenAddress.slice(0, 6)}...${testTokenAddress.slice(-4)}`
+                    formatAddr: truncateHex(testTokenAddress)
                 };
               }).catch(() => {
                 return null;
