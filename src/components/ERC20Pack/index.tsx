@@ -10,6 +10,8 @@ import { ERC20TokenInfo } from '../ERC20TokenInfo';
 
 import { getUserERC20MessagesUnPacked, leaveMessageERC20PackDone } from '../../services/account.service';
 
+import { useGetUserERC20MessagesUnPackedCache } from '../../hooks/useGetUserERC20MessageUnPacked';
+
 const CIVIA_ERC20_CONTRACT_ADDRESS = '0x8a647C33fe1fb520bDbcbA10d88d0397F5FdC056';
 
 import styles from './index.module.css';
@@ -61,32 +63,28 @@ const ERC20Mint: FC<any> = () => {
 
     const [messageApi, contextHolder] = message.useMessage();
 
+    const { data: unpackMessage } = useGetUserERC20MessagesUnPackedCache(searchCiviaWalletAddress);
+    console.log(unpackMessage);
+
     useEffect(() => {
-        getUserERC20MessagesUnPacked(searchCiviaWalletAddress).then(({ code, result}) => {
-            if(code === 0){
-                const newMessageList = result.messages.reduce((newML: Map<string, any>, item: any, index: number) => {
-                    const content = JSON.parse(item.content);
-                    const newMLItem: any[] = [];
-                    content.packContents.forEach((contentItem: any) => {
-                        newMLItem.push(contentItem);
-                    });
-                    newML.set(item.message_id, {
-                        ...item,
-                        messageIds: content.messageIds,
-                        content: newMLItem.sort((a: any, b: any) => {
-                            return a.id_begin > b.id_begin ? 1: -1;
-                        })
-                    });
-                    return newML;
-                }, new Map());
-                setUnPackMessageList(newMessageList);
-            }
-        }).catch((err) => {
-            console.log(err);
-        }).finally(() => {
-            setIsLoading(false);
-        });
-    }, []);
+        const newMessageList = unpackMessage.reduce((newML: Map<string, any>, item: any, index: number) => {
+            const content = JSON.parse(item.content);
+            const newMLItem: any[] = [];
+            content.packContents.forEach((contentItem: any) => {
+                newMLItem.push(contentItem);
+            });
+            newML.set(item.message_id, {
+                ...item,
+                messageIds: content.messageIds,
+                content: newMLItem.sort((a: any, b: any) => {
+                    return a.id_begin > b.id_begin ? 1: -1;
+                })
+            });
+            return newML;
+        }, new Map());
+        setUnPackMessageList(newMessageList);
+        setIsLoading(false);
+    }, [unpackMessage]);
 
     const handleSign = async (tokenAddress: string) => {
         const unPackMessageItem: any = unPackMessageList.get(tokenAddress);

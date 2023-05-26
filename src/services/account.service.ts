@@ -5,6 +5,7 @@ import { abi as TestTokenAbi } from '../../abi/TestToken.json';
 import { abi as CiviaERC20CheckAbi } from '../../abi/CiviaERC20Check.json';
 const { decodeShortString } = shortString;
 import axios from 'axios';
+import useSWR from 'swr';
 
 const sbtConstractAddress = '0x056041215dda8462b041678717612fd64f99310aaa834a9d42527aeba5f3c661';
 
@@ -150,9 +151,9 @@ export const getErc20Message = async (account: string) => {
         });
     return Promise.resolve(response.data).then((res) => {
         if (res.code === 1) {
-            return false;
+            return Promise.resolve(false);
         }
-        return res.result.messages;
+        return Promise.resolve(res.result.messages);
     }).catch((err) => {
         console.log(err);
     });
@@ -195,6 +196,7 @@ export const leaveMessagePackERC20 = async (account: string, messageIds: string[
 export const getUserERC20MessagesUnPacked = async (account: string) => {
     const getTokenRes = await getSessionToken(account).catch((err) => {});
     const key = `${account},token`;
+    console.log('request2----');
     const response = await axios.post('/api/app/getUserERC20MessagesUnPacked',
         {
             account

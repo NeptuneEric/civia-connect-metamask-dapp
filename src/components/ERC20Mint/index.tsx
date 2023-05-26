@@ -6,6 +6,8 @@ import { getContract, getWalletClient, readContract, writeContract } from '@wagm
 import { ethers } from "ethers";
 import { userMintERC20Done } from '../../services/account.service';
 
+import { useGetERCMessageUnMint } from '../../hooks/useGetERCMessageUnMint';
+
 import { ERC20TokenInfo } from '../ERC20TokenInfo';
 import { ERC20TokenBalance } from '../ERC20TokenBalance';
 
@@ -144,7 +146,6 @@ const ERC20CheckList: FC<any> = forwardRef((props, ref) => {
 
 //
 const ERC20Mint: FC<any> = () => {
-    const [refreshMessageList, setRefreshMessageList] = useState(1);
     const locationSearch = new URLSearchParams(location.search);
     const searchCiviaWalletAddress = locationSearch.get('civiaAddress') as string;
     const searchERC20Token = locationSearch.get('erc20token') as string;
@@ -171,11 +172,12 @@ const ERC20Mint: FC<any> = () => {
     const checkedMessageList = filterMessageList.filter((item) => {
         return item.every((su: any) => su.customContent);
     });
-    console.log(checkedMessageList);
+
+    const { data: unMintMessageData } = useGetERCMessageUnMint(searchCiviaWalletAddress);
 
     useEffect(() => {
-        getErc20Message(searchCiviaWalletAddress).then((res) => {
-            const newMessageMapList = res.reduce((newML: Map<string, any>, item: any, index: number) => {
+        if(unMintMessageData && unMintMessageData.length){
+            const newMessageMapList = unMintMessageData.reduce((newML: Map<string, any>, item: any, index: number) => {
                 const content = JSON.parse(item.content);
                 const token = content.token;
                 const newMLItem = newML.get(token) || [];
@@ -189,27 +191,15 @@ const ERC20Mint: FC<any> = () => {
                 return newML;
             }, new Map());
             setMessageList(newMessageMapList);
-        }).finally(() => {
             setIsLoading(false);
-        });
-    }, [refreshMessageList]);
+        }
+    }, [unMintMessageData]);
 
     useEffect(() => {
         if(checkedMessageList.length){
             setTimeout((checkListRef.current as any).openNotification, 500);
         }
     }, [checkedMessageList.length]);
-
-    const handleSelectAll = async (evt: CheckboxChangeEvent) => {
-        console.log(evt);
-        const { value, checked } = evt.target;
-        // if(checked){
-        //     selectedTokens.set(value, true);
-        // }else{
-        //     selectedTokens.delete(value);
-        // }
-        // setSelectedTokens(selectedTokens);
-    }
 
     const handlePackAll = async (tokenAddress: string) => {
         //
@@ -278,7 +268,6 @@ const ERC20Mint: FC<any> = () => {
             checkedMessageList.flat().forEach(({ message_id }) => {
                 userMintERC20Done(searchCiviaWalletAddress, [message_id]);
             });
-            setRefreshMessageList(pre => pre + 1);
             (checkListRef.current as any).destroy();
             return true;
         }).catch((err) => {
