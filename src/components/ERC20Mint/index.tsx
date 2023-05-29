@@ -41,7 +41,8 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
             onSigned({ signData: localStorageSignData });
             setStep(1);
         }
-    }, [item.message_id, onSigned]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [item.message_id]);
 
     const [messageApi, contextHolder] = message.useMessage();
     const { isConnected: isMetaMaskConnected, address: metamaskAddress } = useAccount();
@@ -140,7 +141,8 @@ const ERC20CheckList: FC<any> = forwardRef((props, ref) => {
             description: props.children,
             duration: null,
             closeIcon: null,
-            key: 1
+            key: 1,
+            placement: 'bottomRight'
         });
     };
 
