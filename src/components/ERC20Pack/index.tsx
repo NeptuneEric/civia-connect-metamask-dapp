@@ -151,7 +151,10 @@ const ERC20Mint: FC<any> = () => {
                 packMsgId: unPackMessageItem.message_id,
                 messageIds: unPackMessageItem.messageIds
             }).then(() => {
-
+                messageApi.open({
+                    type: 'success',
+                    content: 'Success'
+                });
             }).finally(() => {
 
             });

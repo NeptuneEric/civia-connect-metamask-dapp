@@ -7,6 +7,7 @@ import { ethers } from 'ethers';
 import { userMintERC20Done, leaveMessagePackERC20 } from '../../services/account.service';
 
 import { useAddBSCTestNet, useAddBSCTestNetAndSwitch } from '../../hooks/useAddBSCTestNet';
+import { localStorageProvider } from '../../lib/localStorageProvider';
 
 import { useGetERCMessageUnMint } from '../../hooks/useGetERCMessageUnMint';
 
@@ -19,6 +20,8 @@ import styles from './index.module.css';
 
 const CIVIA_ERC20_CONTRACT_ADDRESS = '0x8a647C33fe1fb520bDbcbA10d88d0397F5FdC056';
 
+const localStorageProviderMap = localStorageProvider();
+
 const TokenItem: FC<any> = ({ item, onSigned }) => {
     const locationSearch = new URLSearchParams(location.search);
     const searchCiviaWalletAddress = locationSearch.get('civiaAddress') as string;
@@ -28,8 +31,17 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
         onSuccess: (res) => {
             setStep(1);
             onSigned({ signData: res });
+            localStorageProviderMap.set(`signData@{searchCiviaWalletAddress}@messageId:${item.message_id}`, res);
         }
     });
+
+    useEffect(() => {
+        const localStorageSignData = localStorageProviderMap.get(`signData@{searchCiviaWalletAddress}@messageId:${item.message_id}`);
+        if (localStorageSignData) {
+            onSigned({ signData: localStorageSignData });
+            setStep(1);
+        }
+    }, [item.message_id, onSigned]);
 
     const [messageApi, contextHolder] = message.useMessage();
     const { isConnected: isMetaMaskConnected, address: metamaskAddress } = useAccount();
@@ -200,16 +212,18 @@ const ERC20Mint: FC<any> = () => {
     const handlePackAll = async (tokenAddress: string) => {
         //
         const messageItems = messageList.get(tokenAddress);
-        console.log(messageItems);
         const messageIds = messageItems!.map((item: any) => item.message_id);
-        console.log(messageIds);
         setIsLoading(true);
-        const res = await leaveMessagePackERC20(searchCiviaWalletAddress, messageIds).catch((err) => {
+        const res = await leaveMessagePackERC20(searchCiviaWalletAddress, messageIds).then(() => {
+            messageApi.open({
+                type: 'success',
+                content: 'Check bundle send to issure'
+            });
+        }).catch((err) => {
             console.log(err);
         }).finally(() => {
             setIsLoading(false);
         });
-        console.log(res);
     };
 
     const handleSignedCreater = (tokenAddress: string, itemIndex: number) => {
@@ -251,8 +265,6 @@ const ERC20Mint: FC<any> = () => {
             const [addrs, senders, users, beginIds, endIds, amounts, v, r_s] = getOneContractArgs(subItem);
             return [preAddrs.concat(addrs), preSenders.concat(senders), preUsers.concat(users), preUeginIds.concat(beginIds), preEndIds.concat(endIds), preAmounts.concat(amounts), preV.concat(v), preR_s.concat(r_s)];
         }, [[], [], [], [], [], [], [], []]);
-
-        console.log(mergedContractArgs);
 
         setIsLoading(true);
         const res = await writeContract({
@@ -309,7 +321,7 @@ const ERC20Mint: FC<any> = () => {
                                             </>
                                         }
                                         extra={
-                                            item.length > 1 ? <Button type="link" onClick={() => { handlePackAll(item[0].content.token); }}>Pack mint</Button> : null
+                                            item.length > 1 ? <Button type="link" onClick={() => { handlePackAll(item[0].content.token); }}>Bundle checks</Button> : null
                                             // <Checkbox onChange={handleSelectAll} checked={item.every((su: any) => su.customContent)}>Select all</Checkbox>
                                         }
                                         >

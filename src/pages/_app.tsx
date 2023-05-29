@@ -4,25 +4,11 @@ import { bscTestnet } from '@wagmi/core/chains';
 import { SWRConfig } from 'swr';
 
 import { customBscTestnet } from '../lib/bscTestNetConfig';
+import { localStorageProvider } from '../lib/localStorageProvider';
 
 import '../styles/globals.css';
 
 import type { AppProps } from 'next/app';
-
-function localStorageProvider () {
-    if (typeof window !== 'undefined') {
-        const map = new Map(JSON.parse(localStorage.getItem('app-cache') || '[]'));
-
-        window.addEventListener('beforeunload', () => {
-            const appCache = JSON.stringify(Array.from(map.entries()));
-            localStorage.setItem('app-cache', appCache);
-        });
-
-        return map as Map<any, any>;
-    } else {
-        return new Map();
-    }
-}
 
 function MyApp ({ Component, pageProps }: AppProps) {
     const { chains, publicClient, webSocketPublicClient } = configureChains(

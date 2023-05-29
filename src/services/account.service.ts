@@ -220,7 +220,7 @@ export const leaveMessagePackERC20 = async (account: string, messageIds: string[
 
 export const getUserERC20MessagesUnPacked = async (account: string) => {
     const getTokenRes = await getSessionToken(account).catch((err) => { console.log(err); });
-    const key = `${account},token`;
+    const key = `${account},unpack`;
     console.log('request2----');
     const response = await axios.post('/api/app/getUserERC20MessagesUnPacked',
         {

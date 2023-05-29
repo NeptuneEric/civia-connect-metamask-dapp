@@ -7,7 +7,6 @@ import { readContract } from '@wagmi/core';
 import { getSynthesizeAddressList, getUsersOwnerTokenCurrentId, leaveMessageERC20 } from '../../services/account.service';
 
 import { ERC20TokenInfo } from '../../components/ERC20TokenInfo';
-import { useAddBSCTestNet, useAddBSCTestNetAndSwitch } from '../../hooks/useAddBSCTestNet';
 
 import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
 
