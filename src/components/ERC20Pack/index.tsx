@@ -61,7 +61,7 @@ const ERC20Mint: FC<any> = () => {
 
     const [messageApi, contextHolder] = message.useMessage();
 
-    const { data: unpackMessage } = useGetUserERC20MessagesUnPackedCache(searchCiviaWalletAddress);
+    const { data: unpackMessage = [] } = useGetUserERC20MessagesUnPackedCache(searchCiviaWalletAddress);
     console.log(unpackMessage);
 
     useEffect(() => {
