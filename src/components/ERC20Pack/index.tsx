@@ -3,6 +3,8 @@ import { Spin, Button, List, message, Card, Empty } from 'antd';
 import { useContractRead, useContractWrite, useConnect, useAccount, useSignMessage } from 'wagmi';
 import { ethers } from 'ethers';
 
+import { useAddBSCTestNet, useAddBSCTestNetAndSwitch } from '../../hooks/useAddBSCTestNet';
+
 import { truncateHex } from '../../services/address.service';
 
 import { ERC20TokenInfo } from '../ERC20TokenInfo';
@@ -29,6 +31,8 @@ const ERC20Mint: FC<any> = () => {
     const searchERC20Token = locationSearch.get('erc20token') as string;
     const [isLoading, setIsLoading] = useState(true);
     const [unPackMessageList, setUnPackMessageList] = useState<Map<string, any[]>>(new Map());
+
+    const { chainId, switchBscTestNet } = useAddBSCTestNetAndSwitch();
     //
     const { isConnected: isMetaMaskConnected, address: metamaskAddress } = useAccount();
     const { connect: metaMaskConnect, connectors: metaMaskConnectors, error: ucError, isLoading: ucIsLoading, pendingConnector } = useConnect();

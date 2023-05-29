@@ -6,6 +6,8 @@ import { writeContract } from '@wagmi/core';
 import { ethers } from 'ethers';
 import { userMintERC20Done, leaveMessagePackERC20 } from '../../services/account.service';
 
+import { useAddBSCTestNet, useAddBSCTestNetAndSwitch } from '../../hooks/useAddBSCTestNet';
+
 import { useGetERCMessageUnMint } from '../../hooks/useGetERCMessageUnMint';
 
 import { ERC20TokenInfo } from '../ERC20TokenInfo';
@@ -148,6 +150,8 @@ const ERC20Mint: FC<any> = () => {
     const { isConnected: isMetaMaskConnected, address: metamaskAddress } = useAccount();
     const { connect: metaMaskConnect, connectors: metaMaskConnectors, error: ucError, isLoading: ucIsLoading, pendingConnector } = useConnect();
     const connectMetamaskRef = useRef(false);
+
+    const { chainId, switchBscTestNet } = useAddBSCTestNetAndSwitch();
 
     // auto connect metamask
     if (!connectMetamaskRef.current && !metamaskAddress && metaMaskConnectors && metaMaskConnectors.length) {

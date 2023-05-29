@@ -3,6 +3,8 @@ import { publicProvider } from 'wagmi/providers/public';
 import { bscTestnet } from '@wagmi/core/chains';
 import { SWRConfig } from 'swr';
 
+import { customBscTestnet } from '../lib/bscTestNetConfig';
+
 import '../styles/globals.css';
 
 import type { AppProps } from 'next/app';
@@ -21,18 +23,6 @@ function localStorageProvider () {
         return new Map();
     }
 }
-
-const customBscTestnet = {
-    ...bscTestnet,
-    rpcUrls: {
-        default: {
-            http: ['https://small-sleek-paper.bsc-testnet.discover.quiknode.pro/c7b1fd7438013a31684e3fc4ed6d3686d8848305']
-        },
-        public: {
-            http: ['https://small-sleek-paper.bsc-testnet.discover.quiknode.pro/c7b1fd7438013a31684e3fc4ed6d3686d8848305']
-        }
-    }
-};
 
 function MyApp ({ Component, pageProps }: AppProps) {
     const { chains, publicClient, webSocketPublicClient } = configureChains(
