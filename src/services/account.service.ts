@@ -74,8 +74,8 @@ export const getMetamaskAddressList = async (account: string, civiaAddressList: 
 };
 
 export const getSynthesizeAddressList = async (account: string) => {
-    const civiaAddressList = await getFollowingList(account).catch((err) => {});
-    const getTokenRes = await getSessionToken(account).catch((err) => {});
+    const civiaAddressList = await getFollowingList(account).catch((err) => { console.log(err); });
+    const getTokenRes = await getSessionToken(account).catch((err) => { console.log(err); });
     // const metamaskAddressList = await getMetamaskAddressList(account, (civiaAddressList || [] as any[]).map((item) => item.address)).then(({ code, result }) => {
     //     if(code === 0){
     //         return result.addressInfos;
@@ -162,7 +162,7 @@ export const getTokenInfo = async (address: string) => {
 };
 
 export const getErc20Message = async (account: string) => {
-    const getTokenRes = await getSessionToken(account).catch((err) => {});
+    const getTokenRes = await getSessionToken(account).catch((err) => { console.log(err); });
     const key = `${account},token`;
     const response = await axios.post('/api/app/getUserERC20MessagesUnMint',
         {
@@ -186,7 +186,7 @@ export const getErc20Message = async (account: string) => {
 
 export const userMintERC20Done = async (account: string, messageIds: number[]) => {
     const key = `${account},token`;
-    const getTokenRes = await getSessionToken(account).catch((err) => {});
+    const getTokenRes = await getSessionToken(account).catch((err) => { console.log(err); });
     const response = await axios.post('/api/app/userMintERC20Done',
         {
             account,
@@ -202,7 +202,7 @@ export const userMintERC20Done = async (account: string, messageIds: number[]) =
 };
 
 export const leaveMessagePackERC20 = async (account: string, messageIds: string[]) => {
-    const getTokenRes = await getSessionToken(account).catch((err) => {});
+    const getTokenRes = await getSessionToken(account).catch((err) => { console.log(err); });
     const key = `${account},token`;
     const response = await axios.post('/api/app/leaveMessagePackERC20',
         {
@@ -219,7 +219,7 @@ export const leaveMessagePackERC20 = async (account: string, messageIds: string[
 };
 
 export const getUserERC20MessagesUnPacked = async (account: string) => {
-    const getTokenRes = await getSessionToken(account).catch((err) => {});
+    const getTokenRes = await getSessionToken(account).catch((err) => { console.log(err); });
     const key = `${account},token`;
     console.log('request2----');
     const response = await axios.post('/api/app/getUserERC20MessagesUnPacked',
@@ -250,7 +250,7 @@ type lmep20 = {
 }
 export const leaveMessageERC20PackDone = async (account: string, params: lmep20) => {
     console.log(params);
-    const getTokenRes = await getSessionToken(account).catch((err) => {});
+    const getTokenRes = await getSessionToken(account).catch((err) => { console.log(err); });
     const key = `${account},token`;
     const response = await axios.post('/api/app/leaveMessageERC20PackDone',
         {

@@ -54,7 +54,7 @@ const ERC20Send: FC<any> = () => {
             const followings = res.filter((item: any) => item.metamaskAddressList.length);
             setFollowings(followings);
         });
-    }, []);
+    }, [searchCiviaWalletAddress]);
 
     useEffect(() => {
         if (metamaskAddress) {
@@ -88,7 +88,7 @@ const ERC20Send: FC<any> = () => {
         if (metamaskAddress && step < 1) {
             setStep(1);
         }
-    }, [metamaskAddress]);
+    }, [metamaskAddress, step]);
 
     const getUsersOwnerTokenCurrentIdAndSignData = async () => {
         setIsLoading(true);

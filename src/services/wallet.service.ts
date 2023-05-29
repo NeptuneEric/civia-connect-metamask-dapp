@@ -8,7 +8,7 @@ export const silentConnectWallet = async () => {
     if (!windowStarknet?.isConnected) {
         await windowStarknet?.enable({
             showModal: false,
-            starknetVersion: 'v4',
+            starknetVersion: 'v4'
         } as any);
     }
     return windowStarknet;
@@ -18,7 +18,7 @@ export const connectWallet = async () => {
     try {
         const windowStarknet = await connect({
             include: ['civia']
-    });
+        });
         await windowStarknet?.enable({ starknetVersion: 'v4' } as any);
         return windowStarknet;
     } catch (e) {
@@ -45,9 +45,9 @@ export const networkId = (): Network | undefined => {
             return 'mainnet-alpha';
         } else if (chainId === constants.StarknetChainId.TESTNET) {
             return 'goerli-alpha';
-        } else if (chainId === constants.StarknetChainId.TESTNET2)
-            {return "goerli2-alpha"};
-        else {
+        } else if (chainId === constants.StarknetChainId.TESTNET2) {
+            return 'goerli2-alpha';
+        } else {
             return 'localhost';
         }
     } catch {}
@@ -64,9 +64,9 @@ export const addToken = async (address: string): Promise<void> => {
             type: 'ERC20',
             options: {
                 address
-      },
+            }
         }
-  });
+    });
 };
 
 export const getExplorerBaseUrl = (): string | undefined => {
@@ -101,20 +101,20 @@ export const signMessage = async (message: string) => {
         domain: {
             name: 'Example DApp',
             chainId: networkId() === 'mainnet-alpha' ? 'SN_MAIN' : 'SN_GOERLI2',
-            version: '0.0.1',
+            version: '0.0.1'
         },
         types: {
             StarkNetDomain: [
                 { name: 'name', type: 'felt' },
                 { name: 'chainId', type: 'felt' },
                 { name: 'version', type: 'felt' }
-      ],
+            ],
             Message: [{ name: 'message', type: 'felt' }]
-    },
+        },
         primaryType: 'Message',
         message: {
             message
-    },
+        }
     });
 };
 
@@ -155,5 +155,5 @@ export const declare = async (contract: string, classHash: string) => {
     return starknet.account.declare({
         contract,
         classHash
-  });
+    });
 };
