@@ -106,6 +106,7 @@ const ERC20Send: FC<any> = () => {
             const localLastCheckId = localStorageProviderMap.get(`@${selectToken}${item},lastCheckId`) || 0;
             const lastCheckId = Number(res[index].result);
             const computedLastCheckId = Math.max(localLastCheckId, lastCheckId);
+            localStorageProviderMap.set(`@${selectToken}${item},lastCheckId`, computedLastCheckId);
             return {
                 ...pre,
                 [item]: computedLastCheckId
@@ -229,7 +230,7 @@ const ERC20Send: FC<any> = () => {
             if (!selectFriend) {
                 return messageApi.open({
                     type: 'error',
-                    content: 'Please select receipients(s)'
+                    content: 'Please input receipients(s)'
                 });
             }
             await getUsersOwnerTokenCurrentIdAndSignData();
