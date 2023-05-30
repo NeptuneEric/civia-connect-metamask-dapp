@@ -110,47 +110,8 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
         onSigned({ signData: undefined });
         setStep(0);
     };
-    //
-    const handleMint = async () => {
-        const { receiver, token, id_begin: idBegin, id_end: idEnd, amount, sign } = item.content;
-        const signObj = JSON.parse(sign);
-        if (signData) {
-            const sigHex = signData.substring(2);
-            const receiverR = '0x' + sigHex.slice(0, 64);
-            const receiverS = '0x' + sigHex.slice(64, 128);
-            const receiverV = parseInt(sigHex.slice(128, 130), 16);
-            //
-            const addrs = [token];
-            const users = [receiver];
-            const beginIds = [idBegin];
-            const endIds = [idEnd];
-            const amounts = [ethers.utils.parseUnits(amount.toString(), 18).toString()];
-            const v = [signObj.v, receiverV];
-            const r_s = [signObj.r, signObj.s, receiverR, receiverS];
-            //
-            setIsLoading(true);
-            const res = await writeContract({
-                address: CIVIA_ERC20_CONTRACT_ADDRESS,
-                abi: CiviaERC20Check.abi,
-                functionName: 'batchMint',
-                args: [addrs, users, beginIds, endIds, amounts, v, r_s]
-            }).then(() => {
-                setStep(-1);
-                return userMintERC20Done(searchCiviaWalletAddress, [item.message_id]);
-            }).catch((err) => {
-                const errStr = String(err);
-                const IsStartIdNotMatch = /start id not match/.test(errStr);
-                console.log(err);
-                messageApi.open({
-                    type: 'error',
-                    content: IsStartIdNotMatch ? 'start id not match' : errStr
-                });
-                IsStartIdNotMatch && userMintERC20Done(searchCiviaWalletAddress, [item.message_id]);
-            }).finally(() => {
-                setIsLoading(false);
-            });
-        }
-    };
+
+    const { idBegin, idEnd } = item.content;
 
     return (
         <>
@@ -162,7 +123,7 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
                     }
                 </div>}
             >
-                <div><label className={styles.label} />{item.content.amount}</div>
+                <div><label className={styles.label} >{idBegin === idEnd ? idBegin : `${idBegin}-${idEnd}`}</label>{item.content.amount}</div>
             </List.Item>
         </>
     );
@@ -330,6 +291,10 @@ const ERC20Mint: FC<any> = () => {
             // checkedMessageList.flat().forEach(({ message_id }) => {
             //     userMintERC20Done(searchCiviaWalletAddress, [message_id]);
             // });
+            messageApi.open({
+                type: 'success',
+                content: 'Success'
+            });
             location.reload();
             // (checkListRef.current as any).destroy();
             return true;

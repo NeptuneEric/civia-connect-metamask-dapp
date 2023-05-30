@@ -323,7 +323,6 @@ const ERC20Send: FC<any> = () => {
                                 label="Receipient(s)"
                                 name="selectFriend"
                                 hidden={step !== 2}
-                                initialValue={['0x39e60EA6d6417ab2b4a44f714b7503748Ce658eA', '0x39e60EA6d6417ab2b4a44f714b7503748Ce658eD']}
                             >
                                 <InputTags onChange={(value: string[]) => { console.log(value); }} />
                             </Form.Item>
