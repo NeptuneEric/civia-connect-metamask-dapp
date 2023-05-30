@@ -9,6 +9,7 @@ import { getSynthesizeAddressList, getUsersOwnerTokenCurrentId, leaveMessageERC2
 import { ERC20TokenInfo } from '../../components/ERC20TokenInfo';
 
 import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
+import { getFormatedAddress } from '../../lib/address';
 
 import styles from './index.module.css';
 import { ethers } from 'ethers';
@@ -17,7 +18,7 @@ const CIVIA_ERC20_CONTRACT_ADDRESS = '0x8a647C33fe1fb520bDbcbA10d88d0397F5FdC056
 
 const ERC20Send: FC<any> = () => {
     const locationSearch = new URLSearchParams(location.search);
-    const searchCiviaWalletAddress = locationSearch.get('civiaAddress') as string;
+    const searchCiviaWalletAddress = getFormatedAddress(locationSearch.get('civiaAddress') as string);
     const [isLoading, setIsLoading] = useState(false);
     const [step, setStep] = useState(0);
     const { connect: metaMaskConnect, connectors: metaMaskConnectors, error: ucError, isLoading: ucIsLoading, pendingConnector } = useConnect();
@@ -152,7 +153,7 @@ const ERC20Send: FC<any> = () => {
             //
             return leaveMessageERC20(searchCiviaWalletAddress, {
                 from: searchCiviaWalletAddress,
-                to: to!,
+                to: getFormatedAddress(to!),
                 sign: JSON.stringify(signData),
                 idBegin: currentId + 1,
                 idEnd: currentId + 1,

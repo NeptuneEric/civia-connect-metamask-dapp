@@ -10,6 +10,7 @@ import { truncateHex } from '../../services/address.service';
 import { ERC20TokenInfo } from '../ERC20TokenInfo';
 
 import { leaveMessageERC20PackDone } from '../../services/account.service';
+import { getFormatedAddress } from '../../lib/address';
 
 import { useGetUserERC20MessagesUnPackedCache } from '../../hooks/useGetUserERC20MessageUnPacked';
 
@@ -27,7 +28,7 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
 //
 const ERC20Mint: FC<any> = () => {
     const locationSearch = new URLSearchParams(location.search);
-    const searchCiviaWalletAddress = locationSearch.get('civiaAddress') as string;
+    const searchCiviaWalletAddress = getFormatedAddress(locationSearch.get('civiaAddress') as string);
     const searchERC20Token = locationSearch.get('erc20token') as string;
     const [isLoading, setIsLoading] = useState(true);
     const [unPackMessageList, setUnPackMessageList] = useState<Map<string, any[]>>(new Map());
