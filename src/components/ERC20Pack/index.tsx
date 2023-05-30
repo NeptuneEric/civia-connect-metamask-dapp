@@ -26,7 +26,7 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
     );
 };
 //
-const ERC20Mint: FC<any> = () => {
+const ERC20Pack: FC<any> = () => {
     const locationSearch = new URLSearchParams(location.search);
     const searchCiviaWalletAddress = getFormatedAddress(locationSearch.get('civiaAddress') as string);
     const searchERC20Token = locationSearch.get('erc20token') as string;
@@ -62,8 +62,12 @@ const ERC20Mint: FC<any> = () => {
 
     const [messageApi, contextHolder] = message.useMessage();
 
-    const { data: unpackMessage = [] } = useGetUserERC20MessagesUnPackedCache(searchCiviaWalletAddress);
-    console.log(unpackMessage);
+    const { data: unpackMessage = [], isLoading: isUnpackMessageLoading } = useGetUserERC20MessagesUnPackedCache(searchCiviaWalletAddress);
+    // console.log(unpackMessage);
+
+    // useEffect(() => {
+    //     setIsLoading(isUnpackMessageLoading);
+    // }, [isUnpackMessageLoading]);
 
     useEffect(() => {
         const newMessageList = unpackMessage.reduce((newML: Map<string, any>, item: any, index: number) => {
@@ -156,8 +160,10 @@ const ERC20Mint: FC<any> = () => {
                     type: 'success',
                     content: 'Success'
                 });
+            }).catch(() => {
+                setIsLoading(false);
             }).finally(() => {
-
+                setIsLoading(false);
             });
         }
     };
@@ -214,4 +220,4 @@ const ERC20Mint: FC<any> = () => {
     );
 };
 
-export default ERC20Mint;
+export default ERC20Pack;
