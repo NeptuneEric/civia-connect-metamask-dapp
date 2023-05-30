@@ -8,6 +8,7 @@ import { getSynthesizeAddressList, getUsersOwnerTokenCurrentId, leaveMessageERC2
 
 import { ERC20TokenInfo } from '../../components/ERC20TokenInfo';
 import { InputTags } from '../../components/InputTags';
+import { localStorageProvider } from '../../lib/localStorageProvider';
 
 import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
 import TestToken from '../../../abi/TestToken.json';
@@ -15,6 +16,8 @@ import { getFormatedAddress } from '../../lib/address';
 
 import styles from './index.module.css';
 import { ethers } from 'ethers';
+
+const localStorageProviderMap = localStorageProvider();
 
 const CIVIA_ERC20_CONTRACT_ADDRESS = '0xaD20848c0C3f198b9b8eca65c4d58dc11bd3A699';
 
@@ -100,9 +103,12 @@ const ERC20Send: FC<any> = () => {
         const res: any = await multicall({ contracts });
 
         const mapedRes = selectFriend.reduce((pre: any, item: string, index: number) => {
+            const localLastCheckId = localStorageProviderMap.get(`@${selectToken}${item},lastCheckId`) || 0;
+            const lastCheckId = Number(res[index].result);
+            const computedLastCheckId = Math.max(localLastCheckId, lastCheckId);
             return {
                 ...pre,
-                [item]: Number(res[index].result)
+                [item]: computedLastCheckId
             };
         }, {});
 
@@ -126,7 +132,6 @@ const ERC20Send: FC<any> = () => {
                     { value: ethers.utils.parseUnits(inputAmount.toString(), 18).toString(), type: 'uint256' }
                 ];
                 setOrderParts(orderParts);
-                console.log(JSON.stringify(orderParts));
                 const types = orderParts.map(o => o.type);
                 const values = orderParts.map(o => o.value);
                 const hash = ethers.utils.solidityKeccak256(types, values);
@@ -179,6 +184,8 @@ const ERC20Send: FC<any> = () => {
 
             await writable.write(JSON.stringify(message));
             await writable.close();
+            const localCheckId = localStorageProviderMap.get(`@${selectToken}${user},lastCheckId`) || 0;
+            localStorageProviderMap.set(`@${selectToken}${user},lastCheckId`, localCheckId + 1);
         }
         setIsLoading(false);
         setStep(5);
