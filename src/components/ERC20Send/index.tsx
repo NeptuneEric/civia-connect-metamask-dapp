@@ -3,12 +3,14 @@ import { FC, useEffect, useState, useRef } from 'react';
 import { Button, Input, message, Steps, Spin, Form, Select, Space, Avatar, List } from 'antd';
 import { CheckOutlined } from '@ant-design/icons';
 import { useConnect, useAccount, useSignMessage } from 'wagmi';
-import { readContract } from '@wagmi/core';
+import { readContract, multicall } from '@wagmi/core';
 import { getSynthesizeAddressList, getUsersOwnerTokenCurrentId, leaveMessageERC20 } from '../../services/account.service';
 
 import { ERC20TokenInfo } from '../../components/ERC20TokenInfo';
+import { InputTags } from '../../components/InputTags';
 
 import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
+import TestToken from '../../../abi/TestToken.json';
 import { getFormatedAddress } from '../../lib/address';
 
 import styles from './index.module.css';
@@ -41,7 +43,7 @@ const ERC20Send: FC<any> = () => {
         onError: () => { setSignDataList(pre => [...pre, null]); }
     });
     const [signDataList, setSignDataList] = useState<any[]>([]);
-    const [userCurrentIds, setUserCurrentIds] = useState<string[]>([]);
+    const [userCurrentIds, setUserCurrentIds] = useState<any[]>([]);
 
     useEffect(() => {
         if (userCurrentIds.length && userCurrentIds.length === signDataList.length) {
@@ -93,19 +95,30 @@ const ERC20Send: FC<any> = () => {
     const getUsersOwnerTokenCurrentIdAndSignData = async () => {
         setIsLoading(true);
         const { selectToken, inputAmount, selectFriend } = form.getFieldsValue();
-        const addrsMap = followings.reduce((addrsMap: Map<string, string>, item: any) => {
-            if (selectFriend.includes(item.metamaskAddressList[0])) {
-                addrsMap.set(item.address, item.metamaskAddressList[0]);
-            }
-            return addrsMap;
-        }, new Map());
         //
-        const res = await getUsersOwnerTokenCurrentId(searchCiviaWalletAddress!, Array.from(addrsMap.keys()), selectToken).finally(() => { setIsLoading(false); });
-        if (res && res.code === 0) {
-            const userCurrentIds = res.result.ownedInfos.map((item: any) => (
+        const contracts = selectFriend.map((item: string) => ({
+            address: CIVIA_ERC20_CONTRACT_ADDRESS,
+            abi: CiviaERC20Check.abi as any,
+            functionName: 'getOwnedTokensCurrentIds',
+            args: [item, [selectToken]]
+        }));
+        setIsLoading(false);
+        //
+        const res: any = await multicall({ contracts });
+
+        const mapedRes = selectFriend.reduce((pre: any, item: string, index: number) => {
+            return {
+                ...pre,
+                [item]: Number(res[index].result[0])
+            };
+        }, {});
+
+        console.log(mapedRes);
+        if (res && mapedRes) {
+            const userCurrentIds = Object.keys(mapedRes).map((item: any) => (
                 {
-                    ...item,
-                    user: addrsMap.get(item.user)
+                    currentId: mapedRes[item],
+                    user: item
                 }
             ));
             setUserCurrentIds(userCurrentIds);
@@ -133,27 +146,21 @@ const ERC20Send: FC<any> = () => {
             });
             return null;
         }
-        console.log(res);
     };
 
     const sendSignData = async () => {
         const { selectToken, inputAmount, selectFriend } = form.getFieldsValue();
 
-        const promises = userCurrentIds.map(({ currentId, user }: any, index: number) => {
+        for (let index = 0; index < userCurrentIds.length; index++) {
+            //
+            const { currentId, user } = userCurrentIds[index];
             const signData = signDataList[index];
             if (!signData) {
-                return Promise.resolve();
+                return;
             }
-            const to = followings.reduce((to, item: any) => {
-                if (item.metamaskAddressList.includes(user)) {
-                    return item.address;
-                }
-                return to;
-            }, null);
-            //
-            return leaveMessageERC20(searchCiviaWalletAddress, {
+            const message = {
                 from: searchCiviaWalletAddress,
-                to: getFormatedAddress(to!),
+                to: null,
                 sign: JSON.stringify(signData),
                 idBegin: currentId + 1,
                 idEnd: currentId + 1,
@@ -161,16 +168,26 @@ const ERC20Send: FC<any> = () => {
                 token: selectToken,
                 sender: metamaskAddress!,
                 receiver: user
-            });
-        });
+            };
+            //
+            const options = {
+                suggestedName: `${selectToken}_${user}_${message.idBegin}_${message.idEnd}.txt`,
+                types: [
+                    {
+                        description: 'Test files',
+                        accept: {
+                            'text/plain': ['.txt']
+                        }
+                    }
+                ]
+            };
+            const handle = await (window as any).showSaveFilePicker(options);
+            const writable = await handle.createWritable();
 
-        console.log(promises);
-
-        const resList = await Promise.all(promises).catch(err => {
-            console.log(err);
-        }).finally(() => {
-            setIsLoading(false);
-        });
+            await writable.write(JSON.stringify(message));
+            await writable.close();
+        }
+        setIsLoading(false);
         setStep(5);
     };
 
@@ -240,9 +257,9 @@ const ERC20Send: FC<any> = () => {
                                 }, {
                                     title: 'Select token'
                                 }, {
-                                    title: 'Select receipient address(es)'
+                                    title: 'Input receipient address(es)'
                                 }, {
-                                    title: 'Sign requirest(s)'
+                                    title: 'Send Check(s)'
                                 }, {
                                     title: 'Success'
                                 }
@@ -255,12 +272,12 @@ const ERC20Send: FC<any> = () => {
                             layout="vertical"
                             labelCol={{ span: 8 }}
                             wrapperCol={{ span: 16 }}
-                            style={{ maxWidth: 600 }}
+                            style={{ maxWidth: 660 }}
                             autoComplete="off"
                             form={form}
                         >
                             <Form.Item
-                                label="Select token"
+                                label="Select token to write Check(s)"
                                 name="selectToken"
                                 hidden={step !== 1}
                             >
@@ -287,7 +304,7 @@ const ERC20Send: FC<any> = () => {
                             <Form.Item
                                 label={
                                     <div>
-                                Token amount
+                                        Token amount
                                         <ERC20TokenInfo tokenAddress={selectedToken}>
                                             {
                                                 (tokeName: string, tokenSymbol: string, formatAddr: string) => {
@@ -303,34 +320,12 @@ const ERC20Send: FC<any> = () => {
                                 <Input />
                             </Form.Item>
                             <Form.Item
-                                label="Select receipient(s)"
+                                label="Receipient(s)"
                                 name="selectFriend"
                                 hidden={step !== 2}
+                                initialValue={['0x39e60EA6d6417ab2b4a44f714b7503748Ce658eA', '0x39e60EA6d6417ab2b4a44f714b7503748Ce658eD']}
                             >
-                                {
-                                    followings.length ? (
-                                        <Select
-                                            mode="multiple"
-                                            onChange={(res) => {
-                                                console.log(res);
-                                            }}
-                                        >
-                                            {
-                                                followings.map((item: any) => {
-                                                    return (
-                                                        <Select.OptGroup key={item.id} label={item.nickName}>
-                                                            {
-                                                                item.metamaskAddressList.slice(0, 1).map((mItem: any) => {
-                                                                    return <Select.Option value={mItem} key={mItem}><Avatar src='https://fleek.fynut.com/c33f0f64-9add-4351-ac8c-c869d382d4f8-bucket/civia/metamask-fox.svg' className={styles.avantar} />{mItem}</Select.Option>;
-                                                                })
-                                                            }
-                                                        </Select.OptGroup>
-                                                    );
-                                                })
-                                            }
-                                        </Select>
-                                    ) : null
-                                }
+                                <InputTags onChange={(value: string[]) => { console.log(value); }} />
                             </Form.Item>
                             <Form.Item hidden={step !== 3}>
                                 {/* <div className={styles.signData}>signData: {signData}</div> */}
@@ -355,7 +350,7 @@ const ERC20Send: FC<any> = () => {
                                     step > 0 && step < 4 ? <Button onClick={handlePreviousStep} >Back</Button> : null
                                 }
                                 {
-                                    step < 4 ? <Button onClick={handleNextStep} type="primary">Next</Button> : null
+                                    step < 4 ? (<Button onClick={handleNextStep} type="primary">{step === 3 ? 'Write Check(s)' : 'Next'}</Button>) : null
                                 }
                             </Space>
                         </div>

@@ -13,7 +13,14 @@ const Erc20Send: NextPage = () => {
                 <title>Write checks</title>
                 <link rel="icon" href="/civia-icon.svg" />
             </Head>
-            <Header title='Write checks' />
+            <Header title={
+                <div>
+                    <h1>Off-chain Checks</h1>
+                    <h2>Low cost distribution of ERC-20 tokens</h2>
+                    <div>Write checks</div>
+                </div>
+            }
+            />
             <main className='main'>
                 <ERC20Send />
             </main>

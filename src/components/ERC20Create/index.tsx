@@ -223,7 +223,7 @@ const Erc20Create: NextPage = () => {
                                             <Input value={testTokenAddress} onChange={(event: ChangeEvent<HTMLInputElement>) => { setTestTokenAddress(event.target.value); }} maxLength={44} />
                                         </Form.Item>
                                         <Form.Item
-                                            label="Token admin"
+                                            label="Issuer signing address"
                                             name="tokenAdmin"
                                             rules={[{ required: true, message: 'Please input token admin address!' }]}
                                             initialValue={testTokenAdmin}
@@ -231,7 +231,7 @@ const Erc20Create: NextPage = () => {
                                             <Input value={testTokenAdmin} onChange={(event: ChangeEvent<HTMLInputElement>) => { setTestTokenAdmin(event.target.value); }} maxLength={44} />
                                         </Form.Item>
                                         <Form.Item
-                                            label="Token amount"
+                                            label="Max mint amount"
                                             name="tokenAmount"
                                             rules={[{ required: true, message: 'Please input token amount!' }]}
                                         >
