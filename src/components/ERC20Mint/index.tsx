@@ -189,7 +189,11 @@ const ERC20Mint: FC<any> = () => {
         return item.every((su: any) => su.customContent);
     });
 
-    const { data: unMintMessageData } = useGetERCMessageUnMint(searchCiviaWalletAddress);
+    const { data: unMintMessageData, isLoading: isLoadingUnMintMessageData } = useGetERCMessageUnMint(searchCiviaWalletAddress);
+
+    useEffect(() => {
+        setIsLoading(isLoadingUnMintMessageData);
+    }, [isLoadingUnMintMessageData]);
 
     useEffect(() => {
         if (unMintMessageData && unMintMessageData.length) {
@@ -207,7 +211,6 @@ const ERC20Mint: FC<any> = () => {
                 return newML;
             }, new Map());
             setMessageList(newMessageMapList);
-            setIsLoading(false);
         }
     }, [unMintMessageData]);
 
