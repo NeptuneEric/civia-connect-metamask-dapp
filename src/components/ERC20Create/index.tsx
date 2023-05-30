@@ -3,6 +3,7 @@ import type { NextPage } from 'next';
 import { Button, Input, message, Steps, Spin, Form } from 'antd';
 import { useContractRead, useContractWrite, useConnect, useAccount, useSignMessage } from 'wagmi';
 import { getContract, getWalletClient, readContract, writeContract } from '@wagmi/core';
+import { ethers } from 'ethers';
 
 import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
 import TestToken from '../../../abi/TestToken.json';
@@ -101,7 +102,7 @@ const Erc20Create: NextPage = () => {
             }
             //
             setIsLoading(true);
-            const res = await writeAsync({ args: [testTokenAddress, testTokenAdmin, 1e18 * (testTokenAmount as any as number)] }).then((res) => {
+            const res = await writeAsync({ args: [testTokenAddress, testTokenAdmin, ethers.utils.parseUnits(testTokenAmount.toString(), 18).toString()] }).then((res) => {
                 setStep(2);
                 return res;
             }).catch((err) => {

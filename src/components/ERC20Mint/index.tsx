@@ -56,7 +56,7 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
             { value: token, type: 'address' },
             { value: idBegin, type: 'uint256' },
             { value: idEnd, type: 'uint256' },
-            { value: `${amount * 1e18}`, type: 'uint256' }
+            { value: ethers.utils.parseUnits(amount.toString(), 18).toString(), type: 'uint256' }
         ];
 
         const types = orderParts.map(o => o.type);
@@ -78,7 +78,7 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
             const users = [receiver];
             const beginIds = [idBegin];
             const endIds = [idEnd];
-            const amounts = [`${amount * 1e18}`];
+            const amounts = [ethers.utils.parseUnits(amount.toString(), 18).toString()];
             const v = [signObj.v, receiverV];
             const r_s = [signObj.r, signObj.s, receiverR, receiverS];
             //
@@ -256,7 +256,7 @@ const ERC20Mint: FC<any> = () => {
             const users = [receiver];
             const beginIds = [idBegin];
             const endIds = [idEnd];
-            const amounts = [`${amount * 1e18}`];
+            const amounts = [ethers.utils.parseUnits(amount.toString(), 18).toString()];
             const v = [signObj.v, receiverV];
             const r_s = [signObj.r, signObj.s, receiverR, receiverS];
 

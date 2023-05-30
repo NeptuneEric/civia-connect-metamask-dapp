@@ -1,7 +1,7 @@
 import { FC, useEffect, useState, useRef } from 'react';
 import { Spin, Button, List, message, Card, Empty } from 'antd';
 import { useContractRead, useContractWrite, useConnect, useAccount, useSignMessage } from 'wagmi';
-import { ethers } from 'ethers';
+import { ethers, BigNumber } from 'ethers';
 
 import { useAddBSCTestNet, useAddBSCTestNetAndSwitch } from '../../hooks/useAddBSCTestNet';
 
@@ -116,7 +116,7 @@ const ERC20Mint: FC<any> = () => {
             { value: token, type: 'address' },
             { value: idBegin, type: 'uint256' },
             { value: idEnd, type: 'uint256' },
-            { value: `${amount * 1e18}`, type: 'uint256' }
+            { value: ethers.utils.parseUnits(amount.toString(), 18).toString(), type: 'uint256' }
         ];
 
         const types = orderParts.map(o => o.type);
@@ -175,7 +175,7 @@ const ERC20Mint: FC<any> = () => {
                                     <div key={index}>
                                         <Card title={
                                             <>
-                                                <div><label className={styles.label}>Receive:</label><code>{truncateHex(item.content[0].receiver)}</code></div>
+                                                <div><label className={styles.label}>Receiver:</label><code>{truncateHex(item.content[0].receiver)}</code></div>
                                                 <ERC20TokenInfo tokenAddress={item.content[0].token}>
                                                     {
                                                         (tokeName: string, tokenSymbol: string, formatAddr: string) => {
@@ -186,7 +186,7 @@ const ERC20Mint: FC<any> = () => {
                                             </>
                                         }
                                         extra={
-                                            <Button type="link" onClick={() => { handleSign(item.message_id); }}>Pack sign</Button>
+                                            <Button type="link" onClick={() => { handleSign(item.message_id); }}>Bundle sign</Button>
                                         }
                                         >
                                             <List.Item><label className={styles.label}>Amount:</label></List.Item>

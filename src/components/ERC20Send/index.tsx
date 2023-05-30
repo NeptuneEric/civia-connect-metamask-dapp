@@ -116,7 +116,7 @@ const ERC20Send: FC<any> = () => {
                     { value: selectToken, type: 'address' },
                     { value: currentId + 1, type: 'uint256' },
                     { value: currentId + 1, type: 'uint256' },
-                    { value: `${inputAmount * 1e18}`, type: 'uint256' }
+                    { value: ethers.utils.parseUnits(amount.toString(), 18).toString(), type: 'uint256' }
                 ];
                 setOrderParts(orderParts);
                 console.log(JSON.stringify(orderParts));
