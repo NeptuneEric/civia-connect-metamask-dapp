@@ -65,6 +65,12 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
         metaMaskSignMessage({ message: ethers.utils.arrayify(hash) as any });
     };
     //
+    const handleDelSignData = async () => {
+        localStorageProviderMap.delete(`signData@{searchCiviaWalletAddress}@messageId:${item.message_id}`);
+        onSigned({ signData: undefined });
+        setStep(0);
+    };
+    //
     const handleMint = async () => {
         const { receiver, token, id_begin: idBegin, id_end: idEnd, amount, sign } = item.content;
         const signObj = JSON.parse(sign);
@@ -112,7 +118,7 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
             <List.Item
                 extra={<div>
                     {
-                        step === 0 ? (<Button size='small' onClick={handleSignData}>Sign</Button>) : (<CheckOutlined className={styles.successIcon} />)
+                        step === 0 ? (<Button size='small' onClick={handleSignData}>Sign</Button>) : (<CheckOutlined className={styles.successIcon} onClick={handleDelSignData} />)
                     }
                 </div>}
             >
@@ -289,8 +295,9 @@ const ERC20Mint: FC<any> = () => {
                 type: 'error',
                 content: isStartIdNotMatch ? 'start id not match' : (isDenied ? 'MetaMask Tx Signature: User denied transaction signature' : errStr)
             });
-        }).finally(() => {
             setIsLoading(false);
+        }).finally(() => {
+            // setIsLoading(false);
         });
     };
 
