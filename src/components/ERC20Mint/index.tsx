@@ -1,4 +1,4 @@
-import { FC, useEffect, useState, useRef, ReactElement, useImperativeHandle, forwardRef } from 'react';
+import { FC, useEffect, useState, useRef, ReactElement, useImperativeHandle, forwardRef, useMemo } from 'react';
 import { Spin, Button, List, message, Space, Card, Empty, notification } from 'antd';
 import { CheckOutlined } from '@ant-design/icons';
 import { useConnect, useAccount, useSignMessage } from 'wagmi';
@@ -9,7 +9,7 @@ import { userMintERC20Done, leaveMessagePackERC20 } from '../../services/account
 import { useAddBSCTestNet, useAddBSCTestNetAndSwitch } from '../../hooks/useAddBSCTestNet';
 import { localStorageProvider } from '../../lib/localStorageProvider';
 
-import { useGetERCMessageUnMint } from '../../hooks/useGetERCMessageUnMint';
+// import { useGetERCMessageUnMint } from '../../hooks/useGetERCMessageUnMint';
 
 import { ERC20TokenInfo } from '../ERC20TokenInfo';
 import { ERC20TokenBalance } from '../ERC20TokenBalance';
@@ -23,6 +23,45 @@ const CIVIA_ERC20_CONTRACT_ADDRESS = '0x8a647C33fe1fb520bDbcbA10d88d0397F5FdC056
 
 const localStorageProviderMap = localStorageProvider();
 
+const useGetERCMessageUnMint = () => {
+    const [data, setData] = useState<any[]>();
+    const handleUploadFile = async () => {
+        try {
+            const options = {
+                multiple: true
+            };
+            const fileHandles = await (window as any).showOpenFilePicker(options);
+            const allContent = await Promise.all(
+                fileHandles.map(async (fileHandle: any) => {
+                    const file = await fileHandle.getFile();
+                    console.log(file);
+                    const content = await file.text();
+                    return {
+                        content,
+                        name: file.name
+                    };
+                })
+            );
+            const arr = allContent.map(({ content, name }) => ({
+                message_id: name,
+                content
+            }));
+            setData(arr);
+            console.log(arr);
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    const inputFile = useMemo(() => <div onClick={handleUploadFile} >Select file</div>, []);
+
+    return {
+        data,
+        isLoading: false,
+        inputFile
+    };
+};
+
 const TokenItem: FC<any> = ({ item, onSigned }) => {
     const locationSearch = new URLSearchParams(location.search);
     const searchCiviaWalletAddress = getFormatedAddress(locationSearch.get('civiaAddress') as string);
@@ -32,12 +71,12 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
         onSuccess: (res) => {
             setStep(1);
             onSigned({ signData: res });
-            localStorageProviderMap.set(`signData@{searchCiviaWalletAddress}@messageId:${item.message_id}`, res);
+            localStorageProviderMap.set(`${item.message_id}`, res);
         }
     });
 
     useEffect(() => {
-        const localStorageSignData = localStorageProviderMap.get(`signData@{searchCiviaWalletAddress}@messageId:${item.message_id}`);
+        const localStorageSignData = localStorageProviderMap.get(`${item.message_id}`);
         if (localStorageSignData) {
             onSigned({ signData: localStorageSignData });
             setStep(1);
@@ -50,7 +89,7 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
 
     //
     const handleSignData = async () => {
-        const { receiver, token, id_begin: idBegin, id_end: idEnd, amount } = item.content;
+        const { receiver, token, idBegin, idEnd, amount } = item.content;
         const orderParts = [
             { value: metamaskAddress, type: 'address' },
             { value: receiver, type: 'address' },
@@ -67,7 +106,7 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
     };
     //
     const handleDelSignData = async () => {
-        localStorageProviderMap.delete(`signData@{searchCiviaWalletAddress}@messageId:${item.message_id}`);
+        localStorageProviderMap.delete(`${item.message_id}`);
         onSigned({ signData: undefined });
         setStep(0);
     };
@@ -190,7 +229,10 @@ const ERC20Mint: FC<any> = () => {
         return item.every((su: any) => su.customContent);
     });
 
-    const { data: unMintMessageData, isLoading: isLoadingUnMintMessageData } = useGetERCMessageUnMint(searchCiviaWalletAddress);
+    const { data: unMintMessageData, isLoading: isLoadingUnMintMessageData, inputFile } = useGetERCMessageUnMint();
+
+    console.log('>>>>>');
+    console.log(unMintMessageData);
 
     useEffect(() => {
         setIsLoading(isLoadingUnMintMessageData);
@@ -207,7 +249,7 @@ const ERC20Mint: FC<any> = () => {
                     content
                 });
                 newML.set(token, newMLItem.sort((a: any, b: any) => {
-                    return a.content.id_begin > b.content.id_begin ? 1 : -1;
+                    return a.content.idBegin > b.content.idBegin ? 1 : -1;
                 }));
                 return newML;
             }, new Map());
@@ -254,7 +296,7 @@ const ERC20Mint: FC<any> = () => {
     const handleBatchMint = async () => {
         console.log(checkedMessageList);
         const getOneContractArgs = (item: any) => {
-            const { sender, receiver, token, id_begin: idBegin, id_end: idEnd, amount, sign } = item.content;
+            const { sender, receiver, token, idBegin, idEnd, amount, sign } = item.content;
             const signObj = JSON.parse(sign);
             const sigHex = item.customContent.signData.substring(2);
             const receiverR = '0x' + sigHex.slice(0, 64);
@@ -285,10 +327,11 @@ const ERC20Mint: FC<any> = () => {
             functionName: 'batchMint',
             args: mergedContractArgs
         }).then(() => {
-            checkedMessageList.flat().forEach(({ message_id }) => {
-                userMintERC20Done(searchCiviaWalletAddress, [message_id]);
-            });
-            (checkListRef.current as any).destroy();
+            // checkedMessageList.flat().forEach(({ message_id }) => {
+            //     userMintERC20Done(searchCiviaWalletAddress, [message_id]);
+            // });
+            location.reload();
+            // (checkListRef.current as any).destroy();
             return true;
         }).catch((err) => {
             const errStr = String(err);
@@ -301,7 +344,7 @@ const ERC20Mint: FC<any> = () => {
             });
             setIsLoading(false);
         }).finally(() => {
-            // setIsLoading(false);
+            setIsLoading(false);
         });
     };
 
@@ -310,6 +353,8 @@ const ERC20Mint: FC<any> = () => {
             <Spin spinning={isLoading}>
                 {contextHolder}
                 <div className={styles.body}>
+                    <div style={{ textAlign: 'center' }}><Button>{inputFile}</Button></div>
+                    <br /><br />
                     <List style={{ visibility: filterMessageList.length ? 'initial' : 'hidden' }}>
                         {
                             filterMessageList.map((item: any, index: number) => {
@@ -354,7 +399,7 @@ const ERC20Mint: FC<any> = () => {
                         }
                     </List>
                     {
-                        filterMessageList.length === 0 ? <Empty /> : null
+                        // filterMessageList.length === 0 ? <div style={{ textAlign: 'center' }}><Button>{inputFile}</Button></div> : null
                     }
                 </div>
 
