@@ -86,16 +86,16 @@
         },
         {
           "internalType": "address",
-          "name": "minterAddr",
+          "name": "issuerAddr",
           "type": "address"
         },
         {
           "internalType": "uint256",
-          "name": "amount",
+          "name": "maxAmt",
           "type": "uint256"
         }
       ],
-      "name": "registERC20",
+      "name": "register",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -109,12 +109,12 @@
         },
         {
           "internalType": "address",
-          "name": "minterAddr",
+          "name": "issuerAddr",
           "type": "address"
         },
         {
           "internalType": "uint256",
-          "name": "amount",
+          "name": "amt",
           "type": "uint256"
         }
       ],
@@ -127,7 +127,7 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "account",
+          "name": "receiverAddr",
           "type": "address"
         },
         {
@@ -136,7 +136,7 @@
           "type": "address"
         }
       ],
-      "name": "getOwnedTokenCurrentId",
+      "name": "getLastCheckId",
       "outputs": [
         {
           "internalType": "uint256",
@@ -152,7 +152,7 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "account",
+          "name": "receiverAddr",
           "type": "address"
         },
         {
@@ -161,7 +161,7 @@
           "type": "address[]"
         }
       ],
-      "name": "getOwnedTokensCurrentIds",
+      "name": "getLastCheckIdByTokens",
       "outputs": [
         {
           "internalType": "uint256[]",
@@ -176,115 +176,74 @@
     {
       "inputs": [
         {
-          "internalType": "address",
-          "name": "tokenAddr",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "sender",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "account",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "beginIds",
-          "type": "uint256[]"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "endIds",
-          "type": "uint256[]"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "amounts",
-          "type": "uint256[]"
+          "components": [
+            {
+              "internalType": "address",
+              "name": "tokenAddr",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "issuerAddr",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "receiverAddr",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "beginId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "endId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amt",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct CiviaERC20Check.Check[]",
+          "name": "checks",
+          "type": "tuple[]"
         },
         {
           "internalType": "uint8[]",
-          "name": "v1",
+          "name": "v_issuer",
           "type": "uint8[]"
         },
         {
           "internalType": "bytes32[]",
-          "name": "r1",
+          "name": "r_issuer",
           "type": "bytes32[]"
         },
         {
           "internalType": "bytes32[]",
-          "name": "s1",
+          "name": "s_issuer",
           "type": "bytes32[]"
         },
         {
           "internalType": "uint8[]",
-          "name": "v2",
+          "name": "v_receiver",
           "type": "uint8[]"
         },
         {
           "internalType": "bytes32[]",
-          "name": "r2",
+          "name": "r_receiver",
           "type": "bytes32[]"
         },
         {
           "internalType": "bytes32[]",
-          "name": "s2",
+          "name": "s_receiver",
           "type": "bytes32[]"
         }
       ],
-      "name": "batchMintOne",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address[]",
-          "name": "tokenAddrs",
-          "type": "address[]"
-        },
-        {
-          "internalType": "address[]",
-          "name": "senders",
-          "type": "address[]"
-        },
-        {
-          "internalType": "address[]",
-          "name": "accounts",
-          "type": "address[]"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "beginIds",
-          "type": "uint256[]"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "endIds",
-          "type": "uint256[]"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "amounts",
-          "type": "uint256[]"
-        },
-        {
-          "internalType": "uint8[]",
-          "name": "v",
-          "type": "uint8[]"
-        },
-        {
-          "internalType": "bytes32[]",
-          "name": "r_s",
-          "type": "bytes32[]"
-        }
-      ],
-      "name": "batchMint",
+      "name": "mint",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -309,30 +268,10 @@
           "internalType": "address",
           "name": "tokenAddr",
           "type": "address"
-        }
-      ],
-      "name": "getTokenInfo",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "tokenAddr",
-          "type": "address"
         },
         {
           "internalType": "address",
-          "name": "minterAddr",
+          "name": "issuerAddr",
           "type": "address"
         }
       ],
@@ -361,37 +300,17 @@
     {
       "inputs": [
         {
-          "internalType": "uint256[]",
-          "name": "ids",
-          "type": "uint256[]"
+          "internalType": "address",
+          "name": "issuerAddr",
+          "type": "address"
         }
       ],
-      "name": "getERC20TokenAddrByIds",
+      "name": "getRegisteredERC20s",
       "outputs": [
         {
           "internalType": "address[]",
           "name": "",
           "type": "address[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "account",
-          "type": "address"
-        }
-      ],
-      "name": "getUserRegistERC20Ids",
-      "outputs": [
-        {
-          "internalType": "uint256[]",
-          "name": "",
-          "type": "uint256[]"
         }
       ],
       "stateMutability": "view",

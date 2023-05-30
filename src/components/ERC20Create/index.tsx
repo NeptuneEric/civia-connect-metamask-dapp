@@ -10,7 +10,7 @@ import TestToken from '../../../abi/TestToken.json';
 
 import styles from './index.module.css';
 
-const CIVIA_ERC20_CONTRACT_ADDRESS = '0x8a647C33fe1fb520bDbcbA10d88d0397F5FdC056';
+const CIVIA_ERC20_CONTRACT_ADDRESS = '0xaD20848c0C3f198b9b8eca65c4d58dc11bd3A699';
 
 const Erc20Create: NextPage = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -35,7 +35,7 @@ const Erc20Create: NextPage = () => {
     const { data, error, isLoading: isWriting, isSuccess, write, writeAsync } = useContractWrite({
         address: CIVIA_ERC20_CONTRACT_ADDRESS,
         abi: CiviaERC20Check.abi,
-        functionName: 'registERC20'
+        functionName: 'register'
     });
 
     useEffect(() => {
@@ -45,17 +45,13 @@ const Erc20Create: NextPage = () => {
             readContract({
                 address: CIVIA_ERC20_CONTRACT_ADDRESS,
                 abi: CiviaERC20Check.abi,
-                functionName: 'getUserRegistERC20Ids',
+                functionName: 'getRegisteredERC20s',
                 args: [metamaskAddress]
             }).then((res) => {
-                return readContract({
-                    address: CIVIA_ERC20_CONTRACT_ADDRESS,
-                    abi: CiviaERC20Check.abi,
-                    functionName: 'getERC20TokenAddrByIds',
-                    args: [res]
-                });
-            }).then((res) => {
                 setGrantedTokens(res as []);
+            }).catch((err) => {
+                //
+                console.log(err);
             }).finally(() => {
                 setIsLoading(false);
             });

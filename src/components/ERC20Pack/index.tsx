@@ -116,9 +116,9 @@ const ERC20Pack: FC<any> = () => {
         //
         const { receiver, token, id_begin: idBegin, id_end: idEnd, amount } = mergedMessageContent;
         const orderParts = [
-            { value: metamaskAddress, type: 'address' },
-            { value: receiver, type: 'address' },
             { value: token, type: 'address' },
+            { value: receiver, type: 'address' },
+            { value: metamaskAddress, type: 'address' },
             { value: idBegin, type: 'uint256' },
             { value: idEnd, type: 'uint256' },
             { value: ethers.utils.parseUnits(amount.toString(), 18).toString(), type: 'uint256' }

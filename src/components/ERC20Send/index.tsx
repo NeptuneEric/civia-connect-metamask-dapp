@@ -16,7 +16,7 @@ import { getFormatedAddress } from '../../lib/address';
 import styles from './index.module.css';
 import { ethers } from 'ethers';
 
-const CIVIA_ERC20_CONTRACT_ADDRESS = '0x8a647C33fe1fb520bDbcbA10d88d0397F5FdC056';
+const CIVIA_ERC20_CONTRACT_ADDRESS = '0xaD20848c0C3f198b9b8eca65c4d58dc11bd3A699';
 
 const ERC20Send: FC<any> = () => {
     const locationSearch = new URLSearchParams(location.search);
@@ -64,15 +64,8 @@ const ERC20Send: FC<any> = () => {
             readContract({
                 address: CIVIA_ERC20_CONTRACT_ADDRESS,
                 abi: CiviaERC20Check.abi,
-                functionName: 'getUserRegistERC20Ids',
+                functionName: 'getRegisteredERC20s',
                 args: [metamaskAddress]
-            }).then((res) => {
-                return readContract({
-                    address: CIVIA_ERC20_CONTRACT_ADDRESS,
-                    abi: CiviaERC20Check.abi,
-                    functionName: 'getERC20TokenAddrByIds',
-                    args: [res]
-                });
             }).then((res) => {
                 setGrantedTokens(res as []);
             }).finally(() => {
@@ -99,8 +92,8 @@ const ERC20Send: FC<any> = () => {
         const contracts = selectFriend.map((item: string) => ({
             address: CIVIA_ERC20_CONTRACT_ADDRESS,
             abi: CiviaERC20Check.abi as any,
-            functionName: 'getOwnedTokensCurrentIds',
-            args: [item, [selectToken]]
+            functionName: 'getLastCheckId',
+            args: [item, selectToken]
         }));
         setIsLoading(false);
         //
@@ -109,7 +102,7 @@ const ERC20Send: FC<any> = () => {
         const mapedRes = selectFriend.reduce((pre: any, item: string, index: number) => {
             return {
                 ...pre,
-                [item]: Number(res[index].result[0])
+                [item]: Number(res[index].result)
             };
         }, {});
 
@@ -125,9 +118,9 @@ const ERC20Send: FC<any> = () => {
             //
             userCurrentIds.forEach(({ currentId, user }:any) => {
                 const orderParts = [
-                    { value: metamaskAddress, type: 'address' },
-                    { value: user, type: 'address' },
                     { value: selectToken, type: 'address' },
+                    { value: user, type: 'address' },
+                    { value: metamaskAddress, type: 'address' },
                     { value: currentId + 1, type: 'uint256' },
                     { value: currentId + 1, type: 'uint256' },
                     { value: ethers.utils.parseUnits(inputAmount.toString(), 18).toString(), type: 'uint256' }

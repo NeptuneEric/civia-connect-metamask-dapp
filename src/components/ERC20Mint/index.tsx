@@ -19,7 +19,7 @@ import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
 
 import styles from './index.module.css';
 
-const CIVIA_ERC20_CONTRACT_ADDRESS = '0x8a647C33fe1fb520bDbcbA10d88d0397F5FdC056';
+const CIVIA_ERC20_CONTRACT_ADDRESS = '0xaD20848c0C3f198b9b8eca65c4d58dc11bd3A699';
 
 const localStorageProviderMap = localStorageProvider();
 
@@ -91,9 +91,9 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
     const handleSignData = async () => {
         const { receiver, token, idBegin, idEnd, amount } = item.content;
         const orderParts = [
-            { value: metamaskAddress, type: 'address' },
-            { value: receiver, type: 'address' },
             { value: token, type: 'address' },
+            { value: receiver, type: 'address' },
+            { value: metamaskAddress, type: 'address' },
             { value: idBegin, type: 'uint256' },
             { value: idEnd, type: 'uint256' },
             { value: ethers.utils.parseUnits(amount.toString(), 18).toString(), type: 'uint256' }
@@ -263,29 +263,38 @@ const ERC20Mint: FC<any> = () => {
             const receiverR = '0x' + sigHex.slice(0, 64);
             const receiverS = '0x' + sigHex.slice(64, 128);
             const receiverV = parseInt(sigHex.slice(128, 130), 16);
-            //
-            const addrs = [token];
-            const senders = [sender];
-            const users = [receiver];
-            const beginIds = [idBegin];
-            const endIds = [idEnd];
-            const amounts = [ethers.utils.parseUnits(amount.toString(), 18).toString()];
-            const v = [signObj.v, receiverV];
-            const r_s = [signObj.r, signObj.s, receiverR, receiverS];
 
-            return [addrs, senders, users, beginIds, endIds, amounts, v, r_s];
+            // return [addrs, senders, users, beginIds, endIds, amounts, v, r_s];
+            const checks = [{
+                tokenAddr: token,
+                issuerAddr: sender,
+                receiverAddr: receiver,
+                beginId: idBegin,
+                endId: idEnd,
+                amt: ethers.utils.parseUnits(amount.toString(), 18).toString()
+            }];
+            const v1 = [signObj.v];
+            const r1 = [signObj.r];
+            const s1 = [signObj.s];
+            const v2 = [receiverV];
+            const r2 = [receiverR];
+            const s2 = [receiverS];
+
+            return [checks, v1, r1, s1, v2, r2, s2];
         };
 
-        const mergedContractArgs = checkedMessageList.flat().reduce(([preAddrs, preSenders, preUsers, preUeginIds, preEndIds, preAmounts, preV, preR_s], subItem: any) => {
-            const [addrs, senders, users, beginIds, endIds, amounts, v, r_s] = getOneContractArgs(subItem);
-            return [preAddrs.concat(addrs), preSenders.concat(senders), preUsers.concat(users), preUeginIds.concat(beginIds), preEndIds.concat(endIds), preAmounts.concat(amounts), preV.concat(v), preR_s.concat(r_s)];
-        }, [[], [], [], [], [], [], [], []]);
+        const mergedContractArgs = checkedMessageList.flat().reduce(([preChecks, preV1, preR1, preS1, preV2, preR2, preS2], subItem: any) => {
+            const [checks, v1, r1, s1, v2, r2, s2] = getOneContractArgs(subItem);
+            return [preChecks.concat(checks), preV1.concat(v1), preR1.concat(r1), preS1.concat(s1), preV2.concat(v2), preR2.concat(r2), preS2.concat(s2)];
+        }, [[], [], [], [], [], [], []]);
+
+        console.log(mergedContractArgs);
 
         setIsLoading(true);
         const res = await writeContract({
             address: CIVIA_ERC20_CONTRACT_ADDRESS,
             abi: CiviaERC20Check.abi,
-            functionName: 'batchMint',
+            functionName: 'mint',
             args: mergedContractArgs
         }).then(() => {
             // checkedMessageList.flat().forEach(({ message_id }) => {
