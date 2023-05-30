@@ -248,7 +248,7 @@ const ERC20Send: FC<any> = () => {
                                 {
                                     title: 'Connect wallet'
                                 }, {
-                                    title: 'Select token'
+                                    title: 'Select token to write Check(s)'
                                 }, {
                                     title: 'Input receipient address(es)'
                                 }, {
@@ -342,7 +342,7 @@ const ERC20Send: FC<any> = () => {
                                     step > 0 && step < 4 ? <Button onClick={handlePreviousStep} >Back</Button> : null
                                 }
                                 {
-                                    step < 4 ? (<Button onClick={handleNextStep} type="primary">{step === 3 ? 'Write Check(s)' : 'Next'}</Button>) : null
+                                    step < 4 ? (<Button onClick={handleNextStep} type="primary">{{ 2: 'Write Check(s)', 3: 'Download' }[step] || 'Next'}</Button>) : null
                                 }
                             </Space>
                         </div>
