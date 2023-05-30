@@ -9,6 +9,7 @@ import { getSynthesizeAddressList, getUsersOwnerTokenCurrentId, leaveMessageERC2
 import { ERC20TokenInfo } from '../../components/ERC20TokenInfo';
 import { InputTags } from '../../components/InputTags';
 import { localStorageProvider } from '../../lib/localStorageProvider';
+import { useERC20TokenInfo } from '../../hooks/useERC20TokenInfo';
 
 import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
 import TestToken from '../../../abi/TestToken.json';
@@ -148,6 +149,7 @@ const ERC20Send: FC<any> = () => {
     };
 
     const sendSignData = async () => {
+        let hasError = false;
         const { selectToken, inputAmount, selectFriend } = form.getFieldsValue();
 
         for (let index = 0; index < userCurrentIds.length; index++) {
@@ -169,27 +171,33 @@ const ERC20Send: FC<any> = () => {
                 receiver: user
             };
             //
+            const token = localStorageProviderMap.get(`@"${selectToken}","tokenInfo"`);
             const options = {
-                suggestedName: `${selectToken}_${user}_${message.idBegin}_${message.idEnd}.txt`,
+                suggestedName: `${token.data.tokenName || selectToken}_${user}_${message.idBegin}_${message.idEnd}.json`,
                 types: [
                     {
                         description: 'Test files',
                         accept: {
-                            'text/plain': ['.txt']
+                            'text/plain': ['.json']
                         }
                     }
                 ]
             };
-            const handle = await (window as any).showSaveFilePicker(options);
-            const writable = await handle.createWritable();
+            try {
+                const handle = await (window as any).showSaveFilePicker(options);
+                const writable = await handle.createWritable();
 
-            await writable.write(JSON.stringify(message));
-            await writable.close();
-            const localCheckId = localStorageProviderMap.get(`@${selectToken}${user},lastCheckId`) || 0;
-            localStorageProviderMap.set(`@${selectToken}${user},lastCheckId`, localCheckId + 1);
+                await writable.write(JSON.stringify(message));
+                await writable.close();
+                const localCheckId = localStorageProviderMap.get(`@${selectToken}${user},lastCheckId`) || 0;
+                localStorageProviderMap.set(`@${selectToken}${user},lastCheckId`, localCheckId + 1);
+            } catch (err) {
+                console.log(err);
+                hasError = true;
+            }
         }
         setIsLoading(false);
-        setStep(5);
+        !hasError && setStep(5);
     };
 
     const handlePreviousStep = async () => {
