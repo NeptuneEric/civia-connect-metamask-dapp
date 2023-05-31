@@ -24,7 +24,7 @@ function MyApp ({ Component, pageProps }: AppProps) {
 
     return (
         <div>
-            <SWRConfig value={{ provider: localStorageProvider }}>
+            <SWRConfig value={{ provider: localStorageProvider as any }}>
                 <WagmiConfig config={config}>
                     <Component {...pageProps} />
                 </WagmiConfig>
