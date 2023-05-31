@@ -173,7 +173,7 @@ const ERC20Send: FC<any> = () => {
             //
             const token = localStorageProviderMap.get(`@"${selectToken}","tokenInfo"`);
             const options = {
-                suggestedName: `${token.data.tokenName || selectToken}_${user}_${message.idBegin}_${message.idEnd}.json`,
+                suggestedName: `${token?.tokenName || selectToken}_${user}_${message.idBegin}_${message.idEnd}.json`,
                 types: [
                     {
                         description: 'Test files',
@@ -296,13 +296,17 @@ const ERC20Send: FC<any> = () => {
                                             grantedTokens.map((item: string) => {
                                                 return (
                                                     <Select.Option value={item} key={item}>
-                                                        <ERC20TokenInfo tokenAddress={item}>
-                                                            {
-                                                                (tokeName: string, tokenSymbol: string, formatAddr: string) => {
-                                                                    return `${tokeName} (${tokenSymbol}) ${formatAddr}`;
-                                                                }
-                                                            }
-                                                        </ERC20TokenInfo>
+                                                        {
+                                                            item && (
+                                                                <ERC20TokenInfo tokenAddress={item}>
+                                                                    {
+                                                                        (tokeName: string, tokenSymbol: string, formatAddr: string) => {
+                                                                            return `${tokeName} (${tokenSymbol}) ${formatAddr}`;
+                                                                        }
+                                                                    }
+                                                                </ERC20TokenInfo>
+                                                            )
+                                                        }
                                                     </Select.Option>
                                                 );
                                             })
@@ -314,13 +318,17 @@ const ERC20Send: FC<any> = () => {
                                 label={
                                     <div>
                                         Token amount
-                                        <ERC20TokenInfo tokenAddress={selectedToken}>
-                                            {
-                                                (tokeName: string, tokenSymbol: string, formatAddr: string) => {
-                                                    return ` (${tokenSymbol})`;
-                                                }
-                                            }
-                                        </ERC20TokenInfo>
+                                        {
+                                            selectedToken && (
+                                                <ERC20TokenInfo tokenAddress={selectedToken}>
+                                                    {
+                                                        (tokeName: string, tokenSymbol: string, formatAddr: string) => {
+                                                            return ` (${tokenSymbol})`;
+                                                        }
+                                                    }
+                                                </ERC20TokenInfo>
+                                            )
+                                        }
                                     </div>
                                 }
                                 name="inputAmount"

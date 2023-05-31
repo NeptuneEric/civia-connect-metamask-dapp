@@ -1,6 +1,6 @@
 import { FC, useEffect, useState, ChangeEvent, KeyboardEvent } from 'react';
 import { Space, List, Input } from 'antd';
-import { CloseOutlined } from '@ant-design/icons';
+import { CloseOutlined, EnterOutlined } from '@ant-design/icons';
 
 export const InputTags: FC<any> = (props) => {
     const { value = [], onChange } = props;
@@ -31,7 +31,7 @@ export const InputTags: FC<any> = (props) => {
                     })
                 }
                 <List.Item>
-                    <Input onPressEnter={handleEnter} value={inputVal} onChange={(evt: ChangeEvent<HTMLInputElement>) => { setInputVal(evt.target.value); }} />
+                    <Input onPressEnter={handleEnter} value={inputVal} onChange={(evt: ChangeEvent<HTMLInputElement>) => { setInputVal(evt.target.value); }} suffix={<EnterOutlined />} />
                 </List.Item>
             </List>
         </div>

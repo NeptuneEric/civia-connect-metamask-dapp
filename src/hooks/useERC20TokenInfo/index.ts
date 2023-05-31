@@ -3,6 +3,8 @@ import useSWR from 'swr';
 import { readContracts } from '@wagmi/core';
 import TestToken from '../../../abi/TestToken.json';
 import { truncateHex } from '../../services/address.service';
+import { localStorageProvider } from '../../lib/localStorageProvider';
+const localStorageProviderMap = localStorageProvider();
 
 export const useERC20TokenInfo = (testTokenAddress: `0x${string}`) => {
     const key = `@"${testTokenAddress}","tokenInfo"`;
@@ -22,19 +24,21 @@ export const useERC20TokenInfo = (testTokenAddress: `0x${string}`) => {
                     }
                 ]
             }).then(([{ result: tokenName }, { result: tokenSymbol }]) => {
-                return {
+                const val = {
                     tokenName,
                     tokenSymbol,
                     formatAddr: truncateHex(testTokenAddress)
                 };
+                localStorageProviderMap.set(key, val);
+                return val;
             }).catch(() => {
                 return null;
             });
-            return res;
+            return Promise.resolve(res);
         } else {
             return null;
         }
-    }, { revalidateIfStale: true });
+    });
 
     return data || {
         tokenName: null,
