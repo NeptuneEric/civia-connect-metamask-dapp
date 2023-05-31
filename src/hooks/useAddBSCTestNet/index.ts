@@ -40,7 +40,6 @@ export const useAddBSCTestNetAndSwitch: any = () => {
         if (chain && chain.id !== customBscTestnet.id) {
             switchBscTestNet();
         }
-        console.log(chain);
     }, []);
 
     return [chainId, switchBscTestNet];
