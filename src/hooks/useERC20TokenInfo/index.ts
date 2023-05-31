@@ -4,7 +4,6 @@ import { readContracts } from '@wagmi/core';
 import TestToken from '../../../abi/TestToken.json';
 import { truncateHex } from '../../services/address.service';
 import { localStorageProvider } from '../../lib/localStorageProvider';
-const localStorageProviderMap = localStorageProvider();
 
 export const useERC20TokenInfo = (testTokenAddress: `0x${string}`) => {
     const key = `@"${testTokenAddress}","tokenInfo"`;
@@ -29,7 +28,6 @@ export const useERC20TokenInfo = (testTokenAddress: `0x${string}`) => {
                     tokenSymbol,
                     formatAddr: truncateHex(testTokenAddress)
                 };
-                localStorageProviderMap.set(key, val);
                 return val;
             }).catch(() => {
                 return null;

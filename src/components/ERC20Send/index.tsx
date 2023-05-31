@@ -3,7 +3,7 @@ import { FC, useEffect, useState, useRef } from 'react';
 import { Button, Input, message, Steps, Spin, Form, Select, Space, Avatar, List } from 'antd';
 import { CheckOutlined } from '@ant-design/icons';
 import { useConnect, useAccount, useSignMessage } from 'wagmi';
-import { readContract, multicall } from '@wagmi/core';
+import { readContract, readContracts, multicall } from '@wagmi/core';
 import { getSynthesizeAddressList, getUsersOwnerTokenCurrentId, leaveMessageERC20 } from '../../services/account.service';
 
 import { ERC20TokenInfo } from '../../components/ERC20TokenInfo';
@@ -171,9 +171,30 @@ const ERC20Send: FC<any> = () => {
                 receiver: user
             };
             //
-            const token = localStorageProviderMap.get(`@"${selectToken}","tokenInfo"`);
+            const res = await readContracts({
+                contracts: [
+                    {
+                        address: selectToken,
+                        abi: TestToken.abi as unknown as any,
+                        functionName: 'name'
+                    },
+                    {
+                        address: selectToken,
+                        abi: TestToken.abi,
+                        functionName: 'symbol'
+                    }
+                ]
+            }).then(([{ result: tokenName }, { result: tokenSymbol }]) => {
+                const val = {
+                    tokenName,
+                    tokenSymbol
+                };
+                return val;
+            }).catch(() => {
+                return null;
+            });
             const options = {
-                suggestedName: `${token?.tokenName || selectToken}_${user}_${message.idBegin}_${message.idEnd}.json`,
+                suggestedName: `${res?.tokenName || selectToken}_${user}_${message.idBegin}_${message.idEnd}.json`,
                 types: [
                     {
                         description: 'Test files',
