@@ -127,8 +127,8 @@ const ERC20Send: FC<any> = () => {
             userCurrentIds.forEach(({ currentId, user }:any) => {
                 const orderParts = [
                     { value: selectToken, type: 'address' },
-                    { value: user, type: 'address' },
                     { value: metamaskAddress, type: 'address' },
+                    { value: user, type: 'address' },
                     { value: currentId + 1, type: 'uint256' },
                     { value: currentId + 1, type: 'uint256' },
                     { value: ethers.utils.parseUnits(inputAmount.toString(), 18).toString(), type: 'uint256' }

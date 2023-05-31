@@ -94,8 +94,8 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
         const { receiverAddr, tokenAddr, beginId, endId, amt } = item.content;
         const orderParts = [
             { value: tokenAddr, type: 'address' },
-            { value: receiverAddr, type: 'address' },
             { value: metamaskAddress, type: 'address' },
+            { value: receiverAddr, type: 'address' },
             { value: beginId, type: 'uint256' },
             { value: endId, type: 'uint256' },
             { value: amt, type: 'uint256' }
