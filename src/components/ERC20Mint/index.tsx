@@ -77,14 +77,14 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
     });
     const { tokenName, tokenSymbol, decimals = 1, formatAddr } = useERC20TokenInfo(item.content.tokenAddr);
 
-    useEffect(() => {
-        const localStorageSignData = localStorageProviderMap.get(`${item.message_id}`);
-        if (localStorageSignData) {
-            onSigned({ signData: localStorageSignData });
-            setStep(1);
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [item.message_id]);
+    // useEffect(() => {
+    //     const localStorageSignData = localStorageProviderMap.get(`${item.message_id}`);
+    //     if (localStorageSignData) {
+    //         onSigned({ signData: localStorageSignData });
+    //         setStep(1);
+    //     }
+    // // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [item.message_id]);
 
     const [messageApi, contextHolder] = message.useMessage();
     const { isConnected: isMetaMaskConnected, address: metamaskAddress } = useAccount();
