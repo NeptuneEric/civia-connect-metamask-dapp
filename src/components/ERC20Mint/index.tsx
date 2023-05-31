@@ -226,7 +226,7 @@ const ERC20Mint: FC<any> = () => {
 
     const handlePackAll = async (tokenAddress: string) => {
         return modal.info({
-            title: 'Success',
+            title: 'Bundle request sent',
             onOk: () => {
                 window.location.reload();
             }
