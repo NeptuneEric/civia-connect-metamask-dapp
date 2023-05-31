@@ -1,5 +1,5 @@
 import { FC, useEffect, useState, useRef, ReactElement, useImperativeHandle, forwardRef, useMemo } from 'react';
-import { Spin, Button, List, message, Space, Card, Empty, notification } from 'antd';
+import { Spin, Button, List, message, Space, Card, Modal, notification } from 'antd';
 import { CheckOutlined } from '@ant-design/icons';
 import { useConnect, useAccount, useSignMessage } from 'wagmi';
 import { writeContract } from '@wagmi/core';
@@ -173,6 +173,7 @@ const ERC20Mint: FC<any> = () => {
     const { isConnected: isMetaMaskConnected, address: metamaskAddress } = useAccount();
     const { connect: metaMaskConnect, connectors: metaMaskConnectors, error: ucError, isLoading: ucIsLoading, pendingConnector } = useConnect();
     const connectMetamaskRef = useRef(false);
+    const [modal, modalContextHolder] = Modal.useModal();
 
     const { chainId, switchBscTestNet } = useAddBSCTestNetAndSwitch();
 
@@ -193,9 +194,6 @@ const ERC20Mint: FC<any> = () => {
     });
 
     const { data: unMintMessageData, isLoading: isLoadingUnMintMessageData, inputFile } = useGetERCMessageUnMint();
-
-    console.log('>>>>>');
-    console.log(unMintMessageData);
 
     useEffect(() => {
         setIsLoading(isLoadingUnMintMessageData);
@@ -227,9 +225,11 @@ const ERC20Mint: FC<any> = () => {
     }, [checkedMessageList.length]);
 
     const handlePackAll = async (tokenAddress: string) => {
-        return messageApi.open({
-            type: 'success',
-            content: 'Bundle request sent'
+        return modal.info({
+            title: 'Success',
+            onOk: () => {
+                window.location.reload();
+            }
         });
         //
         // const messageItems = messageList.get(tokenAddress);
@@ -331,6 +331,7 @@ const ERC20Mint: FC<any> = () => {
         <>
             <Spin spinning={isLoading}>
                 {contextHolder}
+                {modalContextHolder}
                 <div className={styles.body}>
                     <div style={{ textAlign: 'center' }}><Button>{inputFile}</Button></div>
                     <br /><br />

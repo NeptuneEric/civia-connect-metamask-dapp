@@ -15,8 +15,8 @@ const Erc20Send: NextPage = () => {
             </Head>
             <Header title={
                 <div>
-                    <h1>Off-chain Checks</h1>
-                    <h2>Low cost distribution of ERC-20 tokens</h2>
+                    <h2>Off-chain Checks</h2>
+                    <p>Low cost distribution of ERC-20 tokens</p>
                     <div>Write checks</div>
                 </div>
             }
