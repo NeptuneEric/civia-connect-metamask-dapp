@@ -14,6 +14,7 @@ import { localStorageProvider } from '../../lib/localStorageProvider';
 import { ERC20TokenInfo } from '../ERC20TokenInfo';
 import { ERC20TokenBalance } from '../ERC20TokenBalance';
 import { getFormatedAddress } from '../../lib/address';
+import { useERC20TokenInfo } from '../../hooks/useERC20TokenInfo';
 
 import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
 
@@ -74,6 +75,7 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
             localStorageProviderMap.set(`${item.message_id}`, res);
         }
     });
+    const { tokenName, tokenSymbol, decimals = 1, formatAddr } = useERC20TokenInfo(item.content.tokenAddr);
 
     useEffect(() => {
         const localStorageSignData = localStorageProviderMap.get(`${item.message_id}`);
@@ -123,7 +125,7 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
                     }
                 </div>}
             >
-                <div><label className={styles.label} >{beginId === endId ? beginId : `${beginId}-${endId}`}:</label>{item.content.amt / 1e18}</div>
+                <div><label className={styles.label} >{beginId === endId ? beginId : `${beginId}-${endId}`}:</label>{item.content.amt / Math.pow(10, decimals as any)}</div>
             </List.Item>
         </>
     );
