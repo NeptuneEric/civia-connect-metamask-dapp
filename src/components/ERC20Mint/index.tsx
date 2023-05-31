@@ -54,7 +54,7 @@ const useGetERCMessageUnMint = () => {
         }
     };
 
-    const inputFile = useMemo(() => <div onClick={handleUploadFile} >Select file</div>, []);
+    const inputFile = useMemo(() => <div onClick={handleUploadFile} >Select checks</div>, []);
 
     return {
         data,
