@@ -159,44 +159,23 @@ const ERC20Send: FC<any> = () => {
             if (!signData) {
                 return;
             }
+            const tokenInfo = localStorageProviderMap.get(`@"${selectToken}","tokenInfo"`);
             const message = {
                 tokenAddr: selectToken,
                 issuerAddr: metamaskAddress!,
                 receiverAddr: user,
                 beginId: currentId + 1,
                 endId: currentId + 1,
-                amt: ethers.utils.parseUnits(inputAmount.toString(), 18).toString(),
+                amt: ethers.utils.parseUnits(inputAmount.toString(), tokenInfo.decimals).toString(),
                 sig: {
                     r: signData.r,
                     s: signData.s,
                     v: signData.v
                 }
             };
-            //
-            const res = await readContracts({
-                contracts: [
-                    {
-                        address: selectToken,
-                        abi: TestToken.abi as unknown as any,
-                        functionName: 'name'
-                    },
-                    {
-                        address: selectToken,
-                        abi: TestToken.abi,
-                        functionName: 'symbol'
-                    }
-                ]
-            }).then(([{ result: tokenName }, { result: tokenSymbol }]) => {
-                const val = {
-                    tokenName,
-                    tokenSymbol
-                };
-                return val;
-            }).catch(() => {
-                return null;
-            });
+
             const options = {
-                suggestedName: `${res?.tokenName || selectToken}_${user}_${message.beginId}_${message.endId}.json`,
+                suggestedName: `${tokenInfo?.data?.tokenName || selectToken}_${user}_${message.beginId}_${message.endId}.json`,
                 types: [
                     {
                         description: 'Test files',

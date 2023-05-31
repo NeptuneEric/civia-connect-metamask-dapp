@@ -20,12 +20,18 @@ export const useERC20TokenInfo = (testTokenAddress: `0x${string}`) => {
                         address: testTokenAddress,
                         abi: TestToken.abi,
                         functionName: 'symbol'
+                    },
+                    {
+                        address: testTokenAddress,
+                        abi: TestToken.abi,
+                        functionName: 'decimals'
                     }
                 ]
-            }).then(([{ result: tokenName }, { result: tokenSymbol }]) => {
+            }).then(([{ result: tokenName }, { result: tokenSymbol }, { result: decimals }]) => {
                 const val = {
                     tokenName,
                     tokenSymbol,
+                    decimals,
                     formatAddr: truncateHex(testTokenAddress)
                 };
                 return val;
@@ -41,6 +47,7 @@ export const useERC20TokenInfo = (testTokenAddress: `0x${string}`) => {
     return data || {
         tokenName: null,
         tokenSymbol: null,
-        formatAddr: null
+        formatAddr: null,
+        decimals: null
     };
 };
