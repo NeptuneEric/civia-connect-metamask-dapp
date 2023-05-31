@@ -227,20 +227,24 @@ const ERC20Mint: FC<any> = () => {
     }, [checkedMessageList.length]);
 
     const handlePackAll = async (tokenAddress: string) => {
-        //
-        const messageItems = messageList.get(tokenAddress);
-        const messageIds = messageItems!.map((item: any) => item.message_id);
-        setIsLoading(true);
-        const res = await leaveMessagePackERC20(searchCiviaWalletAddress, messageIds).then(() => {
-            messageApi.open({
-                type: 'success',
-                content: 'Check bundle send to issure'
-            });
-        }).catch((err) => {
-            console.log(err);
-        }).finally(() => {
-            setIsLoading(false);
+        return messageApi.open({
+            type: 'success',
+            content: 'Bundle request sent'
         });
+        //
+        // const messageItems = messageList.get(tokenAddress);
+        // const messageIds = messageItems!.map((item: any) => item.message_id);
+        // setIsLoading(true);
+        // const res = await leaveMessagePackERC20(searchCiviaWalletAddress, messageIds).then(() => {
+        //     messageApi.open({
+        //         type: 'success',
+        //         content: 'Check bundle send to issure'
+        //     });
+        // }).catch((err) => {
+        //     console.log(err);
+        // }).finally(() => {
+        //     setIsLoading(false);
+        // });
     };
 
     const handleSignedCreater = (tokenAddress: string, itemIndex: number) => {
@@ -353,10 +357,10 @@ const ERC20Mint: FC<any> = () => {
                                                 </ERC20TokenBalance>
                                             </>
                                         }
-                                        // extra={
-                                        //     item.length > 1 ? <Button type="link" onClick={() => { handlePackAll(item[0].content.tokenAddr); }}>Bundle checks</Button> : null
-                                        //     // <Checkbox onChange={handleSelectAll} checked={item.every((su: any) => su.customContent)}>Select all</Checkbox>
-                                        // }
+                                        extra={
+                                            item.length > 1 ? <Button type="link" onClick={() => { handlePackAll(item[0].content.tokenAddr); }}>Bundle checks</Button> : null
+                                            // <Checkbox onChange={handleSelectAll} checked={item.every((su: any) => su.customContent)}>Select all</Checkbox>
+                                        }
                                         >
                                             <List.Item><label className={styles.label}>Amount:</label></List.Item>
                                             {

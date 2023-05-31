@@ -1,3 +1,4 @@
+import { ConfigProvider } from 'antd';
 import { WagmiConfig, createConfig, configureChains, mainnet } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
 import { bscTestnet } from '@wagmi/core/chains';
@@ -24,11 +25,20 @@ function MyApp ({ Component, pageProps }: AppProps) {
 
     return (
         <div>
-            <SWRConfig value={{ provider: localStorageProvider as any }}>
-                <WagmiConfig config={config}>
-                    <Component {...pageProps} />
-                </WagmiConfig>
-            </SWRConfig>
+            <ConfigProvider
+                theme={{
+                    token: {
+                        // colorPrimary: 'rgba(0, 125, 40, 1)',
+                        fontSize: 14
+                    }
+                }}
+            >
+                <SWRConfig value={{ provider: localStorageProvider as any }}>
+                    <WagmiConfig config={config}>
+                        <Component {...pageProps} />
+                    </WagmiConfig>
+                </SWRConfig>
+            </ConfigProvider>
         </div>
     );
 }
