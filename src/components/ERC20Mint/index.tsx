@@ -351,10 +351,10 @@ const ERC20Mint: FC<any> = () => {
                                                 </ERC20TokenBalance>
                                             </>
                                         }
-                                        extra={
-                                            item.length > 1 ? <Button type="link" onClick={() => { handlePackAll(item[0].content.tokenAddr); }}>Bundle checks</Button> : null
-                                            // <Checkbox onChange={handleSelectAll} checked={item.every((su: any) => su.customContent)}>Select all</Checkbox>
-                                        }
+                                        // extra={
+                                        //     item.length > 1 ? <Button type="link" onClick={() => { handlePackAll(item[0].content.tokenAddr); }}>Bundle checks</Button> : null
+                                        //     // <Checkbox onChange={handleSelectAll} checked={item.every((su: any) => su.customContent)}>Select all</Checkbox>
+                                        // }
                                         >
                                             <List.Item><label className={styles.label}>Amount:</label></List.Item>
                                             {
