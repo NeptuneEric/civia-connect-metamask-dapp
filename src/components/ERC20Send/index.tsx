@@ -160,15 +160,17 @@ const ERC20Send: FC<any> = () => {
                 return;
             }
             const message = {
-                from: searchCiviaWalletAddress,
-                to: null,
-                sign: JSON.stringify(signData),
-                idBegin: currentId + 1,
-                idEnd: currentId + 1,
-                amount: inputAmount,
-                token: selectToken,
-                sender: metamaskAddress!,
-                receiver: user
+                tokenAddr: selectToken,
+                issuerAddr: metamaskAddress!,
+                receiverAddr: user,
+                beginId: currentId + 1,
+                endId: currentId + 1,
+                amt: ethers.utils.parseUnits(inputAmount.toString(), 18).toString(),
+                sig: {
+                    r: signData.r,
+                    s: signData.s,
+                    v: signData.v
+                }
             };
             //
             const res = await readContracts({
@@ -194,7 +196,7 @@ const ERC20Send: FC<any> = () => {
                 return null;
             });
             const options = {
-                suggestedName: `${res?.tokenName || selectToken}_${user}_${message.idBegin}_${message.idEnd}.json`,
+                suggestedName: `${res?.tokenName || selectToken}_${user}_${message.beginId}_${message.endId}.json`,
                 types: [
                     {
                         description: 'Test files',
