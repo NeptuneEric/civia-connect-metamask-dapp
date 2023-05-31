@@ -1,17 +1,17 @@
 import { FC, useEffect, useState } from 'react';
 import { getNetwork } from '@wagmi/core';
 
-import { customBscTestnet } from '../../lib/bscTestNetConfig';
+import { customNetConfig } from '../../lib/customNetConfig';
 
 const DefaultBSCTestChainConfig = {
-    chainId: '0x' + (customBscTestnet.id).toString(16),
-    chainName: customBscTestnet.name,
-    nativeCurrency: customBscTestnet.nativeCurrency,
-    rpcUrls: [customBscTestnet.rpcUrls.public.http ?? customBscTestnet.rpcUrls.default.http].flat(),
-    blockExplorerUrls: [customBscTestnet.blockExplorers.default.url || customBscTestnet.blockExplorers.etherscan.url]
+    chainId: '0x' + (customNetConfig.id).toString(16),
+    chainName: customNetConfig.name,
+    nativeCurrency: customNetConfig.nativeCurrency,
+    rpcUrls: [customNetConfig.rpcUrls.public.http ?? customNetConfig.rpcUrls.default.http].flat(),
+    blockExplorerUrls: [customNetConfig.blockExplorers.default.url || customNetConfig.blockExplorers.etherscan.url]
 };
 
-export const useAddBSCTestNet: FC<any> = ({ BSCTestChainConfig = DefaultBSCTestChainConfig }) => {
+export const useAddCustomNet: FC<any> = ({ BSCTestChainConfig = DefaultBSCTestChainConfig }) => {
     useEffect(() => {
         (window as any).ethereum.request({
             method: 'wallet_addEthereumChain',
@@ -37,7 +37,7 @@ export const useAddBSCTestNetAndSwitch: any = () => {
     useEffect(() => {
         const { chain, chains } = getNetwork();
         chain && setChainId(chain.id);
-        if (chain && chain.id !== customBscTestnet.id) {
+        if (chain && chain.id !== customNetConfig.id) {
             switchBscTestNet();
         }
     }, []);

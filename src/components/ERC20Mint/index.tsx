@@ -6,7 +6,7 @@ import { writeContract } from '@wagmi/core';
 import { ethers } from 'ethers';
 import { userMintERC20Done, leaveMessagePackERC20 } from '../../services/account.service';
 
-import { useAddBSCTestNet, useAddBSCTestNetAndSwitch } from '../../hooks/useAddBSCTestNet';
+import { useAddCustomNet, useAddBSCTestNetAndSwitch } from '../../hooks/useAddCustomNet';
 import { localStorageProvider } from '../../lib/localStorageProvider';
 
 // import { useGetERCMessageUnMint } from '../../hooks/useGetERCMessageUnMint';
@@ -20,7 +20,7 @@ import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
 
 import styles from './index.module.css';
 
-const CIVIA_ERC20_CONTRACT_ADDRESS = '0xf9bd4a64903Af3625E3c2598a348dCB3594d59E4';
+const CIVIA_ERC20_CONTRACT_ADDRESS = '0xBEfC4820810543f923791F638EE82705dD2302Fe';
 
 const localStorageProviderMap = localStorageProvider();
 

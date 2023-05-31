@@ -10,7 +10,7 @@ import TestToken from '../../../abi/TestToken.json';
 
 import styles from './index.module.css';
 
-const CIVIA_ERC20_CONTRACT_ADDRESS = '0xf9bd4a64903Af3625E3c2598a348dCB3594d59E4';
+const CIVIA_ERC20_CONTRACT_ADDRESS = '0xBEfC4820810543f923791F638EE82705dD2302Fe';
 
 const Erc20Create: NextPage = () => {
     const [isLoading, setIsLoading] = useState(false);

@@ -3,7 +3,7 @@ import { Spin, Button, List, message, Card, Empty } from 'antd';
 import { useContractRead, useContractWrite, useConnect, useAccount, useSignMessage } from 'wagmi';
 import { ethers, BigNumber } from 'ethers';
 
-import { useAddBSCTestNet, useAddBSCTestNetAndSwitch } from '../../hooks/useAddBSCTestNet';
+import { useAddCustomNet, useAddBSCTestNetAndSwitch } from '../../hooks/useAddCustomNet';
 
 import { truncateHex } from '../../services/address.service';
 

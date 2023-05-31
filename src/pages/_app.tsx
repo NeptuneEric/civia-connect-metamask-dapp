@@ -4,7 +4,7 @@ import { publicProvider } from 'wagmi/providers/public';
 import { bscTestnet } from '@wagmi/core/chains';
 import { SWRConfig } from 'swr';
 
-import { customBscTestnet } from '../lib/bscTestNetConfig';
+import { customNetConfig } from '../lib/customNetConfig';
 import { localStorageProvider } from '../lib/localStorageProvider';
 
 import '../styles/globals.css';
@@ -13,7 +13,7 @@ import type { AppProps } from 'next/app';
 
 function MyApp ({ Component, pageProps }: AppProps) {
     const { chains, publicClient, webSocketPublicClient } = configureChains(
-        [customBscTestnet],
+        [customNetConfig],
         [publicProvider()]
     );
 

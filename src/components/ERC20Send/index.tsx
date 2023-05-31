@@ -20,7 +20,7 @@ import { ethers } from 'ethers';
 
 const localStorageProviderMap = localStorageProvider();
 
-const CIVIA_ERC20_CONTRACT_ADDRESS = '0xf9bd4a64903Af3625E3c2598a348dCB3594d59E4';
+const CIVIA_ERC20_CONTRACT_ADDRESS = '0xBEfC4820810543f923791F638EE82705dD2302Fe';
 
 const ERC20Send: FC<any> = () => {
     const locationSearch = new URLSearchParams(location.search);
