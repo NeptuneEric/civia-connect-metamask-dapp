@@ -348,7 +348,7 @@ const ERC20Mint: FC<any> = () => {
                                                         }
                                                     }
                                                 </ERC20TokenInfo>
-                                                <ERC20TokenBalance tokenAddress={item[0].content.tokenAddr} tokenId={item[0].content.tokenId} userAddress={metamaskAddress}>
+                                                <ERC20TokenBalance tokenAddress={item[0].content.tokenAddr} tokenIds={item.map((item0: any) => item0.content.tokenId)} userAddress={metamaskAddress}>
                                                     {
                                                         (res: any) => {
                                                             return res ? <code>{`Balance: ${res}`}</code> : null;

@@ -104,10 +104,10 @@ const ERC20Send: FC<any> = () => {
         const res: any = await multicall({ contracts });
 
         const mapedRes = selectFriend.reduce((pre: any, item: string, index: number) => {
-            const localLastCheckId = Number(localStorageProviderMap.get(`@${selectToken}${item},lastCheckId`) || 0);
+            const localLastCheckId = Number(localStorageProviderMap.get(`@${selectToken}.${inputId}.${item},lastCheckId`) || 0);
             const lastCheckId = Number(res[index].result);
             const computedLastCheckId = Math.max(localLastCheckId, lastCheckId);
-            localStorageProviderMap.set(`@${selectToken}${item},lastCheckId`, computedLastCheckId);
+            localStorageProviderMap.set(`@${selectToken}.${inputId}.${item},lastCheckId`, computedLastCheckId);
             return {
                 ...pre,
                 [item]: computedLastCheckId
@@ -177,7 +177,7 @@ const ERC20Send: FC<any> = () => {
             };
 
             const options = {
-                suggestedName: `${tokenInfo?.data?.tokenName || selectToken}_${user}_${message.beginId}_${message.endId}.json`,
+                suggestedName: `${tokenInfo?.data?.tokenName || selectToken}_${inputId}_${user}_${message.beginId}_${message.endId}.json`,
                 types: [
                     {
                         description: 'Test files',
@@ -193,8 +193,8 @@ const ERC20Send: FC<any> = () => {
 
                 await writable.write(JSON.stringify(message));
                 await writable.close();
-                const localCheckId = localStorageProviderMap.get(`@${selectToken}${user},lastCheckId`) || 0;
-                localStorageProviderMap.set(`@${selectToken}${user},lastCheckId`, localCheckId + 1);
+                const localCheckId = localStorageProviderMap.get(`@${selectToken}.${inputId}.${user},lastCheckId`) || 0;
+                localStorageProviderMap.set(`@${selectToken}.${inputId}.${user},lastCheckId`, localCheckId + 1);
             } catch (err) {
                 console.log(err);
                 hasError = true;
