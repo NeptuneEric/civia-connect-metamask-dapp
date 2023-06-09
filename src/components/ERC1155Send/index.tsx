@@ -6,7 +6,7 @@ import { useConnect, useAccount, useSignMessage } from 'wagmi';
 import { readContract, readContracts, multicall } from '@wagmi/core';
 import { getSynthesizeAddressList, getUsersOwnerTokenCurrentId, leaveMessageERC20 } from '../../services/account.service';
 
-import { ERC20TokenInfo } from '../../components/ERC20TokenInfo';
+import { ERC1155TokenInfo } from '../../components/ERC1155TokenInfo';
 import { InputTags } from '../../components/InputTags';
 import { localStorageProvider } from '../../lib/localStorageProvider';
 import { useERC20TokenInfo } from '../../hooks/useERC20TokenInfo';
@@ -308,13 +308,13 @@ const ERC20Send: FC<any> = () => {
                                                     <Select.Option value={item} key={item}>
                                                         {
                                                             item && (
-                                                                <ERC20TokenInfo tokenAddress={item}>
+                                                                <ERC1155TokenInfo tokenAddress={item}>
                                                                     {
                                                                         (tokeName: string, tokenSymbol: string, formatAddr: string) => {
                                                                             return `${tokeName} (${tokenSymbol}) ${formatAddr}`;
                                                                         }
                                                                     }
-                                                                </ERC20TokenInfo>
+                                                                </ERC1155TokenInfo>
                                                             )
                                                         }
                                                     </Select.Option>
@@ -330,13 +330,13 @@ const ERC20Send: FC<any> = () => {
                                         Token amount
                                         {
                                             selectedToken && (
-                                                <ERC20TokenInfo tokenAddress={selectedToken}>
+                                                <ERC1155TokenInfo tokenAddress={selectedToken}>
                                                     {
                                                         (tokeName: string, tokenSymbol: string, formatAddr: string) => {
                                                             return ` (${tokenSymbol})`;
                                                         }
                                                     }
-                                                </ERC20TokenInfo>
+                                                </ERC1155TokenInfo>
                                             )
                                         }
                                     </div>

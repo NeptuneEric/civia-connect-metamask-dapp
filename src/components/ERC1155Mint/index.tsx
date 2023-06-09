@@ -8,8 +8,8 @@ import { ethers } from 'ethers';
 import { useAddCustomNet, useAddBSCTestNetAndSwitch } from '../../hooks/useAddCustomNet';
 import { localStorageProvider } from '../../lib/localStorageProvider';
 
-import { ERC20TokenInfo } from '../ERC20TokenInfo';
-import { ERC20TokenBalance } from '../ERC20TokenBalance';
+import { ERC1155TokenInfo } from '../ERC1155TokenInfo';
+import { ERC1155TokenBalance } from '../ERC1155TokenBalance';
 import { getFormatedAddress } from '../../lib/address';
 import { useERC20TokenInfo } from '../../hooks/useERC20TokenInfo';
 
@@ -338,23 +338,23 @@ const ERC20Mint: FC<any> = () => {
                         {
                             filterMessageList.map((item: any, index: number) => {
                                 return (
-                                    <div key={index}>
+                                    <div key={item[0].content.tokenAddr}>
                                         <Card title={
                                             <>
-                                                <ERC20TokenInfo tokenAddress={item[0].content.tokenAddr}>
+                                                <ERC1155TokenInfo tokenAddress={item[0].content.tokenAddr}>
                                                     {
                                                         (tokeName: string, tokenSymbol: string, formatAddr: string) => {
                                                             return <span><label className={styles.label}>Token:</label>{`${tokeName} (${tokenSymbol}) ${formatAddr}`}&nbsp;&nbsp;</span>;
                                                         }
                                                     }
-                                                </ERC20TokenInfo>
-                                                <ERC20TokenBalance tokenAddress={item[0].content.tokenAddr} tokenIds={item.map((item0: any) => item0.content.tokenId)} userAddress={metamaskAddress}>
+                                                </ERC1155TokenInfo>
+                                                <ERC1155TokenBalance tokenAddress={item[0].content.tokenAddr} tokenIds={item.map((item0: any) => item0.content.tokenId)} userAddress={metamaskAddress}>
                                                     {
                                                         (res: any) => {
                                                             return res ? <code>{`Balance: ${res}`}</code> : null;
                                                         }
                                                     }
-                                                </ERC20TokenBalance>
+                                                </ERC1155TokenBalance>
                                             </>
                                         }
                                         extra={
@@ -366,7 +366,7 @@ const ERC20Mint: FC<any> = () => {
                                             {
                                                 item.map((subItem: any, subIndex: number) => {
                                                     return (
-                                                        <TokenItem item={subItem} key={subIndex} onSigned={handleSignedCreater(subItem.content.tokenAddr, subIndex)} />
+                                                        <TokenItem item={subItem} key={subItem.content.tokenAddr} onSigned={handleSignedCreater(subItem.content.tokenAddr, subIndex)} />
                                                     );
                                                 })
                                             }
@@ -392,13 +392,13 @@ const ERC20Mint: FC<any> = () => {
                                             {
                                                 checkedMessageList.map((item: any, index: number) => {
                                                     return <List.Item key={index}>
-                                                        <ERC20TokenInfo tokenAddress={item[0].content.tokenAddr}>
+                                                        <ERC1155TokenInfo tokenAddress={item[0].content.tokenAddr}>
                                                             {
                                                                 (tokeName: string, tokenSymbol: string, formatAddr: string) => {
                                                                     return <div><label className={styles.label}>Token:</label>{`${tokeName} (${tokenSymbol}) ${formatAddr}`}</div>;
                                                                 }
                                                             }
-                                                        </ERC20TokenInfo>
+                                                        </ERC1155TokenInfo>
                                                     </List.Item>;
                                                 })
                                             }

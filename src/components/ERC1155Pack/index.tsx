@@ -7,7 +7,7 @@ import { useAddCustomNet, useAddBSCTestNetAndSwitch } from '../../hooks/useAddCu
 
 import { truncateHex } from '../../services/address.service';
 
-import { ERC20TokenInfo } from '../ERC20TokenInfo';
+import { ERC1155TokenInfo } from '../ERC1155TokenInfo';
 
 import { leaveMessageERC20PackDone } from '../../services/account.service';
 import { getFormatedAddress } from '../../lib/address';
@@ -183,13 +183,13 @@ const ERC20Pack: FC<any> = () => {
                                         <Card title={
                                             <>
                                                 <div><label className={styles.label}>Receiver:</label><code>{truncateHex(item.content[0].receiver)}</code></div>
-                                                <ERC20TokenInfo tokenAddress={item.content[0].token}>
+                                                <ERC1155TokenInfo tokenAddress={item.content[0].token}>
                                                     {
                                                         (tokeName: string, tokenSymbol: string, formatAddr: string) => {
                                                             return <span><label className={styles.label}>Token:</label>{`${tokeName} (${tokenSymbol}) ${formatAddr}`}&nbsp;&nbsp;</span>;
                                                         }
                                                     }
-                                                </ERC20TokenInfo>
+                                                </ERC1155TokenInfo>
                                             </>
                                         }
                                         extra={
