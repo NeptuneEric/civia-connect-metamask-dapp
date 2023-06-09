@@ -1,18 +1,16 @@
 import { ConfigProvider } from 'antd';
-import { WagmiConfig, createConfig, configureChains, mainnet } from 'wagmi';
+import { WagmiConfig, createConfig, configureChains } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
-import { bscTestnet } from '@wagmi/core/chains';
 import { SWRConfig } from 'swr';
+import type { AppProps } from 'next/app';
 
 import { customNetConfig } from '../lib/customNetConfig';
 import { localStorageProvider } from '../lib/localStorageProvider';
 
 import '../styles/globals.css';
 
-import type { AppProps } from 'next/app';
-
 function MyApp ({ Component, pageProps }: AppProps) {
-    const { chains, publicClient, webSocketPublicClient } = configureChains(
+    const { publicClient, webSocketPublicClient } = configureChains(
         [customNetConfig],
         [publicProvider()]
     );
@@ -33,7 +31,7 @@ function MyApp ({ Component, pageProps }: AppProps) {
                     }
                 }}
             >
-                <SWRConfig value={{ provider: localStorageProvider as any }}>
+                <SWRConfig value={{ provider: localStorageProvider }}>
                     <WagmiConfig config={config}>
                         <Component {...pageProps} />
                     </WagmiConfig>

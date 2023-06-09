@@ -1,10 +1,6 @@
-import useSWR, {
-    BareFetcher,
+import {
     Cache,
-    Key,
-    SWRConfiguration,
-    unstable_serialize,
-    useSWRConfig
+    unstable_serialize as unstableSerialize
 } from 'swr';
 
 import { BigNumber } from 'ethers';
@@ -17,26 +13,13 @@ export const reviveJsonBigNumber = (_: string, value: any) => {
 };
 
 export const localStorageProvider = () => {
-    // if (typeof window !== 'undefined') {
-    //     const map = new Map(JSON.parse(localStorage.getItem('app-cache') || '[]'));
-
-    //     window.addEventListener('beforeunload', () => {
-    //         const appCache = JSON.stringify(Array.from(map.entries()));
-    //         localStorage.setItem('app-cache', appCache);
-    //     });
-
-    //     return map as Map<any, any>;
-    // } else {
-    //     return new Map();
-    // }
-
     const swrPersistedCache = {
         set: (key: any, value: any) => {
-            return localStorage.setItem(unstable_serialize(key), JSON.stringify(value));
+            return localStorage.setItem(unstableSerialize(key), JSON.stringify(value));
         },
         get: (key: any) => {
             try {
-                const value = localStorage.getItem(unstable_serialize(key));
+                const value = localStorage.getItem(unstableSerialize(key));
                 if (!value) {
                     throw new Error('No value found');
                 }
@@ -46,9 +29,9 @@ export const localStorageProvider = () => {
             }
         },
         delete: (key: any) => {
-            return localStorage.removeItem(unstable_serialize(key));
+            return localStorage.removeItem(unstableSerialize(key));
         }
     };
 
-    return swrPersistedCache;
+    return swrPersistedCache as Cache;
 };

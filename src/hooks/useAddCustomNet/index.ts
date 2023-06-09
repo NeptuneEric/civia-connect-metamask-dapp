@@ -11,7 +11,7 @@ const DefaultBSCTestChainConfig = {
     blockExplorerUrls: [customNetConfig.blockExplorers.default.url || customNetConfig.blockExplorers.etherscan.url]
 };
 
-export const useAddCustomNet: FC<any> = ({ BSCTestChainConfig = DefaultBSCTestChainConfig }) => {
+export const useAddCustomNet: FC<{ BSCTestChainConfig: typeof DefaultBSCTestChainConfig }> = ({ BSCTestChainConfig = DefaultBSCTestChainConfig }) => {
     useEffect(() => {
         (window as any).ethereum.request({
             method: 'wallet_addEthereumChain',

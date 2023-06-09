@@ -4,12 +4,9 @@ import { CheckOutlined } from '@ant-design/icons';
 import { useConnect, useAccount, useSignMessage } from 'wagmi';
 import { writeContract } from '@wagmi/core';
 import { ethers } from 'ethers';
-import { userMintERC20Done, leaveMessagePackERC20 } from '../../services/account.service';
 
 import { useAddCustomNet, useAddBSCTestNetAndSwitch } from '../../hooks/useAddCustomNet';
 import { localStorageProvider } from '../../lib/localStorageProvider';
-
-// import { useGetERCMessageUnMint } from '../../hooks/useGetERCMessageUnMint';
 
 import { ERC20TokenInfo } from '../ERC20TokenInfo';
 import { ERC20TokenBalance } from '../ERC20TokenBalance';

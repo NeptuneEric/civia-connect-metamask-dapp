@@ -1,9 +1,9 @@
-import { FC } from 'react';
+import { FC, ReactElement } from 'react';
 import { Image } from 'antd';
 
 import styles from './index.module.css';
 
-const Header: FC<any> = ({ title }) => {
+const Header: FC<{ title: ReactElement }> = ({ title }) => {
     return (
         <div className={styles.title}>{title}</div>
     );
