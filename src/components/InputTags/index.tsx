@@ -1,20 +1,24 @@
 import { FC, useEffect, useState, ChangeEvent, KeyboardEvent } from 'react';
 import { Space, List, Input } from 'antd';
 import { CloseOutlined, EnterOutlined } from '@ant-design/icons';
+import { ethers } from 'ethers';
 
 export const InputTags: FC<{
-    value: string[],
-    onChange: (newTags: string[]) => never
+    value?: string[],
+    onChange: (newTags: string[]) => void
 }> = (props) => {
     const { value = [], onChange } = props;
     const [tags, setTags] = useState(Array.from(new Set(value as string[])));
     const [inputVal, setInputVal] = useState('');
     //
     const handleEnter = (evt: KeyboardEvent<HTMLInputElement>) => {
+        const address = (evt.target as any).value;
+        // if (ethers.utils.isAddress(address)) {
         setInputVal('');
-        const newTags = Array.from(new Set([...tags, (evt.target as any).value]));
+        const newTags = Array.from(new Set([...tags, address]));
         setTags(newTags);
         onChange(newTags);
+        // }
     };
 
     const handleDel = (tag: string, index: number) => {

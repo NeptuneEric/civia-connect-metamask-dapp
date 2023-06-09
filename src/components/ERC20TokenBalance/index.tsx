@@ -5,8 +5,8 @@ import useSWR from 'swr';
 import TestToken from '../../../abi/TestToken.json';
 import { useERC20TokenInfo } from '../../hooks/useERC20TokenInfo';
 
-export const ERC20TokenBalance: FC<any> = ({ tokenAddress, userAddress, children }) => {
-    const { tokenName, tokenSymbol, decimals = 1, formatAddr } = useERC20TokenInfo(tokenAddress);
+export const ERC20TokenBalance: FC<any> = ({ tokenAddress, tokenId, userAddress, children }) => {
+    // const { tokenName, tokenSymbol, decimals = 1, formatAddr } = useERC20TokenInfo(tokenAddress);
     //
     const key = `${userAddress}-${tokenAddress}-balance`;
     const { data } = useSWR(key, async () => {
@@ -15,9 +15,9 @@ export const ERC20TokenBalance: FC<any> = ({ tokenAddress, userAddress, children
                 address: tokenAddress,
                 abi: TestToken.abi,
                 functionName: 'balanceOf',
-                args: [userAddress]
+                args: [userAddress, tokenId]
             }).then((res: any) => {
-                return res.toString() / Math.pow(10, decimals as any as number);
+                return res.toString();
             }).catch((err) => {
                 console.log(err);
             });

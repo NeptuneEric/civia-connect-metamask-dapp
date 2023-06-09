@@ -33,5 +33,5 @@ export const localStorageProvider = () => {
         }
     };
 
-    return swrPersistedCache as Cache;
+    return swrPersistedCache as any;
 };

@@ -31,7 +31,7 @@ export const useERC20TokenInfo = (testTokenAddress: `0x${string}`) => {
                 const val = {
                     tokenName,
                     tokenSymbol,
-                    decimals,
+                    decimals: 0,
                     formatAddr: truncateHex(testTokenAddress)
                 };
                 return val;

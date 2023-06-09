@@ -10,7 +10,7 @@ import TestToken from '../../../abi/TestToken.json';
 
 import styles from './index.module.css';
 
-const CIVIA_ERC20_CONTRACT_ADDRESS = '0xBEfC4820810543f923791F638EE82705dD2302Fe';
+const CIVIA_ERC20_CONTRACT_ADDRESS = '0x1346a841E7df6F81E1accB347F3e0c2580A9D971';
 
 const Erc20Create: NextPage = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +45,7 @@ const Erc20Create: NextPage = () => {
             readContract({
                 address: CIVIA_ERC20_CONTRACT_ADDRESS,
                 abi: CiviaERC20Check.abi,
-                functionName: 'getRegisteredERC20s',
+                functionName: 'getRegisteredTokens',
                 args: [metamaskAddress]
             }).then((res) => {
                 setGrantedTokens(res as []);
@@ -98,7 +98,7 @@ const Erc20Create: NextPage = () => {
             }
             //
             setIsLoading(true);
-            const res = await writeAsync({ args: [testTokenAddress, testTokenAdmin, ethers.utils.parseUnits(testTokenAmount.toString(), 18).toString()] }).then((res) => {
+            const res = await writeAsync({ args: [testTokenAddress, testTokenAdmin, testTokenAmount] }).then((res) => {
                 setStep(2);
                 return res;
             }).catch((err) => {

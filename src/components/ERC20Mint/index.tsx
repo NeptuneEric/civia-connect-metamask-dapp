@@ -17,7 +17,7 @@ import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
 
 import styles from './index.module.css';
 
-const CIVIA_ERC20_CONTRACT_ADDRESS = '0xBEfC4820810543f923791F638EE82705dD2302Fe';
+const CIVIA_ERC20_CONTRACT_ADDRESS = '0x1346a841E7df6F81E1accB347F3e0c2580A9D971';
 
 const localStorageProviderMap = localStorageProvider();
 
@@ -72,7 +72,7 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
             localStorageProviderMap.set(`${item.message_id}`, res);
         }
     });
-    const { tokenName, tokenSymbol, decimals = 1, formatAddr } = useERC20TokenInfo(item.content.tokenAddr);
+    // const { tokenName, tokenSymbol, decimals = 0, formatAddr } = useERC20TokenInfo(item.content.tokenAddr);
 
     // useEffect(() => {
     //     const localStorageSignData = localStorageProviderMap.get(`${item.message_id}`);
@@ -88,11 +88,12 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
 
     //
     const handleSignData = async () => {
-        const { receiverAddr, tokenAddr, beginId, endId, amt, issuerAddr } = item.content;
+        const { receiverAddr, tokenAddr, tokenId, beginId, endId, amt, issuerAddr } = item.content;
         const orderParts = [
             { value: tokenAddr, type: 'address' },
             { value: issuerAddr, type: 'address' },
             { value: receiverAddr, type: 'address' },
+            { value: tokenId, type: 'uint256' },
             { value: beginId, type: 'uint256' },
             { value: endId, type: 'uint256' },
             { value: amt, type: 'uint256' }
@@ -122,7 +123,7 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
                     }
                 </div>}
             >
-                <div><label className={styles.label} >{beginId === endId ? beginId : `${beginId}-${endId}`}:</label>{item.content.amt / Math.pow(10, decimals as any)}</div>
+                <div><label className={styles.label} >{beginId === endId ? beginId : `${beginId}-${endId}`}:</label>{item.content.amt}</div>
             </List.Item>
         </>
     );
@@ -260,7 +261,7 @@ const ERC20Mint: FC<any> = () => {
     const handleBatchMint = async () => {
         console.log(checkedMessageList);
         const getOneContractArgs = (item: any) => {
-            const { issuerAddr, receiverAddr, tokenAddr, beginId, endId, amt, sig } = item.content;
+            const { issuerAddr, receiverAddr, tokenAddr, tokenId, beginId, endId, amt, sig } = item.content;
             const sigHex = item.customContent.signData.substring(2);
             const receiverR = '0x' + sigHex.slice(0, 64);
             const receiverS = '0x' + sigHex.slice(64, 128);
@@ -271,6 +272,7 @@ const ERC20Mint: FC<any> = () => {
                 tokenAddr,
                 issuerAddr,
                 receiverAddr,
+                tokenId,
                 beginId,
                 endId,
                 amt
@@ -346,7 +348,7 @@ const ERC20Mint: FC<any> = () => {
                                                         }
                                                     }
                                                 </ERC20TokenInfo>
-                                                <ERC20TokenBalance tokenAddress={item[0].content.tokenAddr} userAddress={metamaskAddress}>
+                                                <ERC20TokenBalance tokenAddress={item[0].content.tokenAddr} tokenId={item[0].content.tokenId} userAddress={metamaskAddress}>
                                                     {
                                                         (res: any) => {
                                                             return res ? <code>{`Balance: ${res}`}</code> : null;
