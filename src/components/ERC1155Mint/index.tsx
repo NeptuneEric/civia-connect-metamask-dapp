@@ -62,7 +62,7 @@ const useGetERCMessageUnMint = () => {
 
 const TokenItem: FC<any> = ({ item, onSigned }) => {
     const locationSearch = new URLSearchParams(location.search);
-    const searchCiviaWalletAddress = getFormatedAddress(locationSearch.get('civiaAddress') as string);
+    const searchCiviaWalletAddress = '0x0'; // getFormatedAddress(locationSearch.get('civiaAddress') as string);
     const [isLoaing, setIsLoading] = useState(false);
     const [step, setStep] = useState<0|1|-1>(0);
     const { data: signData, signMessage: metaMaskSignMessage } = useSignMessage({
@@ -163,7 +163,7 @@ const ERC20CheckList: FC<any> = forwardRef((props, ref) => {
 //
 const ERC20Mint: FC<any> = () => {
     const locationSearch = new URLSearchParams(location.search);
-    const searchCiviaWalletAddress = getFormatedAddress(locationSearch.get('civiaAddress') as string);
+    const searchCiviaWalletAddress = '0x0';// getFormatedAddress(locationSearch.get('civiaAddress') as string);
     const searchERC20Token = locationSearch.get('erc20token') as string;
     const [isLoading, setIsLoading] = useState(true);
     const [messageList, setMessageList] = useState<Map<string, any[]>>(new Map());

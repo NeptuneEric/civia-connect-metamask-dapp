@@ -24,7 +24,7 @@ const CIVIA_ERC20_CONTRACT_ADDRESS = '0x1346a841E7df6F81E1accB347F3e0c2580A9D971
 
 const ERC20Send: FC<any> = () => {
     const locationSearch = new URLSearchParams(location.search);
-    const searchCiviaWalletAddress = getFormatedAddress(locationSearch.get('civiaAddress') as string);
+    const searchCiviaWalletAddress = '0x0';// getFormatedAddress(locationSearch.get('civiaAddress') as string);
     const [isLoading, setIsLoading] = useState(false);
     const [step, setStep] = useState(0);
     const { connect: metaMaskConnect, connectors: metaMaskConnectors, error: ucError, isLoading: ucIsLoading, pendingConnector } = useConnect();
