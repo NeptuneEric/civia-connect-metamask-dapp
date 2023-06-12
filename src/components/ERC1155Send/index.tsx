@@ -326,6 +326,15 @@ const ERC20Send: FC<any> = () => {
                             </Form.Item>
                             <Form.Item
                                 label={
+                                    <div>Token Id</div>
+                                }
+                                name="inputId"
+                                hidden={step !== 2}
+                            >
+                                <Input />
+                            </Form.Item>
+                            <Form.Item
+                                label={
                                     <div>
                                         Token amount
                                         {
@@ -343,15 +352,7 @@ const ERC20Send: FC<any> = () => {
                                 }
                                 name="inputAmount"
                                 hidden={step !== 2}
-                            >
-                                <Input />
-                            </Form.Item>
-                            <Form.Item
-                                label={
-                                    <div>Token Id</div>
-                                }
-                                name="inputId"
-                                hidden={step !== 2}
+                                initialValue={1}
                             >
                                 <Input />
                             </Form.Item>
