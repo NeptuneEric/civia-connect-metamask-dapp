@@ -1,5 +1,5 @@
 
-import { FC, useEffect, useState, useRef } from 'react';
+import { FC, useEffect, useState, useRef, useMemo } from 'react';
 import { Button, Input, message, Steps, Spin, Form, Select, Space, Avatar, List } from 'antd';
 import { CheckOutlined } from '@ant-design/icons';
 import { useConnect, useAccount, useSignMessage } from 'wagmi';
@@ -91,23 +91,25 @@ const ERC20Send: FC<any> = () => {
 
     const getUsersOwnerTokenCurrentIdAndSignData = async () => {
         setIsLoading(true);
-        const { selectToken, inputAmount, inputId, selectFriend } = form.getFieldsValue();
+        const { selectToken, inputAmount, inputId: inputIdsStr, selectFriend } = form.getFieldsValue();
         //
-        const contracts = selectFriend.map((item: string) => ({
+        const inputIds = inputIdsStr.split(',');
+        const contracts = inputIds.map((item: string) => ({
             address: CIVIA_ERC20_CONTRACT_ADDRESS,
             abi: CiviaERC20Check.abi as any,
             functionName: 'getLastCheckId',
-            args: [item, selectToken, inputId]
+            args: [selectFriend[0], selectToken, item]
         }));
         setIsLoading(false);
         //
         const res: any = await multicall({ contracts });
 
-        const mapedRes = selectFriend.reduce((pre: any, item: string, index: number) => {
-            const localLastCheckId = Number(localStorageProviderMap.get(`@${selectToken}.${inputId}.${item},lastCheckId`) || 0);
+        // key: id value: lastId
+        const mapedRes = inputIds.reduce((pre: any, item: string, index: number) => {
+            const localLastCheckId = Number(localStorageProviderMap.get(`@${selectToken}.${item}.${selectFriend[0]},lastCheckId`) || 0);
             const lastCheckId = Number(res[index].result);
             const computedLastCheckId = Math.max(localLastCheckId, lastCheckId);
-            localStorageProviderMap.set(`@${selectToken}.${inputId}.${item},lastCheckId`, computedLastCheckId);
+            localStorageProviderMap.set(`@${selectToken}.${item}.${selectFriend[0]},lastCheckId`, computedLastCheckId);
             return {
                 ...pre,
                 [item]: computedLastCheckId
@@ -118,20 +120,21 @@ const ERC20Send: FC<any> = () => {
         if (res && mapedRes) {
             const userCurrentIds = Object.keys(mapedRes).map((item: any) => (
                 {
+                    inputId: item,
                     currentId: mapedRes[item],
-                    user: item
+                    user: selectFriend[0]
                 }
             ));
             setUserCurrentIds(userCurrentIds);
             //
-            userCurrentIds.forEach(({ currentId, user }:any) => {
+            inputIds.forEach((inputId:any, index: number) => {
                 const orderParts = [
                     { value: selectToken, type: 'address' },
                     { value: metamaskAddress, type: 'address' },
-                    { value: user, type: 'address' },
+                    { value: userCurrentIds[index].user, type: 'address' },
                     { value: inputId, type: 'uint256' },
-                    { value: currentId + 1, type: 'uint256' },
-                    { value: currentId + 1, type: 'uint256' },
+                    { value: userCurrentIds[index].currentId + 1, type: 'uint256' },
+                    { value: userCurrentIds[index].currentId + 1, type: 'uint256' },
                     { value: inputAmount.toString(), type: 'uint256' }
                 ];
                 setOrderParts(orderParts);
@@ -151,9 +154,10 @@ const ERC20Send: FC<any> = () => {
 
     const sendSignData = async () => {
         let hasError = false;
-        const { selectToken, inputAmount, inputId, selectFriend } = form.getFieldsValue();
+        const { selectToken, inputAmount, inputId: inputIdsStr, selectFriend } = form.getFieldsValue();
+        const inputIds = inputIdsStr.split(',');
 
-        for (let index = 0; index < userCurrentIds.length; index++) {
+        for (let index = 0; index < inputIds.length; index++) {
             //
             const { currentId, user } = userCurrentIds[index];
             const signData = signDataList[index];
@@ -165,7 +169,7 @@ const ERC20Send: FC<any> = () => {
                 tokenAddr: selectToken,
                 issuerAddr: metamaskAddress!,
                 receiverAddr: user,
-                tokenId: inputId,
+                tokenId: inputIds[index],
                 beginId: currentId + 1,
                 endId: currentId + 1,
                 amt: inputAmount.toString(),
@@ -177,7 +181,7 @@ const ERC20Send: FC<any> = () => {
             };
 
             const options = {
-                suggestedName: `${tokenInfo?.data?.tokenName || selectToken}_${inputId}_${user}_${message.beginId}_${message.endId}.json`,
+                suggestedName: `${tokenInfo?.data?.tokenName || selectToken}_${inputIds[index]}_${user}_${message.beginId}_${message.endId}.json`,
                 types: [
                     {
                         description: 'Test files',
@@ -193,8 +197,8 @@ const ERC20Send: FC<any> = () => {
 
                 await writable.write(JSON.stringify(message));
                 await writable.close();
-                const localCheckId = localStorageProviderMap.get(`@${selectToken}.${inputId}.${user},lastCheckId`) || 0;
-                localStorageProviderMap.set(`@${selectToken}.${inputId}.${user},lastCheckId`, localCheckId + 1);
+                const localCheckId = localStorageProviderMap.get(`@${selectToken}.${inputIds[index]}.${user},lastCheckId`) || 0;
+                localStorageProviderMap.set(`@${selectToken}.${inputIds[index]}.${user},lastCheckId`, localCheckId + 1);
             } catch (err) {
                 console.log(err);
                 hasError = true;
@@ -239,7 +243,7 @@ const ERC20Send: FC<any> = () => {
                     content: 'Please specify token amount'
                 });
             }
-            if (!inputId || !/^[1-9]\d*$/.test(inputId)) {
+            if (!inputId || !/^(\d+,)*\d+$/.test(inputId)) {
                 return messageApi.open({
                     type: 'error',
                     content: 'Please specify token id'
@@ -365,14 +369,14 @@ const ERC20Send: FC<any> = () => {
                             </Form.Item>
                             <Form.Item hidden={step !== 3}>
                                 {/* <div className={styles.signData}>signData: {signData}</div> */}
-                                <List bordered style={{ width: '500px' }}>
+                                <List bordered style={{ width: '600px' }}>
                                     {
                                         userCurrentIds.map((item: any, index: number) => {
                                             return (
-                                                <List.Item key={item.user}
+                                                <List.Item key={item.user + item.inputId}
                                                     actions={[signDataList[index] ? <CheckOutlined style={{ color: 'green' }} /> : null]}
                                                 >
-                                                    {item.user}
+                                                    {item.user}&nbsp;(tokenId: {item.inputId})
                                                 </List.Item>
                                             );
                                         })

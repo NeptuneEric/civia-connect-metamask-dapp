@@ -352,7 +352,7 @@ const ERC20Mint: FC<any> = () => {
                                             {
                                                 item.map((subItem: any, subIndex: number) => {
                                                     return (
-                                                        <TokenItem item={subItem} key={subItem.content.tokenAddr} onSigned={handleSignedCreater(subItem.content.tokenAddr, subIndex)} />
+                                                        <TokenItem item={subItem} key={subItem.content.tokenAddr + subIndex} onSigned={handleSignedCreater(subItem.content.tokenAddr, subIndex)} />
                                                     );
                                                 })
                                             }

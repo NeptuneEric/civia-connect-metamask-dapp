@@ -37,9 +37,15 @@ export const InputTags: FC<{
                         return <List.Item key={index} extra={<CloseOutlined onClick={() => { handleDel(tag, index); }} />}><div>{tag}</div></List.Item>;
                     })
                 }
-                <List.Item>
-                    <Input onPressEnter={handleEnter} value={inputVal} onChange={(evt: ChangeEvent<HTMLInputElement>) => { setInputVal(evt.target.value); }} suffix={<EnterOutlined />} />
-                </List.Item>
+                {
+                    tags.length > 0 ? (
+                        null
+                    ) : (
+                        <List.Item>
+                            <Input onPressEnter={handleEnter} value={inputVal} onChange={(evt: ChangeEvent<HTMLInputElement>) => { setInputVal(evt.target.value); }} suffix={<EnterOutlined />} />
+                        </List.Item>
+                    )
+                }
             </List>
         </div>
     );
