@@ -1,16 +1,15 @@
 import { useEffect, useState, ChangeEvent, useRef } from 'react';
 import type { NextPage } from 'next';
-import { Button, Input, message, Steps, Spin, Form } from 'antd';
-import { useContractRead, useContractWrite, useConnect, useAccount, useSignMessage } from 'wagmi';
-import { getContract, getWalletClient, readContract, writeContract } from '@wagmi/core';
-import { ethers } from 'ethers';
+import { Button, Input, message, Steps, Spin, Form, Radio, RadioChangeEvent } from 'antd';
+import { useConnect, useAccount } from 'wagmi';
+import { readContract, writeContract } from '@wagmi/core';
 
-import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
+import CiviaERC1155Check from '../../../abi/CiviaERC1155Check.json';
 import TestToken from '../../../abi/TestToken.json';
 
 import styles from './index.module.css';
 
-const CIVIA_ERC20_CONTRACT_ADDRESS = '0x1346a841E7df6F81E1accB347F3e0c2580A9D971';
+const CIVIA_ERC20_CONTRACT_ADDRESS = '0x9EeBE54154EF15a476B2CD731e48607f67Eace62';
 
 const Erc20Create: NextPage = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -21,9 +20,13 @@ const Erc20Create: NextPage = () => {
     const [messageApi, contextHolder] = message.useMessage();
     const [grantedTokens, setGrantedTokens] = useState([]);
     //
+    const [tokenType, setTokenType] = useState('ft');
     const [testTokenAddress, setTestTokenAddress] = useState('');
     const [testTokenAdmin, setTestTokenAdmin] = useState('');
     const [testTokenAmount, setTestTokenAmount] = useState('');
+    const [testTokenId, setTestTokenId] = useState('');
+    const [testTokenFromId, setTestTokenFromId] = useState('');
+    const [testTokenToId, setTestTokenToId] = useState('');
 
     useEffect(() => {
         if (metamaskAddress) {
@@ -31,20 +34,13 @@ const Erc20Create: NextPage = () => {
         }
     }, [metamaskAddress]);
 
-    // registe contract
-    const { data, error, isLoading: isWriting, isSuccess, write, writeAsync } = useContractWrite({
-        address: CIVIA_ERC20_CONTRACT_ADDRESS,
-        abi: CiviaERC20Check.abi,
-        functionName: 'register'
-    });
-
     useEffect(() => {
         if (metamaskAddress) {
             setTestTokenAdmin(metamaskAddress);
             setIsLoading(true);
             readContract({
                 address: CIVIA_ERC20_CONTRACT_ADDRESS,
-                abi: CiviaERC20Check.abi,
+                abi: CiviaERC1155Check.abi,
                 functionName: 'getRegisteredTokens',
                 args: [metamaskAddress]
             }).then((res) => {
@@ -83,22 +79,49 @@ const Erc20Create: NextPage = () => {
                 type: 'error',
                 content: 'Please specify token admin'
             });
-        } else if (!testTokenAmount) {
+        } else if (tokenType === 'ft' && !testTokenId) {
+            messageApi.open({
+                type: 'error',
+                content: 'Please specify token Id'
+            });
+        } else if (tokenType === 'ft' && !testTokenAmount) {
             messageApi.open({
                 type: 'error',
                 content: 'Please specify token amount'
             });
+        } else if (tokenType === 'nft' && !testTokenFromId) {
+            messageApi.open({
+                type: 'error',
+                content: 'Please specify token from Id'
+            });
+        } else if (tokenType === 'nft' && !testTokenToId) {
+            messageApi.open({
+                type: 'error',
+                content: 'Please specify token to Id'
+            });
         } else {
             // check if registered
-            if (testTokenAddress && grantedTokens.length) {
-                const isTestTokenGranted = grantedTokens.some((add: string) => add === testTokenAddress);
-                if (isTestTokenGranted) {
-                    return setStep(2);
-                }
-            }
+            // if (testTokenAddress && grantedTokens.length) {
+            //     const isTestTokenGranted = grantedTokens.some((add: string) => add === testTokenAddress);
+            //     if (isTestTokenGranted) {
+            //         return setStep(2);
+            //     }
+            // }
             //
             setIsLoading(true);
-            const res = await writeAsync({ args: [testTokenAddress, testTokenAdmin, testTokenAmount] }).then((res) => {
+            await (tokenType === 'ft'
+                ? writeContract({
+                    address: CIVIA_ERC20_CONTRACT_ADDRESS,
+                    abi: CiviaERC1155Check.abi,
+                    functionName: 'register',
+                    args: [testTokenAddress, testTokenAdmin, testTokenId, testTokenAmount]
+                }) : writeContract({
+                    address: CIVIA_ERC20_CONTRACT_ADDRESS,
+                    abi: CiviaERC1155Check.abi,
+                    functionName: 'registerNFT',
+                    args: [testTokenAddress, testTokenAdmin, testTokenFromId, testTokenToId]
+                })
+            ).then((res) => {
                 setStep(2);
                 return res;
             }).catch((err) => {
@@ -211,6 +234,12 @@ const Erc20Create: NextPage = () => {
                             {
                                 step === 1 ? (
                                     <>
+                                        <Form.Item>
+                                            <Radio.Group onChange={(evt: RadioChangeEvent) => { setTokenType(evt.target.value); }} defaultValue={tokenType}>
+                                                <Radio.Button value="ft">Fungible token</Radio.Button>
+                                                <Radio.Button value="nft">Non-fungible token</Radio.Button>
+                                            </Radio.Group>
+                                        </Form.Item>
                                         <Form.Item
                                             label="Token contract address"
                                             name="tokenAddress"
@@ -226,13 +255,44 @@ const Erc20Create: NextPage = () => {
                                         >
                                             <Input value={testTokenAdmin} onChange={(event: ChangeEvent<HTMLInputElement>) => { setTestTokenAdmin(event.target.value); }} maxLength={44} />
                                         </Form.Item>
-                                        <Form.Item
-                                            label="Max mint amount"
-                                            name="tokenAmount"
-                                            rules={[{ required: true, message: 'Please input token amount!' }]}
-                                        >
-                                            <Input value={testTokenAmount} onChange={(event: ChangeEvent<HTMLInputElement>) => { setTestTokenAmount(event.target.value); }} maxLength={44} />
-                                        </Form.Item>
+                                        {
+                                            tokenType === 'ft' ? (
+                                                <>
+                                                    <Form.Item
+                                                        label="Token Id"
+                                                        name="tokenId"
+                                                        rules={[{ required: true, message: 'Please input token amount!' }]}
+                                                    >
+                                                        <Input value={testTokenId} onChange={(event: ChangeEvent<HTMLInputElement>) => { setTestTokenId(event.target.value); }} maxLength={44} />
+                                                    </Form.Item>
+                                                    <Form.Item
+                                                        label="Max mint amount"
+                                                        name="tokenAmount"
+                                                        rules={[{ required: true, message: 'Please input token amount!' }]}
+                                                    >
+                                                        <Input value={testTokenAmount} onChange={(event: ChangeEvent<HTMLInputElement>) => { setTestTokenAmount(event.target.value); }} maxLength={44} />
+                                                    </Form.Item>
+
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Form.Item
+                                                        label="From token Id"
+                                                        name="fromTokenId"
+                                                        rules={[{ required: true, message: 'Please input token amount!' }]}
+                                                    >
+                                                        <Input value={testTokenFromId} onChange={(event: ChangeEvent<HTMLInputElement>) => { setTestTokenFromId(event.target.value); }} maxLength={44} />
+                                                    </Form.Item>
+                                                    <Form.Item
+                                                        label="To token Id"
+                                                        name="toTokenId"
+                                                        rules={[{ required: true, message: 'Please input token amount!' }]}
+                                                    >
+                                                        <Input value={testTokenToId} onChange={(event: ChangeEvent<HTMLInputElement>) => { setTestTokenToId(event.target.value); }} maxLength={44} />
+                                                    </Form.Item>
+                                                </>
+                                            )
+                                        }
                                         <Form.Item>
                                             <div className={styles.btnWrapper}>
                                                 <Button onClick={registCiviaErc20} type="primary">Register</Button>

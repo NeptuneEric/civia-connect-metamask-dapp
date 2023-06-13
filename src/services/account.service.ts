@@ -3,7 +3,7 @@ import { zipWith } from 'lodash-es';
 import { Multicall } from '@argent/x-multicall';
 import SBTMgrCompiledContractAbi from '../../abi/SBTMgr.json';
 import { abi as TestTokenAbi } from '../../abi/TestToken.json';
-import { abi as CiviaERC20CheckAbi } from '../../abi/CiviaERC20Check.json';
+import { abi as CiviaERC20CheckAbi } from '../../abi/CiviaERC1155Check.json';
 import axios from 'axios';
 import useSWR from 'swr';
 const { decodeShortString } = shortString;

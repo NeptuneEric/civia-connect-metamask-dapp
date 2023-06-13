@@ -11,7 +11,7 @@ import { InputTags } from '../../components/InputTags';
 import { localStorageProvider } from '../../lib/localStorageProvider';
 import { useERC20TokenInfo } from '../../hooks/useERC20TokenInfo';
 
-import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
+import CiviaERC1155Check from '../../../abi/CiviaERC1155Check.json';
 import TestToken from '../../../abi/TestToken.json';
 import { getFormatedAddress } from '../../lib/address';
 
@@ -20,7 +20,7 @@ import { ethers } from 'ethers';
 
 const localStorageProviderMap = localStorageProvider();
 
-const CIVIA_ERC20_CONTRACT_ADDRESS = '0x1346a841E7df6F81E1accB347F3e0c2580A9D971';
+const CIVIA_ERC20_CONTRACT_ADDRESS = '0x9EeBE54154EF15a476B2CD731e48607f67Eace62';
 
 const ERC20Send: FC<any> = () => {
     const locationSearch = new URLSearchParams(location.search);
@@ -67,7 +67,7 @@ const ERC20Send: FC<any> = () => {
             setIsLoading(true);
             readContract({
                 address: CIVIA_ERC20_CONTRACT_ADDRESS,
-                abi: CiviaERC20Check.abi,
+                abi: CiviaERC1155Check.abi,
                 functionName: 'getRegisteredTokens',
                 args: [metamaskAddress]
             }).then((res) => {
@@ -96,7 +96,7 @@ const ERC20Send: FC<any> = () => {
         const inputIds = inputIdsStr.split(',');
         const contracts = inputIds.map((item: string) => ({
             address: CIVIA_ERC20_CONTRACT_ADDRESS,
-            abi: CiviaERC20Check.abi as any,
+            abi: CiviaERC1155Check.abi as any,
             functionName: 'getLastCheckId',
             args: [selectFriend[0], selectToken, item]
         }));

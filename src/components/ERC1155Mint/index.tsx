@@ -13,11 +13,11 @@ import { ERC1155TokenBalance } from '../ERC1155TokenBalance';
 import { getFormatedAddress } from '../../lib/address';
 import { useERC20TokenInfo } from '../../hooks/useERC20TokenInfo';
 
-import CiviaERC20Check from '../../../abi/CiviaERC20Check.json';
+import CiviaERC1155Check from '../../../abi/CiviaERC1155Check.json';
 
 import styles from './index.module.css';
 
-const CIVIA_ERC20_CONTRACT_ADDRESS = '0x1346a841E7df6F81E1accB347F3e0c2580A9D971';
+const CIVIA_ERC20_CONTRACT_ADDRESS = '0x9EeBE54154EF15a476B2CD731e48607f67Eace62';
 
 const localStorageProviderMap = localStorageProvider();
 
@@ -283,7 +283,7 @@ const ERC20Mint: FC<any> = () => {
         setIsLoading(true);
         const res = await writeContract({
             address: CIVIA_ERC20_CONTRACT_ADDRESS,
-            abi: CiviaERC20Check.abi,
+            abi: CiviaERC1155Check.abi,
             functionName: 'mint',
             args: mergedContractArgs
         }).then(() => {

@@ -91,6 +91,11 @@
         },
         {
           "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
           "name": "maxAmt",
           "type": "uint256"
         }
@@ -114,11 +119,16 @@
         },
         {
           "internalType": "uint256",
-          "name": "amt",
+          "name": "fromTokenId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "toTokenId",
           "type": "uint256"
         }
       ],
-      "name": "addIssuerAmount",
+      "name": "registerNFT",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -255,12 +265,17 @@
           "type": "address"
         },
         {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        },
+        {
           "internalType": "address",
           "name": "issuerAddr",
           "type": "address"
         }
       ],
-      "name": "getTokenInfoByIssuer",
+      "name": "getIssuerMintInfo",
       "outputs": [
         {
           "internalType": "uint256",
