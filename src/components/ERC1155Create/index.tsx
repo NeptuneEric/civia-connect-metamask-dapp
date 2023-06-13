@@ -79,25 +79,30 @@ const Erc20Create: NextPage = () => {
                 type: 'error',
                 content: 'Please specify token admin'
             });
-        } else if (tokenType === 'ft' && !testTokenId) {
+        } else if (tokenType === 'ft' && !/^[1-9]\d*$/.test(testTokenId)) {
             messageApi.open({
                 type: 'error',
                 content: 'Please specify token Id'
             });
-        } else if (tokenType === 'ft' && !testTokenAmount) {
+        } else if (tokenType === 'ft' && !/^[1-9]\d*$/.test(testTokenAmount)) {
             messageApi.open({
                 type: 'error',
                 content: 'Please specify token amount'
             });
-        } else if (tokenType === 'nft' && !testTokenFromId) {
+        } else if (tokenType === 'nft' && !/^[1-9]\d*$/.test(testTokenFromId)) {
             messageApi.open({
                 type: 'error',
                 content: 'Please specify token from Id'
             });
-        } else if (tokenType === 'nft' && !testTokenToId) {
+        } else if (tokenType === 'nft' && !/^[1-9]\d*$/.test(testTokenToId)) {
             messageApi.open({
                 type: 'error',
                 content: 'Please specify token to Id'
+            });
+        } else if (tokenType === 'nft' && Number(testTokenFromId) >= Number(testTokenToId)) {
+            messageApi.open({
+                type: 'error',
+                content: 'Token from Id must be less than Token to Id'
             });
         } else {
             // check if registered
