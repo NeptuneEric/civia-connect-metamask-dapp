@@ -8,7 +8,7 @@ import { localStorageProvider } from '../../lib/localStorageProvider';
 import { ethers } from 'ethers';
 import { useSignMessage } from 'wagmi';
 
-const CIVIA_ERC20_CONTRACT_ADDRESS = '0x9EeBE54154EF15a476B2CD731e48607f67Eace62';
+const CIVIA_ERC20_CONTRACT_ADDRESS = '0x37898De1854a096E5679c711EDf92b5Aaf2eADd1';
 const localStorageProviderMap = localStorageProvider();
 
 export const ReceipientFT: FC<any> = forwardRef(({
