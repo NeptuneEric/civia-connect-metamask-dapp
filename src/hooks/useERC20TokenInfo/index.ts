@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useDebugValue } from 'react';
 import useSWR from 'swr';
 import { readContracts } from '@wagmi/core';
 import TestToken from '../../../abi/TestToken.json';
@@ -7,6 +7,7 @@ import { localStorageProvider } from '../../lib/localStorageProvider';
 
 export const useERC20TokenInfo = (testTokenAddress: `0x${string}`) => {
     const key = `@"${testTokenAddress}","tokenInfo"`;
+    useDebugValue(key);
     const { data, error } = useSWR(key, async () => {
         if (testTokenAddress) {
             const res = await readContracts({
