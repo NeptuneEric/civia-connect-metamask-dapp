@@ -1,14 +1,12 @@
 
 import { FC, useEffect, useState, useRef } from 'react';
-import { Button, Input, message, Steps, Spin, Form, Select, Space, Radio, List, RadioChangeEvent } from 'antd';
+import { Button, message, Steps, Spin, Form, Select, Space, Radio, List, RadioChangeEvent } from 'antd';
 import { CheckOutlined } from '@ant-design/icons';
-import { useConnect, useAccount, useSignMessage } from 'wagmi';
-import { readContract, multicall } from '@wagmi/core';
+import { useConnect, useAccount } from 'wagmi';
+import { readContract } from '@wagmi/core';
 import { getSynthesizeAddressList } from '../../services/account.service';
 
 import { ERC1155TokenInfo } from '../../components/ERC1155TokenInfo';
-import { InputTags } from '../../components/InputTags';
-import { localStorageProvider } from '../../lib/localStorageProvider';
 
 import CiviaERC1155Check from '../../../abi/CiviaERC1155Check.json';
 
@@ -16,9 +14,6 @@ import { ReceipientFT } from './ReceipientFT';
 import { ReceipientNFT } from './ReceipientNFT';
 
 import styles from './index.module.css';
-import { ethers } from 'ethers';
-
-const localStorageProviderMap = localStorageProvider();
 
 const CIVIA_ERC20_CONTRACT_ADDRESS = '0x9EeBE54154EF15a476B2CD731e48607f67Eace62';
 
@@ -27,24 +22,14 @@ const ERC20Send: FC<any> = () => {
     const searchCiviaWalletAddress = '0x0';// getFormatedAddress(locationSearch.get('civiaAddress') as string);
     const [isLoading, setIsLoading] = useState(false);
     const [step, setStep] = useState(0);
-    const { connect: metaMaskConnect, connectors: metaMaskConnectors, error: ucError, isLoading: ucIsLoading, pendingConnector } = useConnect();
+    const { connect: metaMaskConnect, connectors: metaMaskConnectors } = useConnect();
     const { isConnected: isMetaMaskConnected, address: metamaskAddress } = useAccount();
     const connectMetamaskRef = useRef(false);
     const subFormItem = useRef();
     const [messageApi, contextHolder] = message.useMessage();
     const [grantedTokens, setGrantedTokens] = useState([]);
-    const [followings, setFollowings] = useState<Array<{address: string; id: string; nickName: string;}>>([]);
     const [form] = Form.useForm();
-    const [orderParts, setOrderParts] = useState<any[]>([]);
     const [tokenType, setTokenType] = useState<'ft'| 'nft'>('ft');
-
-    useEffect(() => {
-        getSynthesizeAddressList(searchCiviaWalletAddress!).then((res: any[]) => {
-            const followings = res.filter((item: any) => item.metamaskAddressList.length);
-            setFollowings(followings);
-        });
-    }, [searchCiviaWalletAddress]);
-
     useEffect(() => {
         if (metamaskAddress) {
             setIsLoading(true);

@@ -20,7 +20,6 @@ export const ReceipientFT: FC<any> = forwardRef(({
     setStep,
     visible
 }, ref) => {
-    const [orderParts, setOrderParts] = useState<any[]>([]);
     const [signDataList, setSignDataList] = useState<any[]>([]);
     const [userCurrentIds, setUserCurrentIds] = useState<any[]>([]);
     const { signMessage: metaMaskSignMessage } = useSignMessage({
@@ -81,10 +80,10 @@ export const ReceipientFT: FC<any> = forwardRef(({
 
         // key: id value: lastId
         const mapedRes = selectFriend.reduce((pre: any, item: string, index: number) => {
-            const localLastCheckId = Number(localStorageProviderMap.get(`@${selectToken}.ft.${inputIdsStr}.${item},lastCheckId`) || 0);
+            const localLastCheckId = Number(localStorageProviderMap.get(`@${selectToken}.${inputIdsStr}.${item},lastCheckId`) || 0);
             const lastCheckId = Number(res[index].result);
             const computedLastCheckId = Math.max(localLastCheckId, lastCheckId);
-            localStorageProviderMap.set(`@${selectToken}.ft.${inputIdsStr}.${item},lastCheckId`, computedLastCheckId);
+            localStorageProviderMap.set(`@${selectToken}.${inputIdsStr}.${item},lastCheckId`, computedLastCheckId);
             return {
                 ...pre,
                 [item]: computedLastCheckId
@@ -112,7 +111,6 @@ export const ReceipientFT: FC<any> = forwardRef(({
                     { value: userCurrentIds[index].currentId + 1, type: 'uint256' },
                     { value: inputAmount.toString(), type: 'uint256' }
                 ];
-                setOrderParts(orderParts);
                 const types = orderParts.map(o => o.type);
                 const values = orderParts.map(o => o.value);
                 const hash = ethers.utils.solidityKeccak256(types, values);
@@ -155,7 +153,7 @@ export const ReceipientFT: FC<any> = forwardRef(({
             };
 
             const options = {
-                suggestedName: `${tokenInfo?.data?.tokenName || selectToken}_ft_${inputIdsStr}_${user}_${message.beginId}_${message.endId}.json`,
+                suggestedName: `${tokenInfo?.data?.tokenName || selectToken}_${inputIdsStr}_${user}_${message.beginId}_${message.endId}.json`,
                 types: [
                     {
                         description: 'Test files',
@@ -171,8 +169,8 @@ export const ReceipientFT: FC<any> = forwardRef(({
 
                 await writable.write(JSON.stringify(message));
                 await writable.close();
-                const localCheckId = localStorageProviderMap.get(`@${selectToken}.ft.${inputIdsStr}.${user},lastCheckId`) || 0;
-                localStorageProviderMap.set(`@${selectToken}.ft.${inputIdsStr}.${user},lastCheckId`, localCheckId + 1);
+                const localCheckId = localStorageProviderMap.get(`@${selectToken}.${inputIdsStr}.${user},lastCheckId`) || 0;
+                localStorageProviderMap.set(`@${selectToken}.${inputIdsStr}.${user},lastCheckId`, localCheckId + 1);
             } catch (err) {
                 console.log(err);
                 hasError = true;

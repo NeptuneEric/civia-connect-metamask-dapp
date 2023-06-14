@@ -20,7 +20,6 @@ export const ReceipientNFT: FC<any> = forwardRef(({
     setStep,
     visible
 }, ref) => {
-    const [orderParts, setOrderParts] = useState<any[]>([]);
     const [signDataList, setSignDataList] = useState<any[]>([]);
     const [userCurrentIds, setUserCurrentIds] = useState<any[]>([]);
     const { signMessage: metaMaskSignMessage } = useSignMessage({
@@ -82,10 +81,10 @@ export const ReceipientNFT: FC<any> = forwardRef(({
 
         // key: id value: lastId
         const mapedRes = inputIds.reduce((pre: any, item: string, index: number) => {
-            const localLastCheckId = Number(localStorageProviderMap.get(`@${selectToken}.nft.${item}.${selectFriendNft[0]},lastCheckId`) || 0);
+            const localLastCheckId = Number(localStorageProviderMap.get(`@${selectToken}.${item}.${selectFriendNft[0]},lastCheckId`) || 0);
             const lastCheckId = Number(res[index].result);
             const computedLastCheckId = Math.max(localLastCheckId, lastCheckId);
-            localStorageProviderMap.set(`@${selectToken}.nft.${item}.${selectFriendNft[0]},lastCheckId`, computedLastCheckId);
+            localStorageProviderMap.set(`@${selectToken}.${item}.${selectFriendNft[0]},lastCheckId`, computedLastCheckId);
             return {
                 ...pre,
                 [item]: computedLastCheckId
@@ -113,7 +112,6 @@ export const ReceipientNFT: FC<any> = forwardRef(({
                     { value: userCurrentIds[index].currentId + 1, type: 'uint256' },
                     { value: inputAmountNft.toString(), type: 'uint256' }
                 ];
-                setOrderParts(orderParts);
                 const types = orderParts.map(o => o.type);
                 const values = orderParts.map(o => o.value);
                 const hash = ethers.utils.solidityKeccak256(types, values);
@@ -156,7 +154,7 @@ export const ReceipientNFT: FC<any> = forwardRef(({
             };
 
             const options = {
-                suggestedName: `${tokenInfo?.data?.tokenName || selectToken}_nft_${inputIds[index]}_${user}_${message.beginId}_${message.endId}.json`,
+                suggestedName: `${tokenInfo?.data?.tokenName || selectToken}_${inputIds[index]}_${user}_${message.beginId}_${message.endId}.json`,
                 types: [
                     {
                         description: 'Test files',
@@ -172,8 +170,8 @@ export const ReceipientNFT: FC<any> = forwardRef(({
 
                 await writable.write(JSON.stringify(message));
                 await writable.close();
-                const localCheckId = localStorageProviderMap.get(`@${selectToken}.nft.${inputIds[index]}.${user},lastCheckId`) || 0;
-                localStorageProviderMap.set(`@${selectToken}.nft.${inputIds[index]}.${user},lastCheckId`, localCheckId + 1);
+                const localCheckId = localStorageProviderMap.get(`@${selectToken}.${inputIds[index]}.${user},lastCheckId`) || 0;
+                localStorageProviderMap.set(`@${selectToken}.${inputIds[index]}.${user},lastCheckId`, localCheckId + 1);
             } catch (err) {
                 console.log(err);
                 hasError = true;
