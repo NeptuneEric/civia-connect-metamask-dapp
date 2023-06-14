@@ -5,9 +5,10 @@ import { ethers } from 'ethers';
 
 export const InputTags: FC<{
     value?: string[],
+    single?: boolean,
     onChange: (newTags: string[]) => void
 }> = (props) => {
-    const { value = [], onChange } = props;
+    const { value = [], single = false, onChange } = props;
     const [tags, setTags] = useState(Array.from(new Set(value as string[])));
     const [inputVal, setInputVal] = useState('');
     //
@@ -38,7 +39,7 @@ export const InputTags: FC<{
                     })
                 }
                 {
-                    tags.length > 0 ? (
+                    single && tags.length > 0 ? (
                         null
                     ) : (
                         <List.Item>
