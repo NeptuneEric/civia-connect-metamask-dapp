@@ -1,5 +1,5 @@
 import { FC, useEffect, useState, useRef, ReactElement, useImperativeHandle, forwardRef, useMemo } from 'react';
-import { Spin, Button, List, message, Space, Card, Modal, notification } from 'antd';
+import { Spin, Button, List, message, Space, Card, Modal, notification, Table } from 'antd';
 import { CheckOutlined } from '@ant-design/icons';
 import { useConnect, useAccount, useSignMessage } from 'wagmi';
 import { writeContract } from '@wagmi/core';
@@ -20,6 +20,8 @@ import styles from './index.module.css';
 const CIVIA_ERC20_CONTRACT_ADDRESS = '0x9EeBE54154EF15a476B2CD731e48607f67Eace62';
 
 const localStorageProviderMap = localStorageProvider();
+
+const { Column } = Table;
 
 const useGetERCMessageUnMint = () => {
     const [data, setData] = useState<any[]>();
@@ -98,21 +100,7 @@ const TokenItem: FC<any> = ({ item, onSigned }) => {
         setStep(0);
     };
 
-    const { beginId, endId } = item.content;
-
-    return (
-        <>
-            <List.Item
-                extra={<div>
-                    {
-                        step === 0 ? (<Button size='small' onClick={handleSignData}>Sign</Button>) : (<CheckOutlined className={styles.successIcon} onClick={handleDelSignData} />)
-                    }
-                </div>}
-            >
-                <div><label className={styles.label} >{beginId === endId ? beginId : `${beginId}-${endId}`}:</label>{item.content.amt}</div>
-            </List.Item>
-        </>
-    );
+    return step === 0 ? (<Button size='small' onClick={handleSignData}>Sign</Button>) : (<CheckOutlined className={styles.successIcon} onClick={handleDelSignData} />);
 };
 
 const ERC20CheckList: FC<any> = forwardRef((props, ref) => {
@@ -325,38 +313,43 @@ const ERC20Mint: FC<any> = () => {
                             filterMessageList.map((item: any, index: number) => {
                                 return (
                                     <div key={item[0].content.tokenAddr}>
-                                        <Card title={
-                                            <>
-                                                <ERC1155TokenInfo tokenAddress={item[0].content.tokenAddr}>
-                                                    {
-                                                        (tokeName: string, tokenSymbol: string, formatAddr: string) => {
-                                                            return <span><label className={styles.label}>Token:</label>{`${tokeName} (${tokenSymbol}) ${formatAddr}`}&nbsp;&nbsp;</span>;
+                                        <Table
+                                            title={() => (
+                                                <h3>
+                                                    <ERC1155TokenInfo tokenAddress={item[0].content.tokenAddr}>
+                                                        {
+                                                            (tokeName: string, tokenSymbol: string, formatAddr: string) => {
+                                                                return <span><label className={styles.label}>Token:</label>{`${tokeName} (${tokenSymbol}) ${formatAddr}`}&nbsp;&nbsp;</span>;
+                                                            }
                                                         }
-                                                    }
-                                                </ERC1155TokenInfo>
-                                                <ERC1155TokenBalance tokenAddress={item[0].content.tokenAddr} tokenIds={item.map((item0: any) => item0.content.tokenId)} userAddress={metamaskAddress}>
-                                                    {
-                                                        (res: any) => {
-                                                            return res ? <code>{`Balance: ${res}`}</code> : null;
+                                                    </ERC1155TokenInfo>
+                                                    <span style={{ float: 'right' }}>
+                                                        {
+                                                            item.length > 1 ? <Button type="link" onClick={() => { handlePackAll(item[0].content.tokenAddr); }}>Bundle checks</Button> : null
                                                         }
-                                                    }
-                                                </ERC1155TokenBalance>
-                                            </>
-                                        }
-                                        extra={
-                                            item.length > 1 ? <Button type="link" onClick={() => { handlePackAll(item[0].content.tokenAddr); }}>Bundle checks</Button> : null
-                                            // <Checkbox onChange={handleSelectAll} checked={item.every((su: any) => su.customContent)}>Select all</Checkbox>
-                                        }
-                                        >
-                                            <List.Item><label className={styles.label}>Amount:</label></List.Item>
-                                            {
+                                                    </span>
+                                                </h3>
+                                            )}
+                                            bordered
+                                            dataSource={
                                                 item.map((subItem: any, subIndex: number) => {
-                                                    return (
-                                                        <TokenItem item={subItem} key={subItem.content.tokenAddr + subIndex} onSigned={handleSignedCreater(subItem.content.tokenAddr, subIndex)} />
-                                                    );
+                                                    const { beginId, endId, tokenId, amt } = subItem.content;
+                                                    return {
+                                                        tokenId,
+                                                        amount: amt,
+                                                        checkId: beginId === endId ? beginId : `${beginId}-${endId}`,
+                                                        signBtn: <TokenItem item={subItem} onSigned={handleSignedCreater(subItem.content.tokenAddr, subIndex)} />
+                                                    };
                                                 })
                                             }
-                                        </Card>
+                                            pagination={false}
+                                            style={{ width: '100%' }}
+                                        >
+                                            <Column title="Token Id" dataIndex="tokenId" key="tokenId" width={160} />
+                                            <Column title="Check Id" dataIndex="checkId" key="checkId" width={160} />
+                                            <Column title="Amount" dataIndex="amount" key="amount" width={160} />
+                                            <Column title="" dataIndex="signBtn" key="signBtn" align="right" />
+                                        </Table>
                                         <br />
                                     </div>
                                 );
