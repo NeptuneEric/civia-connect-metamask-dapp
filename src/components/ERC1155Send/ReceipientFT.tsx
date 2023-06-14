@@ -3,10 +3,10 @@ import { Form, Input } from 'antd';
 import { InputTags } from '../../components/InputTags';
 import { ERC1155TokenInfo } from '../../components/ERC1155TokenInfo';
 import CiviaERC1155Check from '../../../abi/CiviaERC1155Check.json';
-import { readContract, multicall } from '@wagmi/core';
+import { multicall } from '@wagmi/core';
 import { localStorageProvider } from '../../lib/localStorageProvider';
 import { ethers } from 'ethers';
-import { useConnect, useAccount, useSignMessage } from 'wagmi';
+import { useSignMessage } from 'wagmi';
 
 const CIVIA_ERC20_CONTRACT_ADDRESS = '0x9EeBE54154EF15a476B2CD731e48607f67Eace62';
 const localStorageProviderMap = localStorageProvider();
