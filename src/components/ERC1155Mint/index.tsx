@@ -17,7 +17,7 @@ import CiviaERC1155Check from '../../../abi/CiviaERC1155Check.json';
 
 import styles from './index.module.css';
 
-const CIVIA_ERC20_CONTRACT_ADDRESS = '0x37898De1854a096E5679c711EDf92b5Aaf2eADd1';
+const CIVIA_ERC20_CONTRACT_ADDRESS = '0xFB85425B4b9bd96AFAC83bb1f756B8A1b8B6A3Ae';
 
 const localStorageProviderMap = localStorageProvider();
 

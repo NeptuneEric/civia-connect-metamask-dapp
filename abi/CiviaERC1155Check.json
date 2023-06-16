@@ -100,7 +100,7 @@
           "type": "uint256"
         }
       ],
-      "name": "register",
+      "name": "registerFungible",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -128,7 +128,7 @@
           "type": "uint256"
         }
       ],
-      "name": "registerTokenRange",
+      "name": "registerNonFungible",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

@@ -9,7 +9,7 @@ import TestToken from '../../../abi/TestToken.json';
 
 import styles from './index.module.css';
 
-const CIVIA_ERC20_CONTRACT_ADDRESS = '0x37898De1854a096E5679c711EDf92b5Aaf2eADd1';
+const CIVIA_ERC20_CONTRACT_ADDRESS = '0xFB85425B4b9bd96AFAC83bb1f756B8A1b8B6A3Ae';
 
 const Erc20Create: NextPage = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -118,12 +118,12 @@ const Erc20Create: NextPage = () => {
                 ? writeContract({
                     address: CIVIA_ERC20_CONTRACT_ADDRESS,
                     abi: CiviaERC1155Check.abi,
-                    functionName: 'register',
+                    functionName: 'registerFungible',
                     args: [testTokenAddress, testTokenAdmin, testTokenId, testTokenAmount]
                 }) : writeContract({
                     address: CIVIA_ERC20_CONTRACT_ADDRESS,
                     abi: CiviaERC1155Check.abi,
-                    functionName: 'registerTokenRange',
+                    functionName: 'registerNonFungible',
                     args: [testTokenAddress, testTokenAdmin, testTokenFromId, testTokenToId]
                 })
             ).then((res) => {
