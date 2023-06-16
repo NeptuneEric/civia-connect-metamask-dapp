@@ -226,7 +226,7 @@ export const ReceipientNFT: FC<any> = forwardRef(({
                 name="inputAmountNft"
                 initialValue={1}
             >
-                <Input />
+                <Input readOnly />
             </Form.Item>
             <Form.Item
                 label="Receipient(s)"
